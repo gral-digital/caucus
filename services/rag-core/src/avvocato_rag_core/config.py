@@ -59,6 +59,14 @@ class Settings(BaseSettings):
     embedding_dim: int = 1024
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
 
+    # Ollama (dev locale: zero cloud, zero costi)
+    ollama_base_url: str = "http://localhost:11434"
+    ollama_llm_model: str = "qwen3:8b"
+    ollama_embedding_model: str = "bge-m3"
+    # Backend selection: 'ollama' | 'vertex' | 'local'
+    embedding_backend: str = "ollama"
+    llm_backend: str = "ollama"
+
     # GCP
     gcp_project: str | None = None
     gcp_region: str = "europe-west1"

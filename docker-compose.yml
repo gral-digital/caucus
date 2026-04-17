@@ -8,9 +8,12 @@ services:
       POSTGRES_USER: avvocato
       POSTGRES_PASSWORD: avvocato
       POSTGRES_DB: avvocato
-      POSTGRES_INITDB_ARGS: "--locale=it_IT.UTF-8 --lc-collate=it_IT.UTF-8 --lc-ctype=it_IT.UTF-8 --encoding=UTF8"
+      # NB: il container pgvector:pg16 è su Debian slim e non ha la locale it_IT.
+      # Usiamo C.UTF-8 (universale). La text-search config italiana usa la
+      # dictionary 'italian' interna di Postgres, che non dipende dalla locale OS.
+      POSTGRES_INITDB_ARGS: "--locale=C.UTF-8 --encoding=UTF8"
     ports:
-      - "5432:5432"
+      - "55432:5432"   # host 55432 → container 5432 (5432/5433 già occupati sul Mac)
     volumes:
       - pg_data:/var/lib/postgresql/data
       - ./infra/local/postgres/init:/docker-entrypoint-initdb.d:ro

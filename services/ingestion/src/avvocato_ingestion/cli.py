@@ -171,9 +171,22 @@ async def _run_ingest(codice: str, from_fixture: bool, skip_embeddings: bool) ->
     vectorstore: QdrantStore | None = None
 
     if not skip_embeddings:
-        from avvocato_rag_core.embeddings.local import LocalBGEM3Provider
+        backend = settings.embedding_backend.lower()
+        if backend == "ollama":
+            from avvocato_rag_core.embeddings.ollama import OllamaEmbeddingProvider
 
-        embedder = LocalBGEM3Provider(model_name=settings.embedding_model)
+            embedder = OllamaEmbeddingProvider(
+                base_url=settings.ollama_base_url,
+                model=settings.ollama_embedding_model,
+                dense_dim=settings.embedding_dim,
+            )
+        elif backend == "local":
+            from avvocato_rag_core.embeddings.local import LocalBGEM3Provider
+
+            embedder = LocalBGEM3Provider(model_name=settings.embedding_model)
+        else:
+            raise RuntimeError(f"Unsupported embedding backend for CLI: {backend!r}")
+
         vectorstore = QdrantStore(
             url=settings.qdrant_url,
             api_key=settings.qdrant_api_key,

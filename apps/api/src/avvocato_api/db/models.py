@@ -65,10 +65,12 @@ class NormPartition(Base):
     __tablename__ = "norm_partition"
     __table_args__ = (
         Index("ix_norm_partition_source_kind_number", "source_id", "kind", "number"),
+        # path è VARCHAR (non ltree) in Fase 1 — vedi commento nella migration.
         Index(
             "ix_norm_partition_path",
             "path",
-            postgresql_using="gist",
+            postgresql_using="gin",
+            postgresql_ops={"path": "gin_trgm_ops"},
         ),
         CheckConstraint(
             "kind IN ('libro','titolo','capo','sezione','articolo','disposizione-transitoria')",

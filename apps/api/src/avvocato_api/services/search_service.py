@@ -21,10 +21,33 @@ from avvocato_rag_core.vectorstore.qdrant_store import QdrantStore
 
 @lru_cache(maxsize=1)
 def _get_embedder() -> EmbeddingProvider:
-    # Lazy: import qui per evitare import di torch quando non serve.
-    from avvocato_rag_core.embeddings.local import LocalBGEM3Provider
+    """Factory per il backend di embedding selezionato via env.
 
-    return LocalBGEM3Provider(model_name=get_settings().embedding_model)
+    - ``ollama`` (default dev): chiama http://localhost:11434 — niente torch.
+    - ``local``: FlagEmbedding bge-m3 in-process (richiede torch + transformers).
+    - ``vertex``: Vertex AI publisher endpoint (per prod).
+    """
+    settings = get_settings()
+    backend = settings.embedding_backend.lower()
+
+    if backend == "ollama":
+        from avvocato_rag_core.embeddings.ollama import OllamaEmbeddingProvider
+
+        return OllamaEmbeddingProvider(
+            base_url=settings.ollama_base_url,
+            model=settings.ollama_embedding_model,
+            dense_dim=settings.embedding_dim,
+        )
+    if backend == "local":
+        # Import lazy per non forzare torch quando non serve.
+        from avvocato_rag_core.embeddings.local import LocalBGEM3Provider
+
+        return LocalBGEM3Provider(model_name=settings.embedding_model)
+    if backend == "vertex":
+        raise NotImplementedError(
+            "VertexEmbeddingProvider richiede access_token_factory; config TBD in prod."
+        )
+    raise ValueError(f"Unknown embedding_backend: {backend!r}")
 
 
 @lru_cache(maxsize=1)

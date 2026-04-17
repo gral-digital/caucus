@@ -49,7 +49,7 @@ def get_vectorstore() -> QdrantStore:
 
 
 @lru_cache(maxsize=1)
-def get_corpus_map(_: Settings | None = None) -> dict[CorpusFilter, str]:
+def get_corpus_map() -> dict[CorpusFilter, str]:
     settings = get_settings()
     return {
         CorpusFilter.CODICI: settings.qdrant_collection_codici,
@@ -60,7 +60,15 @@ def get_corpus_map(_: Settings | None = None) -> dict[CorpusFilter, str]:
 
 @lru_cache(maxsize=1)
 def get_llm_router() -> LLMRouter:
+    """Router LLM. In dev locale usa Ollama via LiteLLM (no cloud, no API key)."""
     settings = get_settings()
+    if settings.llm_backend.lower() == "ollama":
+        # LiteLLM accetta "ollama/<model>" per chiamare ollama local.
+        return LLMRouter(
+            primary_model=f"ollama/{settings.ollama_llm_model}",
+            fallback_model=None,
+            extra_params={"api_base": settings.ollama_base_url},
+        )
     return LLMRouter(
         primary_model=settings.llm_primary_model,
         fallback_model=settings.llm_fallback_model,

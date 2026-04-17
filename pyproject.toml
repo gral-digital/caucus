@@ -14,7 +14,8 @@ members = [
 ]
 
 [tool.uv.sources]
-rag-core = { workspace = true }
+avvocato-rag-core = { workspace = true }
+avvocato-ingestion = { workspace = true }
 
 [tool.ruff]
 line-length = 100

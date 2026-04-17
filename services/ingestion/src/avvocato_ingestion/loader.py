@@ -12,6 +12,7 @@ versioning documentato in docs/DATA_MODEL.md §5.
 
 from __future__ import annotations
 
+import time
 from uuid import uuid4
 
 import structlog
@@ -224,32 +225,59 @@ class Loader:
             )
 
     async def _embed_and_index_chunks(self, chunks: list[BuiltChunk]) -> None:
-        texts = [c.text for c in chunks]
-        vectors = await self._embedder.embed(texts, kind="passage")
+        """Processa i chunk in micro-batch per resilienza e visibilità.
 
-        # Persistenza Postgres
-        for chunk in chunks:
-            self._s.add(
-                NormChunk(
-                    id=chunk.id,
-                    partition_id=chunk.partition_id,
-                    comma_id=chunk.comma_id,
-                    chunk_kind=chunk.chunk_kind.value,
-                    text=chunk.text,
-                    token_count=chunk.token_count,
-                    qdrant_point_id=chunk.id,
-                    metadata_=chunk.metadata,
+        Strategia: N chunk alla volta → embed → persist Postgres → upsert Qdrant
+        → commit parziale. Se un batch fallisce il resto del codice è già al
+        sicuro su disco e posso ripartire dal checkpoint.
+        """
+        # Micro-batch scelto per ottimizzare throughput Ollama su Apple Silicon:
+        # 64 chunk ≈ una richiesta embed di ~30k token, comfort zone per bge-m3.
+        micro_batch = 64
+        total = len(chunks)
+        start_time = time.perf_counter()
+
+        for i in range(0, total, micro_batch):
+            batch = chunks[i : i + micro_batch]
+            texts = [c.text for c in batch]
+            vectors = await self._embedder.embed(texts, kind="passage")
+
+            for chunk in batch:
+                self._s.add(
+                    NormChunk(
+                        id=chunk.id,
+                        partition_id=chunk.partition_id,
+                        comma_id=chunk.comma_id,
+                        chunk_kind=chunk.chunk_kind.value,
+                        text=chunk.text,
+                        token_count=chunk.token_count,
+                        qdrant_point_id=chunk.id,
+                        metadata_=chunk.metadata,
+                    )
                 )
-            )
-        await self._s.flush()
+            await self._s.flush()
 
-        # Upsert Qdrant
-        await self._vs.upsert(
-            collection=self._collection,
-            ids=[c.id for c in chunks],
-            embeddings=vectors,
-            payloads=[{**c.metadata, "text": c.text} for c in chunks],
-        )
+            await self._vs.upsert(
+                collection=self._collection,
+                ids=[c.id for c in batch],
+                embeddings=vectors,
+                payloads=[{**c.metadata, "text": c.text} for c in batch],
+            )
+            # Commit parziale: se l'ingestione si interrompe, il lavoro fatto resta.
+            await self._s.commit()
+
+            done = i + len(batch)
+            elapsed = time.perf_counter() - start_time
+            rate = done / elapsed if elapsed > 0 else 0.0
+            eta = (total - done) / rate if rate > 0 else 0.0
+            logger.info(
+                "loader.batch_done",
+                done=done,
+                total=total,
+                pct=f"{100 * done / total:.1f}%",
+                rate_per_sec=f"{rate:.1f}",
+                eta_sec=int(eta),
+            )
 
 
 # ----------------------------------------------------------------------

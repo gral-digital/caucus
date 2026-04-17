@@ -82,9 +82,17 @@ def upgrade() -> None:
         "norm_partition",
         ["source_id", "kind", "number"],
     )
-    # Conversione manuale a ltree e indice GiST (ltree non è un tipo SA-supportato nativo)
-    op.execute("ALTER TABLE norm_partition ALTER COLUMN path TYPE ltree USING path::ltree")
-    op.execute("CREATE INDEX ix_norm_partition_path ON norm_partition USING gist(path)")
+    # NB: la colonna `path` è VARCHAR per Fase 1. Quando ci serviranno query
+    # di gerarchia (ancestor/descendant) faremo una migration dedicata che la
+    # convertirà a ltree + aggiunge indice GiST. Per ora indicizzazione trigram
+    # è sufficiente e non richiede cast lato driver async.
+    op.create_index(
+        "ix_norm_partition_path",
+        "norm_partition",
+        ["path"],
+        postgresql_using="gin",
+        postgresql_ops={"path": "gin_trgm_ops"},
+    )
 
     # ---- norm_comma ----
     op.create_table(
