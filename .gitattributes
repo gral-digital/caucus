@@ -1,0 +1,18 @@
+# Fixture AKN XML: sono snapshot rigenerabili ma li committiamo per test offline.
+# Taggati come generated così non inquinano i language stats del repo.
+# (Non usiamo git-lfs: i file sono ~14 MB totali, accettabile senza LFS.)
+data/fixtures/**/*.xml linguist-generated text eol=lf diff=xml
+
+# Python
+*.py text eol=lf diff=python
+# TS/JS
+*.ts text eol=lf
+*.tsx text eol=lf
+*.js text eol=lf
+*.mjs text eol=lf
+*.json text eol=lf
+# Config
+*.yml text eol=lf
+*.yaml text eol=lf
+*.toml text eol=lf
+*.md text eol=lf

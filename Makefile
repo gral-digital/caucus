@@ -32,11 +32,23 @@ migrate:  ## Applica migration Postgres
 migrate-new:  ## Crea nuova migration (usage: make migrate-new msg="descrizione")
 	cd apps/api && uv run alembic revision --autogenerate -m "$(msg)"
 
-seed-codice-civile:  ## Scarica e indicizza Codice Civile da Normattiva
-	uv run -m avvocato_ingestion.sources.normattiva --codice civile
+fetch-codici:  ## Scarica AKN XML di CC + CP e salva come fixture (richiede rete)
+	uv run avvocato-ingest fetch --codice cc
+	uv run avvocato-ingest fetch --codice cp
 
-seed-codice-penale:  ## Scarica e indicizza Codice Penale da Normattiva
-	uv run -m avvocato_ingestion.sources.normattiva --codice penale
+seed-codice-civile:  ## Indicizza Codice Civile (usa fixture se presente, altrimenti scarica)
+	uv run avvocato-ingest ingest --codice cc --from-fixture
+
+seed-codice-penale:  ## Indicizza Codice Penale (usa fixture se presente, altrimenti scarica)
+	uv run avvocato-ingest ingest --codice cp --from-fixture
+
+seed-codici-fast:  ## Indicizza entrambi i codici SENZA embeddings (Postgres-only, 10× più veloce)
+	uv run avvocato-ingest ingest --codice cc --from-fixture --skip-embeddings
+	uv run avvocato-ingest ingest --codice cp --from-fixture --skip-embeddings
+
+parse-codici:  ## Parse-only (nessuna persistenza); verifica conteggio articoli
+	uv run avvocato-ingest parse --codice cc
+	uv run avvocato-ingest parse --codice cp
 
 lint:  ## Lint (Python + TS)
 	uv run ruff check .

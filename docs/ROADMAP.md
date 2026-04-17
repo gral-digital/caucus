@@ -16,9 +16,12 @@ i moduli si sbloccano in parallelo perché riusano lo stesso motore.
 - [x] Ingestion scaffold Normattiva
 - [x] Next.js 15 chat UI con citazioni cliccabili
 - [x] Terraform minimo GCP `europe-west1`
-- [ ] Parser AkomaNtoso XML *completo* per Normattiva (ora scaffold)
-- [ ] Primo seed funzionante: almeno Codice Civile + Penale indicizzati
+- [x] Parser AkomaNtoso XML completo per Normattiva (CC + CP, 92% rubrica coverage)
+- [x] Fixture committati di CC + CP (snapshot 2026-04-17) per test offline
+- [x] Suite di test pytest sul parser (unit + fixture-based con articoli sentinel)
+- [ ] Primo seed funzionante end-to-end: CC + CP indicizzati in Postgres + Qdrant
 - [ ] Deploy `dev` su Cloud Run
+- [ ] Arricchimento gerarchia Libro/Titolo/Capo (parsing indice HTML Normattiva)
 
 ### M2 — "Chiedi al Codice" GA
 - [ ] Auth (Clerk o Auth.js)

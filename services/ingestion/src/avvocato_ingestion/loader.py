@@ -42,18 +42,30 @@ class Loader:
         self,
         *,
         session: AsyncSession,
-        embedder: EmbeddingProvider,
-        vectorstore: QdrantStore,
+        embedder: EmbeddingProvider | None,
+        vectorstore: QdrantStore | None,
         qdrant_collection: str,
+        skip_embeddings: bool = False,
     ) -> None:
+        if not skip_embeddings and (embedder is None or vectorstore is None):
+            raise ValueError(
+                "embedder e vectorstore sono richiesti se skip_embeddings=False"
+            )
         self._s = session
         self._embedder = embedder
         self._vs = vectorstore
         self._collection = qdrant_collection
+        self._skip_embeddings = skip_embeddings
 
     async def load(self, act: CanonicalAct) -> None:
-        logger.info("loader.start", urn=act.urn, short_id=act.short_id)
-        await self._vs.ensure_collection(self._collection)
+        logger.info(
+            "loader.start",
+            urn=act.urn,
+            short_id=act.short_id,
+            skip_embeddings=self._skip_embeddings,
+        )
+        if not self._skip_embeddings and self._vs is not None:
+            await self._vs.ensure_collection(self._collection)
 
         source = await self._upsert_source(act)
         all_chunks: list[BuiltChunk] = []
@@ -73,15 +85,37 @@ class Loader:
 
         await self._s.flush()
 
-        if all_chunks:
+        if all_chunks and not self._skip_embeddings:
             await self._embed_and_index_chunks(all_chunks)
+        elif all_chunks:
+            # Skip embeddings: persistiamo solo norm_chunk con qdrant_point_id=id.
+            # Permette di fare un reindex dopo con un worker dedicato.
+            await self._persist_chunks_without_embeddings(all_chunks)
 
         logger.info(
             "loader.done",
             urn=act.urn,
             chunks=len(all_chunks),
-            collection=self._collection,
+            indexed_qdrant=not self._skip_embeddings,
         )
+
+    async def _persist_chunks_without_embeddings(
+        self, chunks: list[BuiltChunk]
+    ) -> None:
+        for chunk in chunks:
+            self._s.add(
+                NormChunk(
+                    id=chunk.id,
+                    partition_id=chunk.partition_id,
+                    comma_id=chunk.comma_id,
+                    chunk_kind=chunk.chunk_kind.value,
+                    text=chunk.text,
+                    token_count=chunk.token_count,
+                    qdrant_point_id=chunk.id,
+                    metadata_=chunk.metadata,
+                )
+            )
+        await self._s.flush()
 
     # ------------------------------------------------------------------
 

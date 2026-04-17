@@ -1,91 +1,180 @@
 # Ingestion
 
-Pipeline di ingestione delle fonti normative e giurisprudenziali. Il design è **idempotente**, **versionato** e **diff-aware**: ri-eseguire l'ingestione aggiorna solo ciò che è cambiato.
+Pipeline di ingestione delle fonti normative italiane. Idempotente, versionata, diff-aware.
 
-## 1. Pipeline generica
+## 1. Fonti primarie
+
+| Fonte | Formato | Uso | Status |
+|-------|---------|-----|--------|
+| **Normattiva** (`normattiva.it`) | **Akoma Ntoso 3.0 XML** | Codici, leggi, d.lgs. | ✅ Implementato |
+| Cassazione (italgiure) | HTML + PDF (Docling) | Sentenze, massime | Fase 4 |
+| Gazzetta Ufficiale | HTML + RSS | Monitoring modifiche | Fase 4 |
+| Documenti del tenant | PDF/DOCX via Docling | Cartelle clienti | Fase 2 |
+
+**Scelta Normattiva AKN**: vedi [ADR-0002](ADR/0002-normattiva-akn.md) per il
+rationale. In sintesi: unica fonte autorevole + pubblico dominio + gerarchia
+machine-readable (formato OASIS).
+
+## 2. Pipeline generica
 
 ```
-source fetcher → validator (hash) → parser (→ canonical AST)
-               → chunker (legal-aware) → embedder (bge-m3)
-               → postgres upsert (norm_*)  + qdrant upsert
-               → reindex FTS                + citation resolver
-               → sanity checks (count, coverage)
+fetch → cache (GCS/local) → validate (hash, size)
+      → parse (→ CanonicalAct)
+      → chunk (legal-aware: articolo-full + per-comma + window)
+      → embed (bge-m3)
+      → upsert Postgres (norm_source, norm_partition, norm_comma, norm_chunk)
+      → upsert Qdrant (collection: codici / leggi / cassazione)
+      → sanity checks (coverage, count)
 ```
 
-Ogni stadio scrive snapshot in `data/sources/<source>/<timestamp>/`, così possiamo rollback e rerun parziali.
+Ogni stadio scrive snapshot in `data/sources/<source>/<timestamp>/`, così si
+può fare rollback e rerun parziali.
 
-## 2. Normattiva (Codici, Leggi)
+## 3. Normattiva — Akoma Ntoso XML
 
-**URL pattern**: `https://www.normattiva.it/uri-res/N2Ls?urn:nir:stato:codice.civile`
+### URN supportati
 
-**Formato preferito**: AkomaNtoso XML quando esposto (rotta `/eli/…`). Fallback HTML parsing con BeautifulSoup.
+| Codice | URN | short_id |
+|--------|-----|----------|
+| Civile | `urn:nir:stato:regio.decreto:1942-03-16;262` | `cc` |
+| Penale | `urn:nir:stato:regio.decreto:1930-10-19;1398` | `cp` |
+| Procedura Civile | `urn:nir:stato:regio.decreto:1940-10-28;1443` | `cpc` |
+| Procedura Penale | `urn:nir:stato:decreto.del.presidente.della.repubblica:1988-09-22;447` | `cpp` |
 
-**Rispetto robots.txt + rate limiting**: max 1 req/s, User-Agent identificabile, retry con backoff esponenziale.
+### Protocollo di download
 
-**Parser**: produce `CanonicalAct` (Pydantic model in `services/ingestion/avvocato_ingestion/parsers/canonical.py`) che normalizza libro/titolo/capo/sezione/articolo/comma indipendentemente dal formato sorgente.
+Normattiva **richiede una sessione cookie** — il link diretto a `caricaAKN`
+non funziona senza aver prima visitato il permalink.
 
-**Versioning**: se il testo di un articolo cambia rispetto all'ultima ingestione, si crea un nuovo record con `effective_from = <data modifica>` e si chiude quello vecchio con `effective_to`.
+1. **Pagina permalink** (necessaria per i cookie di sessione):
+   ```
+   GET https://www.normattiva.it/uri-res/N2Ls?{urn}
+   ```
+   Nell'HTML c'è un link `caricaAKN?dataGU=...&codiceRedaz=...&dataVigenza=...`.
+   Estraiamo i tre parametri via regex.
 
-### Comando
+2. **Download AKN XML**:
+   ```
+   GET https://www.normattiva.it/do/atto/caricaAKN?dataGU=X&codiceRedaz=Y&dataVigenza=Z
+   ```
+   Risposta: `application/xml` Akoma Ntoso 3.0.
+
+Implementazione: [`services/ingestion/src/avvocato_ingestion/fetchers/normattiva.py`](../services/ingestion/src/avvocato_ingestion/fetchers/normattiva.py).
+
+### Struttura AKN Normattiva
+
+Normattiva serializza l'AKN in un formato "flat":
+- `<akomaNtoso>` → `<act>` → `<attachments>` → N `<attachment>` (uno per articolo)
+- Ogni `<attachment>` contiene un `<doc name="CODICE CIVILE-art. 2043">` con
+  un singolo `<mainBody><paragraph><content><p>` che tiene TUTTO il testo
+  dell'articolo (rubrica + commi concatenati con `\n \n`).
+- Il testo usa `(( ... ))` per marcare passaggi introdotti da modifiche.
+- Dopo il testo vigente, Normattiva accoda note `-----------\nAGGIORNAMENTO (N)`
+  con descrizione delle modifiche storiche — il parser le separa in metadata.
+
+La gerarchia Libro/Titolo/Capo/Sezione **non** è codificata a livello di
+articolo nell'XML servito da Normattiva. Il parser iniziale flattisce tutti
+gli articoli sotto un'unica root. Arricchimento gerarchico previsto in fase 2.
+
+### Coverage attuale (fixture 2026-04-17)
+
+| Codice | Articoli totali | Articoli attivi | Rubriche riconosciute |
+|--------|----------------:|----------------:|----------------------:|
+| CC | 3261 | 2946 | 2728 / 2946 = **92.6%** |
+| CP | 987  | 768  | 699 / 768 = **91.0%** |
+
+Le rubriche non riconosciute cadono quasi tutte su articoli abrogati/soppressi
+(che non hanno più rubrica per definizione).
+
+## 4. Comandi
+
+### Scaricare fixture (con connessione)
+
 ```bash
-make seed-codice-civile
-make seed-codice-penale
-# oppure arbitrario:
-uv run -m avvocato_ingestion.sources.normattiva --urn urn:nir:stato:codice.civile
+# Scarica e salva XML AKN sotto data/fixtures/normattiva/
+make fetch-codici
+# oppure singolo:
+uv run avvocato-ingest fetch --codice cc
 ```
 
-## 3. Cassazione (italgiure)
+### Parse-only (sanity check)
 
-**Fonte**: `https://www.italgiure.giustizia.it/sncass/` (Cassazione SN — sentenze e massime).
+```bash
+make parse-codici
+# Output:
+# ✓ cc parsato: 3261 articoli, 2838 con rubrica (87.0%)
+# ✓ cp parsato: 987 articoli, 827 con rubrica (83.8%)
+```
 
-**Accesso**: richiede user-agent pulito; non è permesso lo scraping massivo aggressivo. Strategia:
-- **Massime** (CED): se disponibile export XML/JSON (esistono API CED per istituzioni; da richiedere), preferirlo a scraping.
-- **Sentenze integrali**: fetch incrementale (ultime N giorni) + ingestione on-demand.
+### Ingestion completa (Postgres + Qdrant)
 
-**Parsing sentenze PDF**: Docling → struttura (intestazione, motivi in fatto, motivi in diritto, PQM).
+```bash
+# Richiede `make up` già attivo (Postgres, Qdrant) e `make migrate` già eseguito.
+make seed-codice-civile   # CC
+make seed-codice-penale   # CP
+```
 
-**Privacy**: rimozione di nomi parti *non* necessaria sui dati Cassazione pubblicati (sono già anonimizzati dalla Corte), ma hashing comunque dei nomi rimanenti per dedup.
+### Ingestion veloce senza embedding (iterazione dev)
 
-## 4. Gazzetta Ufficiale (opzionale fase 4+)
+```bash
+make seed-codici-fast
+# Popola norm_source/partition/comma/chunk in Postgres
+# ma non calcola embedding né fa upsert su Qdrant.
+# Usare dopo: reindex con worker dedicato.
+```
 
-Feed RSS quotidiano + download PDF. Solo atti di pubblicazione normativa rilevanti (codici, leggi, d.lgs., d.l.). Serve principalmente come **trigger di update** su norme esistenti.
-
-## 5. Documenti del tenant (fase 2+)
-
-Upload PDF/DOCX/EML via UI → GCS bucket per-tenant → Cloud Tasks enqueues ingestion job → Docling parse → chunking + embedding → Qdrant collection tenant.
-
-**Quarantine**: antivirus scan (ClamAV o Google Chronicle) prima di aprire il file. Rifiuto se >100MB senza piano enterprise.
-
-## 6. Connectors enterprise (fase 5+)
-
-Integrazione **Onyx** come gateway connettori (Drive, SharePoint, OneDrive, Confluence, Notion, Email). Onyx gestisce OAuth, incremental sync, change detection. Noi consumiamo il suo output normalizzato e lo passiamo al nostro chunker legal-aware.
-
-Perché Onyx e non reimplementare: 40+ connettori già testati in produzione, auth flows consolidati, delta sync robusto.
-
-## 7. Schema di chunking legal-aware
+## 5. Chunking legal-aware
 
 Tre livelli di chunk per ogni articolo, tutti indicizzati:
 
-1. **Articolo completo** (`articolo-full`): un chunk = testo dell'intero articolo + rubrica. Buono per query "cos'è l'art. 2043".
-2. **Comma singolo** (`comma`): un chunk per comma. Buono per query fine-grained.
-3. **Window scorrevole** (`window`): finestra 512 token con overlap 64, solo per articoli molto lunghi (>2k token). Buono per ricerche in linguaggio naturale che non mappano a struttura.
+1. **Articolo completo** (`articolo-full`): rubrica + tutti i commi. Buono per
+   query del tipo "cos'è l'art. 2043".
+2. **Comma singolo** (`comma`): un chunk per comma. Fine-grained.
+3. **Window scorrevole** (`window`): finestra 2048 char / overlap 256, solo
+   per articoli molto lunghi (>2k token). Coprire ricerche in linguaggio
+   naturale che non mappano a una struttura precisa.
 
-Il retriever fa hybrid search su tutti, reranker sceglie i migliori, l'expander Postgres recupera il contesto gerarchico (articoli adiacenti, rubrica, commi fratelli).
+Il retriever fa hybrid search su tutti; il reranker sceglie; l'expander
+Postgres recupera il contesto gerarchico (articoli adiacenti, rubrica).
 
-## 8. Quality checks post-ingestion
+Dettaglio: `services/ingestion/src/avvocato_ingestion/chunker.py`.
 
-Dopo ogni run:
-- Conteggio articoli per codice vs reference golden (es. Codice Civile ≈ 2969 articoli).
-- Coverage citation resolver: % di citazioni interne risolte.
-- Sample 10 articoli casuali → render markdown → ispezione manuale periodica.
-- Embedding drift: distanza media tra embedding nuovi e vecchi sugli stessi articoli non modificati (deve essere ≈ 0).
+## 6. Versioning
 
-## 9. Schedule
+Ogni `norm_partition` e `norm_comma` ha `effective_from` / `effective_to`.
+Quando Normattiva serve una versione con testo cambiato:
+- Il vecchio record resta, con `effective_to = data modifica`.
+- Ne viene creato uno nuovo con `effective_from = data modifica`, `effective_to = NULL`.
+
+Query a data X:
+```sql
+WHERE effective_from <= X
+  AND (effective_to IS NULL OR effective_to > X)
+```
+
+## 7. Schedule (prod)
 
 | Fonte | Schedule | Tool |
 |-------|----------|------|
-| Codici | Weekly (lun 03:00 CET) | Cloud Scheduler → Cloud Run Job |
-| Leggi speciali tracked | Weekly | idem |
-| Cassazione massime | Daily (04:00 CET) | idem |
-| Cassazione sentenze | On-demand | Cloud Tasks |
-| Documenti tenant | Event-driven (upload) | Pub/Sub → Cloud Run |
+| Codici (CC, CP, CPC, CPP) | Weekly (lun 03:00 CET) | Cloud Scheduler → Cloud Run Job |
+| Cassazione massime | Daily (04:00 CET) | idem (fase 4) |
+| Cassazione sentenze | On-demand | Cloud Tasks (fase 4) |
+| Documenti tenant | Event-driven (upload) | Pub/Sub → Cloud Run (fase 2) |
+
+## 8. Quality checks
+
+Dopo ogni run di ingestion:
+- Conteggio articoli per codice vs reference range (CC 3100-3400, CP 900-1100).
+- Coverage rubriche su articoli attivi ≥ 85%.
+- Articoli famosi sentinel: CC 2043, 1418, 414 / CP 575, 416-bis, 612-bis hanno
+  rubrica corretta (test parametrizzati).
+- Test completi in `services/ingestion/tests/test_normattiva_akn_parser.py`.
+
+## 9. Fonti rifiutate
+
+Vedi ADR-0002 per il dettaglio.
+
+- **Wikisource**: ferma al 2022, non aggiornata con riforma Cartabia 2022 e modifiche 2023-2025.
+- **HuggingFace datasets** (`mii-llm/gazzetta-ufficiale`, `joelniklaus/Multi_Legal_Pile`): non contengono i Codici vigenti consolidati.
+- **Brocardi.it, Altalex**: ToU ostili a scraping; annotazioni coperte da copyright.
+- **Normattiva export form** (`/esporta/attoCompleto`): richiede autenticazione, non usabile programmaticamente.
