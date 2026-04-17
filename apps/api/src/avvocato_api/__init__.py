@@ -1,0 +1,1 @@
+"""Avvocato API — FastAPI backend."""

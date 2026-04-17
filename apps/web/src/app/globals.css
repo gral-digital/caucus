@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+  html,
+  body {
+    @apply bg-paper text-ink antialiased;
+  }
+  /* Spaziatura tipografica da documento giuridico */
+  .prose-legal p {
+    @apply leading-relaxed my-3;
+  }
+  .prose-legal [data-cite] {
+    @apply text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent;
+    cursor: pointer;
+  }
+}

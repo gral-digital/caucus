@@ -1,0 +1,5 @@
+project       = "avvocato-dev"
+env           = "dev"
+api_image     = "europe-west1-docker.pkg.dev/avvocato-dev/avvocato-dev-docker/api:latest"
+web_image     = "europe-west1-docker.pkg.dev/avvocato-dev/avvocato-dev-docker/web:latest"
+sql_tier      = "db-custom-1-3840"

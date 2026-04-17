@@ -1,0 +1,54 @@
+[project]
+name = "avvocato"
+version = "0.0.1"
+description = "Piattaforma AI enterprise per il settore legale italiano"
+readme = "README.md"
+requires-python = ">=3.12"
+
+[tool.uv.workspace]
+members = [
+    "apps/api",
+    "services/ingestion",
+    "services/indexer",
+    "services/rag-core",
+]
+
+[tool.uv.sources]
+rag-core = { workspace = true }
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [".venv", "data", "volumes", "node_modules"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",    # pycodestyle + pyflakes
+    "I",              # isort
+    "N",              # pep8-naming
+    "UP",             # pyupgrade
+    "B",              # flake8-bugbear
+    "A",              # flake8-builtins
+    "C4",             # flake8-comprehensions
+    "PIE",            # flake8-pie
+    "SIM",            # flake8-simplify
+    "ARG",            # unused args
+    "PTH",            # pathlib
+    "RUF",            # ruff-specific
+]
+ignore = ["E501"]  # line too long — handled by formatter
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+addopts = "-ra -q --strict-markers"
+testpaths = ["apps/api/tests", "services/*/tests"]

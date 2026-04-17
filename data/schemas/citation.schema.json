@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://avvocato.it/schemas/citation.schema.json",
+  "title": "Citation",
+  "description": "Citazione machine-readable a una norma o sentenza italiana. Formato canonico usato da LLM, API e UI.",
+  "type": "object",
+  "oneOf": [
+    { "$ref": "#/$defs/NormCitation" },
+    { "$ref": "#/$defs/CaseLawCitation" }
+  ],
+  "$defs": {
+    "NormCitation": {
+      "type": "object",
+      "required": ["kind", "source", "part", "num"],
+      "properties": {
+        "kind": { "const": "norm" },
+        "source": {
+          "type": "string",
+          "description": "Short-id della fonte normativa",
+          "examples": ["cc", "cp", "cpc", "cpp", "cost", "dlgs-231-2001"]
+        },
+        "part": {
+          "type": "string",
+          "enum": ["libro", "titolo", "capo", "sezione", "articolo", "art"],
+          "description": "Tipo di partizione citata"
+        },
+        "num": {
+          "type": "string",
+          "description": "Numero preservato come stringa (supporta 'bis', 'ter', ecc.)",
+          "examples": ["2043", "570-bis", "131-ter"]
+        },
+        "comma": {
+          "type": ["string", "null"],
+          "examples": ["1", "2", "1-bis"]
+        },
+        "letter": {
+          "type": ["string", "null"],
+          "examples": ["a", "b"]
+        },
+        "number": {
+          "type": ["string", "null"],
+          "description": "Sotto-numero della lettera (es. '1)', '2)') se presente",
+          "examples": ["1", "2"]
+        },
+        "effective_at": {
+          "type": ["string", "null"],
+          "format": "date",
+          "description": "Data per versioning. NULL = testo vigente."
+        }
+      },
+      "additionalProperties": false
+    },
+    "CaseLawCitation": {
+      "type": "object",
+      "required": ["kind", "court", "decision_number", "decision_year"],
+      "properties": {
+        "kind": { "const": "case" },
+        "court": {
+          "type": "string",
+          "enum": ["cass-civ", "cass-pen", "cass-su", "cost", "app", "trib", "giudice-pace", "ced"]
+        },
+        "section": { "type": ["string", "null"] },
+        "decision_number": { "type": "string" },
+        "decision_year": { "type": "integer", "minimum": 1900, "maximum": 2100 }
+      },
+      "additionalProperties": false
+    }
+  }
+}
