@@ -1,7 +1,11 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { streamChat, type RetrievalHitSummary } from "@/lib/chatStream";
+import {
+  streamChat,
+  type CitationWarnings,
+  type RetrievalHitSummary,
+} from "@/lib/chatStream";
 import { CitationsPanel } from "./CitationsPanel";
 import { MessageBubble } from "./MessageBubble";
 import { QuestionInput } from "./QuestionInput";
@@ -13,6 +17,7 @@ type Turn = {
   hits: RetrievalHitSummary[];
   status: "retrieving" | "streaming" | "done" | "error";
   error?: string;
+  citationWarnings?: CitationWarnings;
 };
 
 const EXAMPLES = [
@@ -40,13 +45,17 @@ export function ChatView() {
     abortRef.current = controller;
     const id = crypto.randomUUID();
 
+    // Snapshot lo storico PRIMA di aggiungere il nuovo turno: il backend vuole
+    // solo i turni passati (non quello corrente).
+    const history = turnsToHistory(turnsRef.current);
+
     setTurns((t) => [
       ...t,
       { id, question, answer: "", hits: [], status: "retrieving" },
     ]);
 
     try {
-      await streamChat({ question }, (ev) => {
+      await streamChat({ question, history }, (ev) => {
         setTurns((prev) =>
           prev.map((turn) => {
             if (turn.id !== id) return turn;
@@ -55,6 +64,8 @@ export function ChatView() {
                 return { ...turn, hits: ev.hits, status: "streaming" };
               case "token":
                 return { ...turn, answer: turn.answer + ev.text };
+              case "citation_warnings":
+                return { ...turn, citationWarnings: ev.warnings };
               case "done":
                 return { ...turn, status: "done" };
               case "error":
@@ -78,6 +89,12 @@ export function ChatView() {
     }
   }, []);
 
+  // Mantieni ref aggiornato ai turn per leggere lo storico senza dipendenze stale
+  const turnsRef = useRef<Turn[]>([]);
+  useEffect(() => {
+    turnsRef.current = turns;
+  }, [turns]);
+
   const isBusy = turns.some(
     (t) => t.status === "retrieving" || t.status === "streaming",
   );
@@ -98,6 +115,10 @@ export function ChatView() {
                 status={turn.status}
                 error={turn.error}
               />
+              {turn.citationWarnings &&
+              turn.citationWarnings.invalid.length > 0 ? (
+                <HallucinationBanner warnings={turn.citationWarnings} />
+              ) : null}
               {turn.hits.length > 0 ? <CitationsPanel hits={turn.hits} /> : null}
             </div>
           ))}
@@ -111,6 +132,42 @@ export function ChatView() {
       </div>
     </div>
   );
+}
+
+function HallucinationBanner({ warnings }: { warnings: CitationWarnings }) {
+  return (
+    <div className="rounded-md border border-amber-400/50 bg-amber-50 px-3 py-2 text-[13px] text-amber-900">
+      <div className="font-medium">
+        ⚠ {warnings.invalid.length} citazion{warnings.invalid.length === 1 ? "e" : "i"} non verificat{warnings.invalid.length === 1 ? "a" : "e"}
+      </div>
+      <div className="mt-1 text-[12.5px] text-amber-800">
+        Il modello ha citato articoli non presenti nel corpus indicizzato. Verifica
+        direttamente prima di fare affidamento sulle seguenti fonti:
+        <ul className="mt-1 list-disc pl-5">
+          {warnings.invalid.slice(0, 5).map((c, i) => (
+            <li key={i}>
+              <span className="font-mono">
+                art. {c.num} {c.source}
+              </span>
+              {c.reason ? <span className="text-amber-700"> — {c.reason}</span> : null}
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+}
+
+function turnsToHistory(
+  turns: Turn[],
+): { role: "user" | "assistant"; content: string }[] {
+  const out: { role: "user" | "assistant"; content: string }[] = [];
+  for (const t of turns) {
+    if (t.status === "error") continue;
+    out.push({ role: "user", content: t.question });
+    if (t.answer) out.push({ role: "assistant", content: t.answer });
+  }
+  return out;
 }
 
 function WelcomeScreen({

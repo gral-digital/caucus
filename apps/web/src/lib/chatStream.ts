@@ -6,8 +6,14 @@
 
 import { fetchEventSource } from "@microsoft/fetch-event-source";
 
+export interface ChatMessage {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export interface ChatRequest {
   question: string;
+  history?: ChatMessage[];
   corpora?: Array<"codici" | "leggi" | "cassazione">;
   sources?: string[];
   effective_at?: string;
@@ -21,9 +27,23 @@ export interface RetrievalHitSummary {
   excerpt: string;
 }
 
+export interface CitationCheck {
+  source: string;
+  num: string;
+  reason?: string;
+  grounding?: "strong" | "weak";
+}
+
+export interface CitationWarnings {
+  valid: CitationCheck[];
+  invalid: CitationCheck[];
+  total: number;
+}
+
 export type ChatStreamEvent =
   | { kind: "retrieval"; hits: RetrievalHitSummary[]; latency_ms: number }
   | { kind: "token"; text: string }
+  | { kind: "citation_warnings"; warnings: CitationWarnings }
   | { kind: "done"; finish_reason: string }
   | { kind: "error"; message: string };
 
@@ -52,6 +72,9 @@ export async function streamChat(
           break;
         case "token":
           onEvent({ kind: "token", text: payload.text });
+          break;
+        case "citation_warnings":
+          onEvent({ kind: "citation_warnings", warnings: payload });
           break;
         case "done":
           onEvent({ kind: "done", finish_reason: payload.finish_reason });

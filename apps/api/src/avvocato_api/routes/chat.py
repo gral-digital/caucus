@@ -10,6 +10,7 @@ Lo streaming è SSE (not WebSocket) per semplicità e cacheability via Cloud Run
 from __future__ import annotations
 
 from collections.abc import AsyncIterator
+from typing import Literal
 
 import orjson
 from fastapi import APIRouter, Depends
@@ -22,8 +23,17 @@ from avvocato_rag_core.schemas.retrieval import CorpusFilter
 router = APIRouter()
 
 
+class ChatMessage(BaseModel):
+    role: Literal["user", "assistant"]
+    content: str
+
+
 class ChatRequest(BaseModel):
-    question: str = Field(..., min_length=2, max_length=4000)
+    question: str = Field(..., min_length=1, max_length=4000)
+    history: list[ChatMessage] = Field(
+        default_factory=list,
+        description="Turni precedenti della conversazione corrente (user/assistant alternati). Esclude il turno attuale.",
+    )
     corpora: list[CorpusFilter] = Field(default_factory=lambda: [CorpusFilter.CODICI])
     sources: list[str] | None = Field(
         None,
