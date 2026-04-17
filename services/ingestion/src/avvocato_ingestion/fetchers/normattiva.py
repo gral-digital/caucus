@@ -136,7 +136,10 @@ class NormattivaFetcher:
     async def _fetch_permalink_params(
         self, client: httpx.AsyncClient, urn: str
     ) -> dict[str, str]:
-        resp = await client.get(self.BASE_PERMALINK, params={"urn": urn})
+        # IMPORTANTE: Normattiva serve solo URN con `;` letterale (non URL-encoded
+        # come `%3B`). httpx.AsyncClient.get(url, params={...}) fa url-encoding
+        # automatico e rompe il dispatcher di Normattiva. Costruiamo l'URL a mano.
+        resp = await client.get(f"{self.BASE_PERMALINK}?{urn}")
         resp.raise_for_status()
         html = resp.text
 

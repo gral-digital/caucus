@@ -6,16 +6,32 @@
   :root {
     color-scheme: light;
   }
-  html,
+  html {
+    height: 100%;
+  }
   body {
-    @apply bg-paper text-ink antialiased;
+    @apply h-full bg-paper text-ink antialiased;
+    font-feature-settings: "ss01", "cv11";
   }
-  /* Spaziatura tipografica da documento giuridico */
-  .prose-legal p {
-    @apply leading-relaxed my-3;
+  ::selection {
+    background-color: rgba(139, 26, 26, 0.18);
   }
-  .prose-legal [data-cite] {
-    @apply text-accent underline decoration-accent/40 underline-offset-4 hover:decoration-accent;
-    cursor: pointer;
+  /* Scrollbar sobria */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.22);
+    background-clip: padding-box;
   }
 }

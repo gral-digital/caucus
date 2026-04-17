@@ -77,7 +77,14 @@ class CodiceInfo:
     in_force_from: date
 
 
+# Catalogo delle fonti normative. Ogni entry mappa uno short_id a:
+# - URN NIR utilizzabile su normattiva.it
+# - metadata di base (titolo, data emanazione, data entrata in vigore)
+#
+# Gli short_id sono convenzionali e usati sia dall'utente (CLI) che dalle
+# citazioni machine-readable nel testo LLM (`<cite source="cds" ...>`).
 CODICI_CATALOG: dict[str, CodiceInfo] = {
+    # ===== Codici "storici" =====
     "cc": CodiceInfo(
         short_id="cc",
         urn="urn:nir:stato:regio.decreto:1942-03-16;262",
@@ -105,6 +112,142 @@ CODICI_CATALOG: dict[str, CodiceInfo] = {
         title="Codice di Procedura Penale",
         issued_at=date(1988, 9, 22),
         in_force_from=date(1989, 10, 24),
+    ),
+    "cost": CodiceInfo(
+        short_id="cost",
+        urn="urn:nir:stato:costituzione",
+        title="Costituzione della Repubblica Italiana",
+        issued_at=date(1947, 12, 27),
+        in_force_from=date(1948, 1, 1),
+    ),
+    # ===== Codici "moderni" =====
+    "cds": CodiceInfo(
+        short_id="cds",
+        urn="urn:nir:stato:decreto.legislativo:1992-04-30;285",
+        title="Codice della Strada",
+        issued_at=date(1992, 4, 30),
+        in_force_from=date(1993, 1, 1),
+    ),
+    "cdc": CodiceInfo(
+        short_id="cdc",
+        urn="urn:nir:stato:decreto.legislativo:2005-09-06;206",
+        title="Codice del Consumo",
+        issued_at=date(2005, 9, 6),
+        in_force_from=date(2005, 10, 23),
+    ),
+    "ccii": CodiceInfo(
+        short_id="ccii",
+        urn="urn:nir:stato:decreto.legislativo:2019-01-12;14",
+        title="Codice della Crisi d'Impresa e dell'Insolvenza",
+        issued_at=date(2019, 1, 12),
+        in_force_from=date(2022, 7, 15),
+    ),
+    "ccp": CodiceInfo(
+        short_id="ccp",
+        urn="urn:nir:stato:decreto.legislativo:2023-03-31;36",
+        title="Codice dei Contratti Pubblici",
+        issued_at=date(2023, 3, 31),
+        in_force_from=date(2023, 7, 1),
+    ),
+    "cad": CodiceInfo(
+        short_id="cad",
+        urn="urn:nir:stato:decreto.legislativo:2005-03-07;82",
+        title="Codice dell'Amministrazione Digitale",
+        issued_at=date(2005, 3, 7),
+        in_force_from=date(2006, 1, 1),
+    ),
+    "cts": CodiceInfo(
+        short_id="cts",
+        urn="urn:nir:stato:decreto.legislativo:2017-07-03;117",
+        title="Codice del Terzo Settore",
+        issued_at=date(2017, 7, 3),
+        in_force_from=date(2017, 8, 3),
+    ),
+    # ===== Testi Unici =====
+    "tus": CodiceInfo(
+        short_id="tus",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1990-10-09;309",
+        title="Testo Unico Stupefacenti",
+        issued_at=date(1990, 10, 9),
+        in_force_from=date(1990, 12, 11),
+    ),
+    "tui": CodiceInfo(
+        short_id="tui",
+        urn="urn:nir:stato:decreto.legislativo:1998-07-25;286",
+        title="Testo Unico Immigrazione",
+        issued_at=date(1998, 7, 25),
+        in_force_from=date(1998, 9, 2),
+    ),
+    "tue": CodiceInfo(
+        short_id="tue",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:2001-06-06;380",
+        title="Testo Unico dell'Edilizia",
+        issued_at=date(2001, 6, 6),
+        in_force_from=date(2003, 6, 30),
+    ),
+    "tusl": CodiceInfo(
+        short_id="tusl",
+        urn="urn:nir:stato:decreto.legislativo:2008-04-09;81",
+        title="Testo Unico Sicurezza sul Lavoro",
+        issued_at=date(2008, 4, 9),
+        in_force_from=date(2008, 5, 15),
+    ),
+    "tub": CodiceInfo(
+        short_id="tub",
+        urn="urn:nir:stato:decreto.legislativo:1993-09-01;385",
+        title="Testo Unico Bancario",
+        issued_at=date(1993, 9, 1),
+        in_force_from=date(1994, 1, 1),
+    ),
+    "tuf": CodiceInfo(
+        short_id="tuf",
+        urn="urn:nir:stato:decreto.legislativo:1998-02-24;58",
+        title="Testo Unico della Finanza",
+        issued_at=date(1998, 2, 24),
+        in_force_from=date(1998, 7, 1),
+    ),
+    "tuir": CodiceInfo(
+        short_id="tuir",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917",
+        title="Testo Unico delle Imposte sui Redditi",
+        issued_at=date(1986, 12, 22),
+        in_force_from=date(1988, 1, 1),
+    ),
+    # ===== Leggi fondamentali =====
+    "cpriv": CodiceInfo(
+        short_id="cpriv",
+        urn="urn:nir:stato:decreto.legislativo:2003-06-30;196",
+        title="Codice in materia di protezione dei dati personali",
+        issued_at=date(2003, 6, 30),
+        in_force_from=date(2004, 1, 1),
+    ),
+    "l241": CodiceInfo(
+        short_id="l241",
+        urn="urn:nir:stato:legge:1990-08-07;241",
+        title="Legge 241/1990 — Procedimento amministrativo",
+        issued_at=date(1990, 8, 7),
+        in_force_from=date(1990, 9, 13),
+    ),
+    "stat": CodiceInfo(
+        short_id="stat",
+        urn="urn:nir:stato:legge:1970-05-20;300",
+        title="Statuto dei Lavoratori (L. 300/1970)",
+        issued_at=date(1970, 5, 20),
+        in_force_from=date(1970, 7, 9),
+    ),
+    "l689": CodiceInfo(
+        short_id="l689",
+        urn="urn:nir:stato:legge:1981-11-24;689",
+        title="Legge 689/1981 — Modifiche al sistema penale (depenalizzazione)",
+        issued_at=date(1981, 11, 24),
+        in_force_from=date(1982, 2, 20),
+    ),
+    "lpf": CodiceInfo(
+        short_id="lpf",
+        urn="urn:nir:stato:legge:2012-12-31;247",
+        title="Nuova disciplina dell'ordinamento della professione forense (L. 247/2012)",
+        issued_at=date(2012, 12, 31),
+        in_force_from=date(2013, 2, 2),
     ),
 }
 
@@ -228,15 +371,122 @@ class NormattivaAknParser:
     # ------------------------------------------------------------------
 
     def _iter_articles(self, root: etree._Element) -> Iterator[CanonicalPartition]:
-        """Itera gli articoli come CanonicalPartition."""
+        """Itera gli articoli come CanonicalPartition.
+
+        Normattiva usa due serializzazioni AKN diverse:
+
+        **Formato A — "flat per attachment"** (codici del 1930-1942: CC, CP, CPC):
+          act > attachments > attachment > doc > mainBody > paragraph > content > p
+          Ogni <attachment> è un articolo. Rubrica e commi sono concatenati in un
+          singolo <p> e vanno estratti con regex.
+
+        **Formato B — "canonico AKN"** (decreti moderni: CdS, TU, leggi):
+          act > body > chapter > article > paragraph > content
+          Ogni <article> ha <num>, <heading> (= rubrica nativa!), <paragraph> strutturati.
+          La gerarchia (chapter/section/part) è navigabile.
+
+        Proviamo prima Formato B (più pulito, più informazione). Se 0 articoli,
+        fallback a Formato A.
+        """
+        # Conta entrambi per decidere quale formato è "il vero corpo".
         attachments = root.findall(".//a:act/a:attachments/a:attachment", _NS)
-        for att in attachments:
-            doc = att.find("a:doc", _NS)
-            if doc is None:
+        articles_b = root.findall(".//a:act/a:body//a:article", _NS)
+
+        # Euristica: Formato A (flat-per-attachment) è usato dai codici storici
+        # quando gli attachment sono MANY e i loro doc.name contengono "art. N".
+        # In questi casi il <body> ha solo 2-3 article del regio decreto di
+        # approvazione (da scartare).
+        #
+        # Formato B (canonico) è usato dai decreti moderni: articles in body
+        # sono centinaia, attachments pochi o nessuno (o solo allegati tecnici).
+        attachment_articles = sum(
+            1
+            for att in attachments
+            if (doc := att.find("a:doc", _NS)) is not None
+            and _ARTICLE_NUM_RE.search(doc.get("name", ""))
+        )
+
+        use_attachments = attachment_articles >= max(10, len(articles_b))
+        if use_attachments:
+            for att in attachments:
+                doc = att.find("a:doc", _NS)
+                if doc is None:
+                    continue
+                parsed = self._parse_article_doc(doc)
+                if parsed is not None:
+                    yield parsed
+            return
+
+        # Formato B: articoli canonici in <body>
+        for art in articles_b:
+            parsed = self._parse_article_canonical(art)
+            if parsed is not None:
+                yield parsed
+
+    def _parse_article_canonical(
+        self, article: etree._Element
+    ) -> CanonicalPartition | None:
+        """Parsa un <article> AKN canonico con <num>/<heading>/<paragraph>."""
+        num_el = article.find("a:num", _NS)
+        if num_el is None:
+            return None
+        # "Art. 186." → "186"
+        num_text = (num_el.text or "").strip()
+        m = _ARTICLE_NUM_RE.search(num_text)
+        if not m:
+            return None
+        num = re.sub(r"\s+", "-", m.group(1).strip()).lower()
+
+        # Rubrica nativa: <heading> (opzionalmente tra parentesi)
+        heading_el = article.find("a:heading", _NS)
+        rubrica: str | None = None
+        if heading_el is not None:
+            raw_heading = "".join(heading_el.itertext()).strip()
+            # Rimuovi parentesi e punto finale: "(Guida sotto l'influenza dell'alcool)." → "Guida sotto l'influenza dell'alcool"
+            rubrica = raw_heading.strip("().").strip()
+            rubrica = self._cleanup_rubrica(rubrica) if rubrica else None
+
+        # Commi: <paragraph> ripetuti, ciascuno con <num> e <content>
+        commi: list[CanonicalComma] = []
+        for p in article.findall("a:paragraph", _NS):
+            pn = p.find("a:num", _NS)
+            pc = p.find("a:content", _NS)
+            if pc is None:
                 continue
-            article = self._parse_article_doc(doc)
-            if article is not None:
-                yield article
+            # num: "1." → "1", "1-bis." → "1-bis"
+            num_raw = (pn.text or "").strip() if pn is not None else ""
+            comma_num = re.sub(r"\.\s*$", "", num_raw).strip() or str(len(commi) + 1)
+            comma_num = re.sub(r"\s+", "-", comma_num).lower()
+            text = "".join(pc.itertext()).strip()
+            text = self._clean_markers(text)
+            if text:
+                commi.append(
+                    CanonicalComma(
+                        number=comma_num,
+                        text=text,
+                        letters=self._extract_letters(text),
+                    )
+                )
+
+        # Full text = concat commi
+        if commi:
+            full_text = "\n\n".join(f"{c.number}. {c.text}" for c in commi)
+            if rubrica:
+                full_text = f"[Rubrica] {rubrica}\n\n{full_text}"
+        else:
+            full_text = rubrica or ""
+
+        if not full_text.strip():
+            return None
+
+        return CanonicalPartition(
+            kind=NormPartitionKind.ARTICOLO,
+            number=num,
+            label=f"art. {num}",
+            rubrica=rubrica,
+            full_text=full_text,
+            commi=commi,
+        )
 
     def _parse_article_doc(self, doc: etree._Element) -> CanonicalPartition | None:
         name = doc.get("name", "")

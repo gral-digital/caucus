@@ -44,7 +44,14 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # TODO: env-driven
+    # Dev locale: accettiamo entrambi 3000 (default Next) e 3100 (fallback se 3000 è
+    # occupato da un altro progetto). In prod: env-driven sul dominio pubblico.
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:3100",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3100",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

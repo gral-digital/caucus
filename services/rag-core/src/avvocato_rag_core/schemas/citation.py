@@ -108,13 +108,33 @@ Citation = Annotated[
 
 
 _SOURCE_SUFFIX = {
+    # Codici classici
     "cc": "c.c.",
     "cp": "c.p.",
     "cpc": "c.p.c.",
     "cpp": "c.p.p.",
     "cost": "Cost.",
+    # Codici moderni
     "cds": "cod. strada",
     "cdc": "cod. cons.",
+    "ccii": "CCII",
+    "ccp": "cod. contr. pubbl.",
+    "cad": "CAD",
+    "cts": "CTS",
+    # Testi Unici
+    "tus": "TU stup.",
+    "tui": "TU imm.",
+    "tue": "TU ed.",
+    "tusl": "TU sic. lav.",
+    "tub": "TUB",
+    "tuf": "TUF",
+    "tuir": "TUIR",
+    # Leggi fondamentali
+    "cpriv": "cod. privacy",
+    "l241": "L. 241/1990",
+    "stat": "St. Lav.",
+    "l689": "L. 689/1981",
+    "lpf": "L. 247/2012",
 }
 
 
