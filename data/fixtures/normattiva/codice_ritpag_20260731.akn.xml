@@ -1,0 +1,1074 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/decreto_legislativo/stato/2002-10-09/231/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto_legislativo/stato/2002-10-09/231"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:stato:decreto.legislativo:2002-10-09;231"/>
+                    <FRBRalias name="eli" value="eli/id/2002/10/23/002G0265/CONSOLIDATED/20200101"/>
+                    <FRBRdate date="2002-10-09" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101" aknrelname="eli/id/2002/10/23/002G0265/CONSOLIDATED/20200101">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content="Attuazione della direttiva 2000/35/CE relativa alla lotta contro i ritardi di pagamento nelle transazioni commerciali. " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="002G0265" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#DECRETO LEGISLATIVO"/>
+                            <nrdfa:span content="2002-10-09" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/decreto_legislativo/stato/2002-10-09/231/ita@2020-01-01/!main"/>
+                    <FRBRuri value="/akn/it/act/decreto_legislativo/stato/2002-10-09/231/ita@2020-01-01"/>
+                    <FRBRdate date="2020-01-01" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/decreto_legislativo/stato/2002-10-09/231/ita@2020-01-01/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/decreto_legislativo/stato/2002-10-09/231/ita@2020-01-01.xml"/>
+                    <FRBRdate date="2002-10-09" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="2002-10-23" name="" number="249" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="2002-10-23" eId="eventRef_0" source="ro1"/>
+                <eventRef date="2012-01-24" eId="eventRef_1" source="rp1"/>
+                <eventRef date="2012-11-15" eId="eventRef_2" source="rp2"/>
+                <eventRef date="2014-11-10" eId="eventRef_3" source="rp3"/>
+                <eventRef date="2018-12-14" eId="eventRef_4" source="rp4"/>
+                <eventRef date="2019-04-30" eId="eventRef_5" source="rp5"/>
+                <eventRef date="2019-06-29" eId="eventRef_6" source="rp6"/>
+                <eventRef date="2019-12-30" eId="eventRef_7" source="rp7"/>
+            </lifecycle>
+            <analysis source="">
+                <activeModifications>
+                    <textualMod eId="amod_0" type="insertion">
+                        <source href="urn:nir:stato:decreto.legislativo:2002-10-09;231#9"/>
+                        <destination href="urn:nir:stato:regio.decreto:1940-10-28;1443#CODICE DI PROCEDURA CIVILE-art. 633"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 9, comma 1) l'abrogazione dell'ultimo comma dell'art. 633.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_1" type="insertion">
+                        <source href="urn:nir:stato:decreto.legislativo:2002-10-09;231#9"/>
+                        <destination href="urn:nir:stato:regio.decreto:1940-10-28;1443#CODICE DI PROCEDURA CIVILE-art. 641"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 9, comma 2, lettera a)) la modifica dell'art. 641, comma 1; (con l'art. 9, comma 2, lettera b)) la modifica dell'art. 641, comma 2.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_2" type="insertion">
+                        <source href="urn:nir:stato:decreto.legislativo:2002-10-09;231#9"/>
+                        <destination href="urn:nir:stato:regio.decreto:1940-10-28;1443#CODICE DI PROCEDURA CIVILE-art. 648"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 9, comma 3) la modifica dell'art. 648, comma 1.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_3" type="insertion">
+                        <source href="urn:nir:stato:decreto.legislativo:2002-10-09;231#10"/>
+                        <destination href="urn:nir:stato:legge:1998-06-18;192#3"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 10, comma 1) la modifica dell'art. 3, comma 3.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_4" type="insertion">
+                        <source href="urn:nir:stato:decreto.legislativo:2002-10-09;231#11"/>
+                        <destination href="urn:nir:stato:regio.decreto:1940-10-28;1443#CODICE DI PROCEDURA CIVILE-art. 633"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, comma 1) la modifica dell'art. 633, ultimo comma.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_5" type="insertion">
+                        <source href="urn:nir:stato:decreto.legislativo:2002-10-09;231#11"/>
+                        <destination href="urn:nir:stato:regio.decreto:1940-10-28;1443#CODICE DI PROCEDURA CIVILE-art. 641"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, comma 1) la modifica dell'art. 641, commi 1 e 2.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_6" type="insertion">
+                        <source href="urn:nir:stato:decreto.legislativo:2002-10-09;231#11"/>
+                        <destination href="urn:nir:stato:regio.decreto:1940-10-28;1443#CODICE DI PROCEDURA CIVILE-art. 648"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 11, comma 1) la modifica dell'art. 648, comma 1.</nakn:text>
+                        </new>
+                    </textualMod>
+                </activeModifications>
+                <passiveModifications>
+                    <textualMod eId="pmod_0" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_1"/>
+                        <new>
+                            <nakn:text>(( (Ambito di applicazione). ))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_1" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_2"/>
+                        <new>
+                            <nakn:text>((1. Le disposizioni contenute nel presente decreto si applicano ad ogni pagamento effettuato a titolo di corrispettivo in una transazione commerciale. 
+ 2. Le disposizioni del presente decreto non trovano applicazione per: 
+ a) debiti oggetto di procedure concorsuali aperte a carico del debitore, comprese le procedure finalizzate alla ristrutturazione del debito; 
+ b) pagamenti effettuati a titolo di risarcimento del danno, compresi i pagamenti effettuati a tale titolo da un assicuratore.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_2" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_3"/>
+                        <new>
+                            <nakn:text>((2))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_3" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_4"/>
+                        <new>
+                            <nakn:text>((3))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_4" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_5"/>
+                        <new>
+                            <nakn:text>((sull'importo dovuto))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_5" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_6"/>
+                        <new>
+                            <nakn:text>((2))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_6" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_7"/>
+                        <new>
+                            <nakn:text>((7-bis. Le banche, gli intermediari finanziari, la Cassa depositi e prestiti S.p.A. e le istituzioni finanziarie dell'Unione europea possono concedere ai comuni, alle province, alle citta' metropolitane, alle regioni e alle province autonome, anche per conto dei rispettivi enti del Servizio sanitario nazionale, anticipazioni di liquidita' da destinare al pagamento di debiti certi, liquidi ed esigibili, maturati alla data del 31 dicembre 2019, relativi a somministrazioni, forniture, appalti e a obbligazioni per prestazioni professionali. L'anticipazione di liquidita' per il pagamento di debiti fuori bilancio e' subordinata al relativo riconoscimento. 
+ 7-ter. Le anticipazioni di cui al comma 7-bis sono concesse, per gli enti locali, entro il limite massimo di tre dodicesimi delle entrate accertate nell'anno 2018 afferenti ai primi tre titoli di entrata del bilancio e, per le regioni e le province autonome, entro il limite massimo del 5 per cento delle entrate accertate nell'anno 2018 afferenti al primo titolo di entrata del bilancio. 
+ 7-quater. Con riferimento alle anticipazioni non costituenti indebitamento ai sensi dell'articolo 3, comma 17, della legge 24 dicembre 2003, n. 350, fatto salvo l'obbligo per gli enti richiedenti di adeguare le relative iscrizioni nel bilancio di previsione successivamente al perfezionamento delle anticipazioni, non trovano applicazione le disposizioni di cui all'articolo 203, comma 1, lettera b), e all'articolo 204 del testo unico di cui al decreto legislativo 18 agosto 2000, n. 267, nonche' di cui all'articolo 62 del decreto legislativo 23 giugno 2011, n. 118. 
+ 7-quinquies. Le anticipazioni agli enti locali sono assistite dalla delegazione di pagamento di cui all'articolo 206 del citato decreto legislativo 18 agosto 2000, n. 267. Ad esse si applicano le disposizioni di cui all'articolo 159, comma 2, e all'articolo 255, comma 10, del predetto decreto legislativo 18 agosto 2000, n. 267. Le anticipazioni alle regioni e alle province autonome sono assistite da garanzia sulle relative entrate di bilancio a norma della specifica disciplina applicabile a ciascuna regione e provincia autonoma. 
+ 7-sexies. La richiesta di anticipazione di liquidita' e' presentata agli istituti finanziari di cui al comma 7-bis entro il termine del 30 aprile 2020 ed e' corredata di un'apposita dichiarazione sottoscritta dal rappresentante legale dell'ente richiedente, contenente l'elenco dei debiti da pagare con l'anticipazione, come qualificati al medesimo comma 7-bis, redatta utilizzando il modello generato dalla piattaforma elettronica per la gestione telematica del rilascio delle certificazioni di cui all'articolo 7, comma 1, del decreto-legge 8 aprile 2013, n. 35, convertito, con modificazioni, dalla legge 6 giugno 2013, n. 64. 
+ 7-septies. Gli enti debitori effettuano il pagamento dei debiti per i quali hanno ottenuto l'anticipazione di liquidita' entro quindici giorni dalla data di effettiva erogazione da parte dell'istituto finanziatore. Per il pagamento dei debiti degli enti del Servizio sanitario nazionale e degli enti locali, da effettuare a valere sui trasferimenti da parte di regioni e province autonome di cui al comma 7-bis, il termine e' di trenta giorni dalla data di effettiva erogazione da parte dell'istituto finanziatore. 
+ 7-octies. Le anticipazioni di liquidita' sono rimborsate entro il termine del 30 dicembre 2020, o anticipatamente in conseguenza del ripristino della normale gestione della liquidita', alle condizioni pattuite contrattualmente con gli istituti finanziatori. 
+ 7-novies. Gli istituti finanziatori verificano, attraverso la piattaforma elettronica di cui al comma 7-sexies, l'avvenuto pagamento dei debiti di cui al medesimo comma. In caso di mancato pagamento, gli istituti finanziatori possono chiedere, per il corrispondente importo, la restituzione dell'anticipazione, anche attivando le garanzie di cui al comma 7-quinquies))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_7" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_8"/>
+                        <new>
+                            <nakn:text>(( (Saggio degli interessi). ))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_8" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_9"/>
+                        <new>
+                            <nakn:text>((1. Gli interessi moratori sono determinati nella misura degli interessi legali di mora. Nelle transazioni commerciali tra imprese e' consentito alle parti di concordare un tasso di interesse diverso, nei limiti previsti dall'articolo 7. 
+ 2. Il tasso di riferimento e' cosi' determinato: 
+ a) per il primo semestre dell'anno cui si riferisce il ritardo, e' quello in vigore il 1° gennaio di quell'anno; 
+ b) per il secondo semestre dell'anno cui si riferisce il ritardo, e' quello in vigore il 1° luglio di quell'anno. 
+ 3. Il Ministero dell'economia e delle finanze da' notizia del tasso di riferimento, curandone la pubblicazione nella Gazzetta Ufficiale della Repubblica italiana nel quinto giorno lavorativo di ciascun semestre solare.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_9" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_10"/>
+                        <new>
+                            <nakn:text>((2))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_10" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_11"/>
+                        <new>
+                            <nakn:text>(( (Risarcimento delle spese di recupero). ))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_11" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_12"/>
+                        <new>
+                            <nakn:text>((1. Nei casi previsti dall'articolo 3, il creditore ha diritto anche al rimborso dei costi sostenuti per il recupero delle somme non tempestivamente corrisposte. 
+ 2. Al creditore spetta, senza che sia necessaria la costituzione in mora, un importo forfettario di 40 euro a titolo di risarcimento del danno. E' fatta salva la prova del maggior danno, che puo' comprendere i costi di assistenza per il recupero del credito.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_12" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_13"/>
+                        <new>
+                            <nakn:text>((2))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_13" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_14"/>
+                        <new>
+                            <nakn:text>((4-bis. Nelle transazioni commerciali in cui il creditore sia una PMI, come definita ai sensi del decreto del Ministro delle attivita' produttive 18 aprile 2005, pubblicato nella Gazzetta Ufficiale n. 238 del 12 ottobre 2005, si presume che sia gravemente iniqua la clausola che prevede termini di pagamento superiori a sessanta giorni. Il presente comma non si applica quando tutte le parti del contratto sono PMI))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_14" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_15"/>
+                        <new>
+                            <nakn:text>(( (Prassi inique). ))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_15" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_16"/>
+                        <new>
+                            <nakn:text>((1. Le prassi relative al termine di pagamento, al saggio degli interessi moratori o al risarcimento per i costi di recupero, quando risultano gravemente inique per il creditore, danno diritto al risarcimento del danno. 
+ 2. Il giudice accerta che una prassi e' gravemente iniqua tenuto conto di quanto previsto dall'articolo 7, comma 2. 
+ 3. Si considera gravemente iniqua la prassi che esclude l'applicazione di interessi di mora. Non e' ammessa prova contraria. 
+ 4. Si presume che sia gravemente iniqua la prassi che esclude il risarcimento per i costi di recupero di cui all'articolo 6))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_16" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_17"/>
+                        <new>
+                            <nakn:text>((1.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_17" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_18"/>
+                        <new>
+                            <nakn:text>((a) di accertare la grave iniquita', ai sensi dell'articolo 7, delle condizioni generali concernenti il termine di pagamento, il saggio degli interessi moratori o il risarcimento per i costi di recupero e di inibirne l'uso.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_18" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_19"/>
+                        <new>
+                            <nakn:text>((2))</nakn:text>
+                        </new>
+                    </textualMod>
+                </passiveModifications>
+            </analysis>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/DECRETO_LEGISLATIVO/stato/2002-10-09/231/!main" showAs=""/>
+                <passiveRef eId="rp1" href="/akn/it/act/DECRETO-LEGGE/stato/2012-01-24/1/!main" showAs=""/>
+                <passiveRef eId="rp2" href="/akn/it/act/DECRETO_LEGISLATIVO/stato/2012-11-09/192/!main" showAs=""/>
+                <passiveRef eId="rp3" href="/akn/it/act/LEGGE/stato/2014-10-30/161/!main" showAs=""/>
+                <passiveRef eId="rp4" href="/akn/it/act/DECRETO-LEGGE/stato/2018-12-14/135/!main" showAs=""/>
+                <passiveRef eId="rp5" href="/akn/it/act/DECRETO-LEGGE/stato/2019-04-30/34/!main" showAs=""/>
+                <passiveRef eId="rp6" href="/akn/it/act/LEGGE/stato/2019-06-28/58/!main" showAs=""/>
+                <passiveRef eId="rp7" href="/akn/it/act/LEGGE/stato/2019-12-27/160/!main" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it">Attuazione della direttiva 2000/35/CE relativa alla lotta contro i ritardi di pagamento nelle transazioni commerciali. </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>002G0265</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#DECRETO LEGISLATIVO"/>
+                        <eli:date_document rdf:datatype="xsd:date">2002-10-09</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101"/>
+                        <eli:is_embodied_by rdf:resource="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/2002/10/23/002G0265/CONSOLIDATED/20200101/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>DECRETO LEGISLATIVO</docType>
+                <docDate date="2002-10-09">09 ottobre 2002</docDate>
+                <docNumber>231</docNumber>
+                <docTitle>Attuazione della direttiva 2000/35/CE relativa alla lotta contro i ritardi di pagamento nelle transazioni commerciali.
+</docTitle>
+            </p>
+            <p>
+                <authorialNote eId="atn1" placement="bottom">
+                    <p>Entrata in vigore del provvedimento: 7/11/2002.</p>
+                </authorialNote>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="formulaInizialePreambolo">
+                <p>IL PRESIDENTE DELLA REPUBBLICA</p>
+            </formula>
+            <citations eId="cits_1">
+                <citation eId="cits_1__cit_1">
+                    <p>Visti gli <ref eId="ref_1" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_76">articoli 76</ref> e <ref eId="ref_2" href="/akn/it/act/costituzione/stato/1947-12-27/const/!main#art_87">87 della Costituzione</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_2">
+                <citation eId="cits_2__cit_1">
+                    <p>Visto l'<ref eId="ref_3" href="/akn/it/act/legge/stato/1988-08-23/400/!main#art_14-com1">articolo 14, comma 1, della legge 23 agosto 1988, n. 400</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_3">
+                <citation eId="cits_3__cit_1">
+                    <p>Vista la <ref eId="ref_4" href="/akn/it/act/legge/stato/2002-03-01/39/!main">legge 1 marzo 2002, n. 39</ref>, recante disposizioni per l'adempimento di obblighi derivanti dall'appartenenza dell'Italia alle Comunita' europee, legge comunitaria 2001, ed in particolare l'articolo 26, recante delega al Governo ad emanare uno o piu' decreti legislativi per adeguare la normativa vigente in materia di ritardi di pagamento ai principi e alle prescrizioni della <ref eId="ref_5" href="/akn/it/act/direttivaUe/eu/2000/35/!main">direttiva 2000/35/CE del Parlamento europeo e del Consiglio, del 29 giugno 2000</ref>, relativa alla lotta contro i ritardi di pagamento nelle transazioni commerciali;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_4">
+                <citation eId="cits_4__cit_1">
+                    <p>Visto il <ref eId="ref_6" href="/akn/it/act/decretoLegislativo/stato/1992-07-24/358/!main">decreto legislativo 24 luglio 1992, n. 358</ref>, recante testo unico delle disposizioni in materia di appalti pubblici di forniture, in attuazione delle <ref eId="ref_7" href="/akn/it/act/direttivaUe/eu/1977/62/!main">direttive 77/62/CEE</ref>, <ref eId="ref_8" href="/akn/it/act/direttivaUe/eu/1980/767/!main">80/767/CEE</ref> e <ref eId="ref_9" href="/akn/it/act/direttivaUe/eu/1988/295/!main">88/295/CEE</ref>, come modificato dal <ref eId="ref_10" href="/akn/it/act/decretoLegislativo/stato/1998-10-20/402/!main">decreto legislativo 20 ottobre 1998, n. 402</ref>, in attuazione delle <ref eId="ref_11" href="/akn/it/act/direttivaUe/eu/1993/36/!main">direttive 93/36/CEE</ref> e <ref eId="ref_12" href="/akn/it/act/direttivaUe/eu/1997/52/!main">97/52/CE</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_5">
+                <citation eId="cits_5__cit_1">
+                    <p>Visto il <ref eId="ref_13" href="/akn/it/act/decretoLegislativo/stato/1995-03-17/157/!main">decreto legislativo 17 marzo 1995, n. 157</ref>, recante attuazione della <ref eId="ref_14" href="/akn/it/act/direttivaUe/eu/1992/50/!main">direttiva 92/50/CEE</ref> in materia di appalti pubblici di servizi, come modificato dal <ref eId="ref_15" href="/akn/it/act/decretoLegislativo/stato/2000-02-25/65/!main">decreto legislativo 25 febbraio 2000, n. 65</ref>, in attuazione delle <ref eId="ref_16" href="/akn/it/act/direttivaUe/eu/1997/52/!main">direttive 97/52/CE</ref> e <ref eId="ref_17" href="/akn/it/act/direttivaUe/eu/1998/4/!main">98/4/CE</ref> che modificano ed integrano, rispettivamente, le <ref eId="ref_18" href="/akn/it/act/direttivaUe/eu/1992/50/!main">direttive 92/50/CEE</ref>, in materia di appalti pubblici di servizi, e 93/38/CEE, limitatamente ai concorsi di progettazione;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_6">
+                <citation eId="cits_6__cit_1">
+                    <p>Visto il <ref eId="ref_19" href="/akn/it/act/decretoLegislativo/stato/2000-02-25/65/!main">decreto legislativo 25 febbraio 2000, n. 65</ref>, recante attuazione delle <ref eId="ref_20" href="/akn/it/act/direttivaUe/eu/1997/52/!main">direttive 97/52/CE</ref> e <ref eId="ref_21" href="/akn/it/act/direttivaUe/eu/1998/4/!main">98/4/CE</ref>, che modificano ed integrano, rispettivamente, le <ref eId="ref_22" href="/akn/it/act/direttivaUe/eu/1992/50/!main">direttive 92/50/CEE</ref>, in materia di appalti pubblici di servizi, e 93/38/CEE, limitatamente ai concorsi di progettazione;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_7">
+                <citation eId="cits_7__cit_1">
+                    <p>Visto il <ref eId="ref_23" href="/akn/it/act/decretoLegislativo/stato/1999-11-25/525/!main">decreto legislativo 25 novembre 1999, n. 525</ref>, recante attuazione della <ref eId="ref_24" href="/akn/it/act/direttivaUe/eu/1998/4/!main">direttiva 98/4/CE</ref> che modifica la normativa comunitaria sulle procedure di appalti nei settori esclusi;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_8">
+                <citation eId="cits_8__cit_1">
+                    <p>Visto il <ref eId="ref_25" href="/akn/it/act/decretoLegislativo/stato/1995-03-17/158/!main">decreto legislativo 17 marzo 1995, n. 158</ref>, recante attuazione delle <ref eId="ref_26" href="/akn/it/act/direttivaUe/eu/1990/531/!main">direttive 90/531/CEE</ref> e <ref eId="ref_27" href="/akn/it/act/direttivaUe/eu/1993/38/!main">93/38/CEE</ref> relative alle procedure di appalti nei settori esclusi;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_9">
+                <citation eId="cits_9__cit_1">
+                    <p>Visto il <ref eId="ref_28" href="/akn/it/act/decreto/ministero.grazia.giustizia/1994-10-05/585/!main">decreto del Ministro di grazia e giustizia 5 ottobre 1994, n. 585</ref>, recante approvazione della delibera del Consiglio nazionale forense in data 12 giugno 1993, che stabilisce i criteri per la determinazione degli onorari, dei diritti e delle indennita' spettanti agli avvocati ed ai procuratori legali per le prestazioni giudiziali, in materia civile e penale, e stragiudiziali;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_10">
+                <citation eId="cits_10__cit_1">
+                    <p>Visto il <ref eId="ref_29" href="/akn/it/act/regio.decreto/stato/1940-10-28/1443/!main">regio decreto 28 ottobre 1940, n. 1443</ref>, recante approvazione del <ref eId="ref_30" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main">codice di procedura civile</ref> e successive modificazioni, ed in particolare gli <ref eId="ref_31" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_633">articoli 633</ref>, <ref eId="ref_32" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_641">641</ref> e <ref eId="ref_33" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_648">648 del codice di procedura civile</ref>;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_11">
+                <citation eId="cits_11__cit_1">
+                    <p>Vista la <ref eId="ref_34" href="/akn/it/act/legge/stato/1998-06-18/192/!main">legge 18 giugno 1998, n. 192</ref>, recante disciplina della subfornitura nelle attivita' produttive, ed in particolare l'articolo 3, commi 2 e 3;</p>
+                </citation>
+            </citations>
+            <citations eId="cits_12">
+                <citation eId="cits_12__cit_1">
+                    <p>Vista la preliminare deliberazione del Consiglio dei Ministri, adottata nella riunione del 14 giugno 2002;</p>
+                </citation>
+            </citations>
+            <p>Acquisiti i pareri delle competenti commissioni della Camera dei deputati e del Senato della Repubblica;</p>
+            <citations eId="cits_13">
+                <citation eId="cits_13__cit_1">
+                    <p>Vista la deliberazione del Consiglio dei Ministri, adottata nella riunione del 20 settembre 2002;</p>
+                </citation>
+            </citations>
+            <p>Sulla proposta del Ministro per le politiche comunitarie e del Ministro della giustizia, di concerto con i Ministri dell'economia e delle finanze, per la funzione pubblica e delle attivita' produttive;</p>
+            <formula name="formulaFinalePreambolo">
+                <p>Emana il seguente decreto legislativo:</p>
+            </formula>
+        </preamble>
+        <body>
+            <article eId="art_1">
+                <num>Art. 1.</num>
+                <heading>
+                    <ins eId="ins_1">(( (Ambito di applicazione). ))</ins>
+                </heading>
+                <paragraph>
+                    <content>
+                        <p>((</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_1__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le disposizioni contenute nel presente decreto si applicano ad ogni pagamento effettuato a titolo di corrispettivo in una transazione commerciale. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p> 2. Le disposizioni del presente decreto non trovano applicazione per: 
+ </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content/>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p> b) pagamenti effettuati a titolo di risarcimento del danno, compresi i pagamenti effettuati a tale titolo da un assicuratore.))</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>((2))</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="35" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_2">
+                <num>Art. 2.</num>
+                <heading> (Definizioni).</heading>
+                <paragraph eId="art_2__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_2__para_1__intro_1">
+                            <p>Ai fini del presente decreto si intende per: 
+ </p>
+                        </intro>
+                        <point eId="art_2__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>"transazioni commerciali": i contratti, comunque denominati, tra imprese ovvero tra imprese e pubbliche amministrazioni, che comportano, in via esclusiva o prevalente, la consegna di merci o la prestazione di servizi contro il pagamento di un prezzo; <ins eId="ins_4">((3))</ins>
+                                </p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>"pubblica amministrazione": le amministrazioni di cui all'<ref eId="content__ref_36" href="/akn/it/act/decretoLegislativo/stato/2006-04-12/163/!main#art_3-com25">articolo 3, comma 25, del decreto legislativo 12 aprile 2006, n. 163</ref>, e ogni altro soggetto, allorquando svolga attivita' per la quale e' tenuto al rispetto della disciplina di cui al <ref eId="content__ref_37" href="/akn/it/act/decretoLegislativo/stato/2006-04-12/163/!main">decreto legislativo 12 aprile 2006, n. 163</ref>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>"imprenditore": ogni soggetto esercente un'attivita' economica organizzata o una libera professione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>"interessi moratori": interessi legali di mora ovvero interessi ad un tasso concordato tra imprese; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>"interessi legali di mora": interessi semplici di mora su base giornaliera ad un tasso che e' pari al tasso di riferimento maggiorato di otto punti percentuali; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_f">
+                            <num>f)</num>
+                            <content>
+                                <p>"tasso di riferimento": il tasso di interesse applicato dalla Banca centrale europea alle sue piu' recenti operazioni di rifinanziamento principali; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_2__para_1.__point_g">
+                            <num>g)</num>
+                            <content>
+                                <p>"importo dovuto": la somma che avrebbe dovuto essere pagata entro il termine contrattuale o legale di pagamento, comprese le imposte, i dazi, le tasse o gli oneri applicabili indicati nella fattura o nella richiesta equivalente di pagamento. 
+ (2) 
+ 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="38" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (3)</p>
+                        <p>
+ La <ref eId="39" href="/akn/it/act/legge/stato/2014-10-30/161/!main">L. 30 ottobre 2014, n. 161</ref> ha disposto (con l'art. 24, comma 1) che "L'<ref eId="40" href="/akn/it/act/decretoLegislativo/stato/2002-10-09/231/!main#art_2-com1-leta">articolo 2, comma 1, lettera a), del decreto legislativo 9 ottobre 2002, n. 231</ref>, come sostituito dall'<ref eId="41" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main#art_1-com1-letb">articolo 1, comma 1, lettera b), del decreto legislativo 9 novembre 2012, n. 192</ref>, si interpreta nel senso che le transazioni commerciali ivi considerate comprendono anche i contratti previsti dall'articolo 3, comma 3, del codice di cui al <ref eId="42" href="/akn/it/act/decretoLegislativo/stato/2006-04-12/163/!main">decreto legislativo 12 aprile 2006, n. 163</ref>". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_3">
+                <num>Art. 3.</num>
+                <heading> Responsabilita' del debitore</heading>
+                <paragraph eId="art_3__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il creditore ha diritto alla corresponsione degli interessi moratori <ins eId="ins_5">((sull'importo dovuto))</ins>, ai sensi degli articoli 4 e 5, salvo che il debitore dimostri che il ritardo nel pagamento del prezzo e' stato determinato dall'impossibilita' della prestazione derivante da causa a lui non imputabile. <ins eId="ins_6">((2))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="43" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_4">
+                <num>Art. 4.</num>
+                <heading> Termini di pagamento</heading>
+                <paragraph eId="art_4__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Gli interessi moratori decorrono, senza che sia necessaria la costituzione in mora, dal giorno successivo alla scadenza del termine per il pagamento. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_2">
+                    <num>2.</num>
+                    <list>
+                        <intro eId="art_4__para_2__intro_1">
+                            <p>Salvo quanto previsto dai commi 3, 4 e 5, il periodo di pagamento non puo' superare i seguenti termini: 
+ </p>
+                        </intro>
+                        <point eId="art_4__para_2.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>trenta giorni dalla data di ricevimento da parte del debitore della fattura o di una richiesta di pagamento di contenuto equivalente. Non hanno effetto sulla decorrenza del termine le richieste di integrazione o modifica formali della fattura o di altra richiesta equivalente di pagamento; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_2.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>trenta giorni dalla data di ricevimento delle merci o dalla data di prestazione dei servizi, quando non e' certa la data di ricevimento della fattura o della richiesta equivalente di pagamento; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_2.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>trenta giorni dalla data di ricevimento delle merci o dalla prestazione dei servizi, quando la data in cui il debitore riceve la fattura o la richiesta equivalente di pagamento e' anteriore a quella del ricevimento delle merci o della prestazione dei servizi; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_2.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>trenta giorni dalla data dell'accettazione o della verifica eventualmente previste dalla legge o dal contratto ai fini dell'accertamento della conformita' della merce o dei servizi alle previsioni contrattuali, qualora il debitore riceva la fattura o la richiesta equivalente di pagamento in epoca non successiva a tale data. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_4__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Nelle transazioni commerciali tra imprese le parti possono pattuire un termine per il pagamento superiore rispetto a quello previsto dal comma 2. Termini superiori a sessanta giorni, purche' non siano gravemente iniqui per il creditore ai sensi dell'articolo 7, devono essere pattuiti espressamente. La clausola relativa al termine deve essere provata per iscritto. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Nelle transazioni commerciali in cui il debitore e' una pubblica amministrazione le parti possono pattuire, purche' in modo espresso, un termine per il pagamento superiore a quello previsto dal comma 2, quando cio' sia oggettivamente giustificato dalla natura particolare del contratto o da talune sue caratteristiche. In ogni caso i termini di cui al comma 2 non possono essere superiori a sessanta giorni. La clausola relativa al termine deve essere provata per iscritto. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_5">
+                    <num>5.</num>
+                    <list>
+                        <intro eId="art_4__para_5__intro_1">
+                            <p>I termini di cui al comma 2 sono raddoppiati: 
+ </p>
+                        </intro>
+                        <point eId="art_4__para_5.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>per le imprese pubbliche che sono tenute al rispetto dei requisiti di trasparenza di cui al <ref eId="content__ref_44" href="/akn/it/act/decretoLegislativo/stato/2003-11-11/333/!main">decreto legislativo 11 novembre 2003, n. 333</ref>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_5.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>per gli enti pubblici che forniscono assistenza sanitaria e che siano stati debitamente riconosciuti a tale fine. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_4__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>Quando e' prevista una procedura diretta ad accertare la conformita' della merce o dei servizi al contratto essa non puo' avere una durata superiore a trenta giorni dalla data della consegna della merce o della prestazione del servizio, salvo che sia diversamente ed espressamente concordato dalle parti e previsto nella documentazione di gara e purche' cio' non sia gravemente iniquo per il creditore ai sensi dell'articolo</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7">
+                    <num>7.</num>
+                    <content>
+                        <p>L'accordo deve essere provato per iscritto. 
+ 7. Resta ferma la facolta' delle parti di concordare termini di pagamento a rate. In tali casi, qualora una delle rate non sia pagata alla data concordata, gli interessi e il risarcimento previsti dal presente decreto sono calcolati esclusivamente sulla base degli importi scaduti. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>((</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7-bis">
+                    <num>7-bis.</num>
+                    <content>
+                        <p>Le banche, gli intermediari finanziari, la Cassa depositi e prestiti S.p.A. e le istituzioni finanziarie dell'Unione europea possono concedere ai comuni, alle province, alle citta' metropolitane, alle regioni e alle province autonome, anche per conto dei rispettivi enti del Servizio sanitario nazionale, anticipazioni di liquidita' da destinare al pagamento di debiti certi, liquidi ed esigibili, maturati alla data del 31 dicembre 2019, relativi a somministrazioni, forniture, appalti e a obbligazioni per prestazioni professionali. L'anticipazione di liquidita' per il pagamento di debiti fuori bilancio e' subordinata al relativo riconoscimento. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7-ter">
+                    <num>7-ter.</num>
+                    <content>
+                        <p>Le anticipazioni di cui al comma 7-bis sono concesse, per gli enti locali, entro il limite massimo di tre dodicesimi delle entrate accertate nell'anno 2018 afferenti ai primi tre titoli di entrata del bilancio e, per le regioni e le province autonome, entro il limite massimo del 5 per cento delle entrate accertate nell'anno 2018 afferenti al primo titolo di entrata del bilancio. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7-quater">
+                    <num>7-quater.</num>
+                    <content>
+                        <p>Con riferimento alle anticipazioni non costituenti indebitamento ai sensi dell'<ref eId="content__ref_45" href="/akn/it/act/legge/stato/2003-12-24/350/!main#art_3-com17">articolo 3, comma 17, della legge 24 dicembre 2003, n. 350</ref>, fatto salvo l'obbligo per gli enti richiedenti di adeguare le relative iscrizioni nel bilancio di previsione successivamente al perfezionamento delle anticipazioni, non trovano applicazione le disposizioni di cui all'articolo 203, comma 1, lettera b), e all'articolo 204 del testo unico di cui al <ref eId="content__ref_46" href="/akn/it/act/decretoLegislativo/stato/2000-08-18/267/!main#art_62">decreto legislativo 18 agosto 2000, n. 267, nonche' di cui all'articolo 62</ref> del <ref eId="content__ref_47" href="/akn/it/act/decretoLegislativo/stato/2011-06-23/118/!main">decreto legislativo 23 giugno 2011, n. 118</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7-quinquies">
+                    <num>7-quinquies.</num>
+                    <content>
+                        <p>Le anticipazioni agli enti locali sono assistite dalla delegazione di pagamento di cui all'articolo 206 del citato <ref eId="content__ref_48" href="/akn/it/act/decretoLegislativo/stato/2000-08-18/267/!main">decreto legislativo 18 agosto 2000, n. 267</ref>. Ad esse si applicano le disposizioni di cui all'articolo 159, comma 2, e all'articolo 255, comma 10, del predetto <ref eId="content__ref_49" href="/akn/it/act/decretoLegislativo/stato/2000-08-18/267/!main">decreto legislativo 18 agosto 2000, n. 267</ref>. Le anticipazioni alle regioni e alle province autonome sono assistite da garanzia sulle relative entrate di bilancio a norma della specifica disciplina applicabile a ciascuna regione e provincia autonoma. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7-sexies">
+                    <num>7-sexies.</num>
+                    <content>
+                        <p>La richiesta di anticipazione di liquidita' e' presentata agli istituti finanziari di cui al comma 7-bis entro il termine del 30 aprile 2020 ed e' corredata di un'apposita dichiarazione sottoscritta dal rappresentante legale dell'ente richiedente, contenente l'elenco dei debiti da pagare con l'anticipazione, come qualificati al medesimo comma 7-bis, redatta utilizzando il modello generato dalla piattaforma elettronica per la gestione telematica del rilascio delle certificazioni di cui all'<ref eId="content__ref_50" href="/akn/it/act/decretoLegge/stato/2013-04-08/35/!main#art_7-com1">articolo 7, comma 1, del decreto-legge 8 aprile 2013, n. 35</ref>, convertito, con modificazioni, dalla <ref eId="content__ref_51" href="/akn/it/act/legge/stato/2013-06-06/64/!main">legge 6 giugno 2013, n. 64</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7-septies">
+                    <num>7-septies.</num>
+                    <content>
+                        <p>Gli enti debitori effettuano il pagamento dei debiti per i quali hanno ottenuto l'anticipazione di liquidita' entro quindici giorni dalla data di effettiva erogazione da parte dell'istituto finanziatore. Per il pagamento dei debiti degli enti del Servizio sanitario nazionale e degli enti locali, da effettuare a valere sui trasferimenti da parte di regioni e province autonome di cui al comma 7-bis, il termine e' di trenta giorni dalla data di effettiva erogazione da parte dell'istituto finanziatore. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_7-octies">
+                    <num>7-octies.</num>
+                    <content>
+                        <p>Le anticipazioni di liquidita' sono rimborsate entro il termine del 30 dicembre 2020, o anticipatamente in conseguenza del ripristino della normale gestione della liquidita', alle condizioni pattuite contrattualmente con gli istituti finanziatori. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p> 7-novies. Gli istituti finanziatori verificano, attraverso la piattaforma elettronica di cui al comma 7-sexies, l'avvenuto pagamento dei debiti di cui al medesimo comma. In caso di mancato pagamento, gli istituti finanziatori possono chiedere, per il corrispondente importo, la restituzione dell'anticipazione, anche attivando le garanzie di cui al comma 7-quinquies))</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="52" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_5">
+                <num>Art. 5.</num>
+                <heading>
+                    <ins eId="ins_8">(( (Saggio degli interessi). ))</ins>
+                </heading>
+                <paragraph>
+                    <content>
+                        <p>((</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Gli interessi moratori sono determinati nella misura degli interessi legali di mora. Nelle transazioni commerciali tra imprese e' consentito alle parti di concordare un tasso di interesse diverso, nei limiti previsti dall'articolo 7. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_2">
+                    <num>2.</num>
+                    <list>
+                        <intro eId="art_5__para_2__intro_1">
+                            <p>Il tasso di riferimento e' cosi' determinato: 
+ </p>
+                        </intro>
+                        <point eId="art_5__para_2.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>per il primo semestre dell'anno cui si riferisce il ritardo, e' quello in vigore il 1° gennaio di quell'anno; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_5__para_2.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>per il secondo semestre dell'anno cui si riferisce il ritardo, e' quello in vigore il 1° luglio di quell'anno. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p> 3. Il Ministero dell'economia e delle finanze da' notizia del tasso di riferimento, curandone la pubblicazione nella Gazzetta Ufficiale della Repubblica italiana nel quinto giorno lavorativo di ciascun semestre solare.))</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>((2))</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="53" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_6">
+                <num>Art. 6.</num>
+                <heading>
+                    <ins eId="ins_11">(( (Risarcimento delle spese di recupero). ))</ins>
+                </heading>
+                <paragraph>
+                    <content>
+                        <p>((</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Nei casi previsti dall'articolo 3, il creditore ha diritto anche al rimborso dei costi sostenuti per il recupero delle somme non tempestivamente corrisposte. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p> 2. Al creditore spetta, senza che sia necessaria la costituzione in mora, un importo forfettario di 40 euro a titolo di risarcimento del danno. E' fatta salva la prova del maggior danno, che puo' comprendere i costi di assistenza per il recupero del credito.))</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>((2))</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="54" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_7">
+                <num>Art. 7.</num>
+                <heading> (Nullita').</heading>
+                <paragraph eId="art_7__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le clausole relative al termine di pagamento, al saggio degli interessi moratori o al risarcimento per i costi di recupero, a qualunque titolo previste o introdotte nel contratto, sono nulle quando risultano gravemente inique in danno del creditore. Si applicano gli <ref eId="content__ref_55" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_1339">articoli 1339</ref> e <ref eId="content__ref_56" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_1419-com2">1419, secondo comma, del codice civile</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il giudice dichiara, anche d'ufficio, la nullita' della clausola avuto riguardo a tutte le circostanze del caso, tra cui il grave scostamento dalla prassi commerciale in contrasto con il principio di buona fede e correttezza, la natura della merce o del servizio oggetto del contratto, l'esistenza di motivi oggettivi per derogare al saggio degli interessi legali di mora, ai termini di pagamento o all'importo forfettario dovuto a titolo di risarcimento per i costi di recupero. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Si considera gravemente iniqua la clausola che esclude l'applicazione di interessi di mora. Non e' ammessa prova contraria. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Si presume che sia gravemente iniqua la clausola che esclude il risarcimento per i costi di recupero di cui all'articolo 6. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>((4-bis. Nelle transazioni commerciali in cui il creditore sia una PMI, come definita ai sensi del decreto del Ministro delle attivita' produttive 18 aprile 2005, pubblicato nella Gazzetta Ufficiale n. 238 del 12 ottobre 2005, si presume che sia gravemente iniqua la clausola che prevede termini di pagamento superiori a sessanta giorni. Il presente comma non si applica quando tutte le parti del contratto sono PMI))</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Nelle transazioni commerciali in cui il debitore e' una pubblica amministrazione e' nulla la clausola avente ad oggetto la predeterminazione o la modifica della data di ricevimento della fattura. La nullita' e' dichiarata d'ufficio dal giudice. 
+ (2) 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="57" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_7-bis">
+                <num>Art. 7-bis.</num>
+                <heading>
+                    <ins eId="ins_15">(( (Prassi inique). ))</ins>
+                </heading>
+                <paragraph>
+                    <content>
+                        <p>((</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7-bis__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le prassi relative al termine di pagamento, al saggio degli interessi moratori o al risarcimento per i costi di recupero, quando risultano gravemente inique per il creditore, danno diritto al risarcimento del danno. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7-bis__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il giudice accerta che una prassi e' gravemente iniqua tenuto conto di quanto previsto dall'articolo 7, comma 2. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7-bis__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Si considera gravemente iniqua la prassi che esclude l'applicazione di interessi di mora. Non e' ammessa prova contraria. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p> 4. Si presume che sia gravemente iniqua la prassi che esclude il risarcimento per i costi di recupero di cui all'articolo 6))</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_7-ter">
+                <num>Art. 7-ter.</num>
+                <heading>(Evidenza nel bilancio sociale)</heading>
+                <paragraph>
+                    <content>
+                        <p>
+                            <ins eId="ins_17">((1.))</ins> A decorrere dall'esercizio 2019, nel bilancio sociale le societa' danno evidenza dei tempi medi di pagamento delle transazioni effettuate nell'anno, individuando altresi' gli eventuali ritardi medi tra i termini pattuiti e quelli effettivamente praticati. I medesimi soggetti danno conto nel bilancio sociale anche delle politiche commerciali adottate con riferimento alle suddette transazioni, nonche' delle eventuali azioni poste in essere in relazione ai termini di pagamento. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_8">
+                <num>Art. 8.</num>
+                <heading> Tutela degli interessi collettivi</heading>
+                <paragraph eId="art_8__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le associazioni di categoria degli imprenditori presenti nel Consiglio nazionale dell'economia e del lavoro (CNEL), prevalentemente in rappresentanza delle piccole e medie imprese di tutti i settori produttivi e degli artigiani, sono legittimate ad agire, a tutela degli interessi collettivi, richiedendo al giudice competente: 
+ <ins eId="ins_18">((a) di accertare la grave iniquita', ai sensi dell'articolo 7, delle condizioni generali concernenti il termine di pagamento, il saggio degli interessi moratori o il risarcimento per i costi di recupero e di inibirne l'uso.))</ins>
+                            <ins eId="ins_19">((2))</ins> 
+ b) di adottare le misure idonee a correggere o eliminare gli effetti dannosi delle violazioni accertate; 
+ c) di ordinare la pubblicazione del provvedimento su uno o piu' quotidiani a diffusione nazionale oppure locale nei casi in cui la pubblicita' del provvedimento possa contribuire a correggere o eliminare gli effetti delle violazioni accertate. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>L'inibitoria e' concessa, quando ricorrono giusti motivi di urgenza, ai sensi degli <ref eId="content__ref_58" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_669bis">articoli 669-bis e seguenti del codice di procedura civile</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>In caso di inadempimento degli obblighi stabiliti dal provvedimento reso nel giudizio di cui ai commi 1 e 2, il giudice, anche su domanda dell'associazione che ha agito, dispone il pagamento di una somma di denaro, da Euro 500 a Euro 1.100, per ogni giorno di ritardo, tenuto conto della gravita' del fatto. 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>
+ Il <ref eId="59" href="/akn/it/act/decretoLegislativo/stato/2012-11-09/192/!main">D.Lgs. 9 novembre 2012, n. 192</ref> ha disposto (con l'art. 3, comma 1) che "Le disposizioni di cui al presente decreto legislativo si applicano alle transazioni commerciali concluse a decorrere dal 1° gennaio 2013". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9">
+                <num>Art. 9.</num>
+                <heading> Modifiche al codice di procedura civile</heading>
+                <paragraph eId="art_9__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>L'ultimo comma dell'<ref eId="content__ref_60" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_633">articolo 633 del codice di procedura civile</ref> e' abrogato.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9__para_2">
+                    <num>2.</num>
+                    <list>
+                        <intro eId="art_9__para_2__intro_1">
+                            <p>All'<ref eId="content__ref_61" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_641">articolo 641 del codice di procedura civile</ref> sono apportate le seguenti modifiche:
+ </p>
+                        </intro>
+                        <point eId="art_9__para_2.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>nel primo periodo, dopo le parole "decreto motivato", sono aggiunte le seguenti: "da emettere entro trenta giorni dal deposito del ricorso";
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_9__para_2.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>il secondo periodo del secondo comma e' cosi' sostituito: "Se l'intimato risiede in uno degli altri Stati dell'Unione europea, il termine e' di cinquanta giorni e puo' essere ridotto fino a venti giorni. Se l'intimato risiede in altri Stati, il termine e' di sessanta giorni e, comunque, non puo' essere inferiore a trenta ne' superiore a centoventi".
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_9__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>All'<ref eId="content__ref_62" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_648-com1">articolo 648, primo comma, del codice di procedura civile</ref>, e' aggiunto, in fine, il seguente periodo: "Il giudice concede l'esecuzione provvisoria parziale del decreto ingiuntivo opposto limitatamente alle somme non contestate, salvo che l'opposizione sia proposta per vizi procedurali".
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_1" placement="bottom">
+                                <p> Note all'art. 9:
+ - Si riporta il testo dell'<ref eId="content__ref_63" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_633">art. 633 del codice di procedura civile</ref>, come modificato dal decreto legislativo qui pubblicato:
+ "Art. 633 (Condizioni di ammissibilita). - Su domanda di chi e' creditore di una somma liquida di danaro o di una determinata quantita' di cose fungibili, o di chi ha diritto alla consegna di una cosa mobile determinata, il giudice competente pronuncia ingiunzione di pagamento o di consegna:
+ 1) se del diritto fatto valere si da' prova scritta;
+ 2) se il credito riguarda onorari per prestazioni giudiziali o stragiudiziali o rimborso di spese fatte da avvocati, procuratori, cancellieri, ufficiali giudiziari o da chiunque altro ha prestato la sua opera in occasione di un processo;
+ 3) se il credito riguarda onorari, diritti o rimborsi spettanti ai notai a norma della loro legge professionale, oppure ad altri esercenti una libera professione o arte, per la quale esiste una tariffa legalmente approvata.
+ L'ingiunzione puo' essere pronunciata anche se il diritto dipende da una controprestazione o da una condizione, purche' il ricorrente offra elementi atti a far presumere l'adempimento della controprestazione o l'avveramento della condizione.".
+ - Il testo dell'<ref eId="content__ref_64" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_641">art. 641 del codice di procedura civile</ref>, come modificato dal decreto legislativo qui pubblicato, e' il seguente:
+ "Art. 641 (Accoglimento della domanda). - Se esistono le condizioni previste nell'art. 633, il giudice, con decreto motivato da emettere entro trenta giorni dal deposito del ricorso, ingiunge all'altra parte di pagare la somma o di consegnare la cosa o la quantita' di cose chieste o invece di queste la somma di cui all'art. 639 nel termine di quaranta giorni, con l'espresso avvertimento che nello stesso termine puo' essere fatta opposizione a norma degli articoli seguenti e che, in mancanza di opposizione, si procedera' a esecuzione forzata.
+ Quando concorrono giusti motivi, il termine puo' essere ridotto sino a dieci giorni oppure aumentato a sessanta. Se l'intimato risiede in uno degli altri Stati dell'Unione europea, il termine e' di cinquanta giorni e puo' essere ridotto fino a venti giorni. Se l'intimato risiede in altri Stati, il termine e' di sessanta giorni e, comunque, non puo' essere inferiore a trenta ne' superiore a centoventi.
+ Nel decreto eccetto per quello emesso sulla base di titoli che hanno gia' efficacia esecutiva secondo le vigenti disposizioni, il giudice liquida le spese e le competenze e ne ingiunge il pagamento.".
+ - Il testo dell'<ref eId="content__ref_65" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_648">art. 648 del codice di procedura civile</ref>, come modificato dal decreto legislativo qui pubblicato, e' il seguente:
+ "Art. 648 (Esecuzione provvisoria in pendenza di opposizione). - Il giudice istruttore, se l'opposizione non e' fondata su prova scritta o di pronta soluzione, puo' concedere, con ordinanza non impugnabile, l'esecuzione provvisoria del decreto, qualora non sia gia' stata concessa a norma dell'art. 642. Il giudice concede l'esecuzione provvisoria parziale del decreto ingiuntivo opposto limitatamente alle somme non contestate, salvo che l'opposizione sia proposta per vizi procedurali.
+ Deve in ogni caso concederla, se la parte che l'ha chiesta offre cauzione per l'ammontare delle eventuali restituzioni, spese e danni.".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_10">
+                <num>Art. 10.</num>
+                <heading> Modifiche alla legge 18 giugno 1998, n. 192</heading>
+                <paragraph eId="art_10__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>All'<ref eId="content__ref_66" href="/akn/it/act/legge/stato/1998-06-18/192/!main#art_3">articolo 3, della legge 18 giugno 1998, n. 192</ref>, il comma 3 e' cosi' sostituito: "In caso di mancato rispetto del termine di pagamento il committente deve al subfornitore, senza bisogno di costituzione in mora, un interesse determinato in misura pari al saggio d'interesse del principale strumento di rifinanziamento della Banca centrale europea applicato alla sua piu' recente operazione di rifinanziamento principale effettuata il primo giorno di calendario del semestre in questione, maggiorato di sette punti percentuali, salva la pattuizione tra le parti di interessi moratori in misura superiore e salva la prova del danno ulteriore. Il saggio di riferimento in vigore il primo giorno lavorativo della Banca centrale europea del semestre in questione si applica per i successivi sei mesi. Ove il ritardo nel pagamento ecceda di trenta giorni il termine convenuto, il committente incorre, inoltre, in una penale pari al 5 per cento dell'importo in relazione al quale non ha rispettato i termini.".
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_2" placement="bottom">
+                                <p> Note all'art. 10:
+ - Il testo dell'<ref eId="content__ref_67" href="/akn/it/act/legge/stato/1998-06-18/192/!main#art_3">art. 3 della legge 18 giugno 1998, n. 192</ref> (Disciplina della subfornitura nelle attivita' produttive) come modificato dal decreto legislativo qui pubblicato, e' il seguente:
+ "Art. 3 (Termini di pagamento). - 1. Il contratto deve fissare i termini di pagamento della subfornitura, decorrenti dal momento della consegna del bene o dal momento della comunicazione dell'avvenuta esecuzione della prestazione, e deve precisare, altresi', gli eventuali sconti in caso di pagamento anticipato rispetto alla consegna.
+ 2. Il prezzo pattuito deve essere corrisposto in un termine che non puo' eccedere i sessanta giorni dal momento della consegna del bene o della comunicazione dell'avvenuta esecuzione della prestazione. Tuttavia, puo' essere fissato un diverso termine, non eccedente i novanta giorni, in accordi nazionali per settori e comparti specifici, sottoscritti presso il Ministero dell'industria, del commercio e dell'artigianato da tutti i soggetti competenti per settore presenti nel Consiglio nazionale dell'economia e del lavoro in rappresentanza dei subfornitori e dei committenti. Puo' altresi' essere fissato un diverso termine, in ogni caso non eccedente i novanta giorni, in accordi riferiti al territorio di competenza della camera di commercio, industria, artigianato e agricoltura presso la quale detti accordi sono sottoscritti dalle rappresentanze locali dei medesimi soggetti di cui al secondo periodo. Gli accordi di cui al presente comma devono contenere anche apposite clausole per garantire e migliorare i processi di innovazione tecnologica, di formazione professionale e di integrazione produttiva.
+ 3. In caso di mancato rispetto del termine di pagamento il committente deve al subfornitore, senza bisogno di costituzione in mora, un interesse determinato in misura pari al saggio d'interesse del principale strumento di rifinanziamento della Banca centrale europea applicato alla sua piu' recente operazione di rifinanziamento principale effettuata il primo giorno di calendario del semestre in questione, maggiorato di 7 punti percentuali, salva la pattuizione tra le parti di interessi moratori in misura superiore e salva la prova del danno ulteriore. Il saggio di riferimento in vigore il primo giorno lavorativo della Banca centrale europea del semestre in questione si applica per i successivi sei mesi. Ove il ritardo nel pagamento ecceda di trenta giorni il termine convenuto, il committente incorre, inoltre, in una penale pari al 5 per cento dall'importo in relazione al quale non ha rispettato i termini.
+ 4. In ogni caso la mancata corresponsione del prezzo entro i termini pattuiti costituira' titolo per l'ottenimento di ingiunzione di pagamento provvisoriamente esecutiva ai sensi degli <ref eId="content__ref_68" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_633">articoli 633 e seguenti del codice di procedura civile</ref>.
+ 5. Ove vengano apportate, nel corso dell'esecuzione del rapporto, su richiesta del committente, significative modifiche e varianti che comportino comunque incrementi dei costi, il subfornitore avra' diritto ad un adeguamento del prezzo anche se non esplicitamente previsto dal contratto.".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_11">
+                <num>Art. 11.</num>
+                <heading> Norme transitorie finali</heading>
+                <paragraph eId="art_11__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le disposizioni del presente decreto non si applicano ai contratti conclusi prima dell'8 agosto 2002.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_11__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Sono fatte salve le vigenti disposizioni del <ref eId="content__ref_69" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main">codice civile</ref> e delle leggi speciali che contengono una disciplina piu' favorevole per il creditore.
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_11__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>La riserva della proprieta' di cui all'<ref eId="content__ref_70" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_1523">articolo 1523 del codice civile</ref>, preventivamente concordata per iscritto tra l'acquirente ed il venditore, e' opponibile ai creditori del compratore se e' confermata nelle singole fatture delle successive forniture aventi data certa anteriore al pignoramento e regolarmente registrate nelle scritture contabili.
+ </p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_3" placement="bottom">
+                                <p> Nota all'art. 11:
+ - Si riporta il testo dell'<ref eId="content__ref_71" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_1523">art. 1523 del codice civile</ref>:
+ "Art. 1523 (Passaggio della proprieta' e dei rischi). - Nella vendita a rate con riserva della proprieta', il compratore acquista la proprieta' della cosa col pagamento dell'ultima rata di prezzo, ma assume i rischi dal momento della consegna.".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+        </body>
+        <conclusions>
+            <formula name="formulaFinaleConclusioni">
+                <p>Il presente decreto, munito del sigillo dello Stato, sara' inserito nella Raccolta ufficiale degli atti normativi della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarlo e di farlo osservare.</p>
+            </formula>
+            <p> Dato a Roma, addi' 9 ottobre 2002</p>
+            <p>CIAMPI Berlusconi, Presidente del Consiglio dei Ministri Buttiglione, Ministro per le politiche comunitarie Castelli, Ministro della giustizia Tremonti, Ministro dell'economia e delle finanze Frattini, Ministro per la funzione pubblica Marzano, Ministro delle attivita' produttive Visto, il Guardasigilli: Castelli</p>
+        </conclusions>
+    </act>
+</akomaNtoso>

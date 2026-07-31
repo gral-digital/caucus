@@ -48,7 +48,6 @@ class HybridRetriever:
         t0 = perf_counter()
         [query_vec] = await self._embedder.embed([query.text], kind="query")
 
-        filters = list(self._build_filters(query))
         used_corpora: list[CorpusFilter] = []
         all_points: list[tuple[CorpusFilter, qm.ScoredPoint]] = []
 
@@ -57,6 +56,11 @@ class HybridRetriever:
             if collection is None:
                 logger.warning("corpus_not_configured", corpus=corpus)
                 continue
+            # Il filtro `sources` (short_id normativi) non ha senso sulla
+            # giurisprudenza: applicarlo azzererebbe i risultati Cassazione
+            # ogni volta che il router pinna una fonte normativa.
+            skip_sources = corpus == CorpusFilter.CASSAZIONE
+            filters = list(self._build_filters(query, skip_sources=skip_sources))
             points = await self._store.hybrid_search(
                 collection,
                 query=query_vec,
@@ -90,8 +94,10 @@ class HybridRetriever:
             used_corpora=used_corpora,
         )
 
-    def _build_filters(self, query: RetrievalQuery) -> Iterable[qm.FieldCondition]:
-        if query.sources:
+    def _build_filters(
+        self, query: RetrievalQuery, *, skip_sources: bool = False
+    ) -> Iterable[qm.FieldCondition]:
+        if query.sources and not skip_sources:
             yield qm.FieldCondition(
                 key="source",
                 match=qm.MatchAny(any=list(query.sources)),

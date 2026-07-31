@@ -217,3 +217,66 @@ class NormChunk(Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+
+class CaseLaw(Base):
+    """Sentenza/ordinanza di Cassazione (fonte: SentenzeWeb, testo anonimizzato)."""
+
+    __tablename__ = "case_law"
+    __table_args__ = (
+        Index("ix_case_law_kind_anno_numero", "kind", "anno", "numero"),
+        Index("ix_case_law_data_deposito", "data_deposito"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    external_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
+    kind: Mapped[str] = mapped_column(String(16), nullable=False)
+    tipoprov: Mapped[str | None] = mapped_column(String(32), nullable=True)
+    sezione: Mapped[str | None] = mapped_column(String(8), nullable=True)
+    numero: Mapped[str] = mapped_column(String(16), nullable=False)
+    anno: Mapped[int] = mapped_column(Integer, nullable=False)
+    ecli: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    data_decisione: Mapped[date | None] = mapped_column(Date, nullable=True)
+    data_deposito: Mapped[date | None] = mapped_column(Date, nullable=True)
+    presidente: Mapped[str | None] = mapped_column(Text, nullable=True)
+    relatore: Mapped[str | None] = mapped_column(Text, nullable=True)
+    materia: Mapped[str | None] = mapped_column(Text, nullable=True)
+    dispositivo: Mapped[str | None] = mapped_column(Text, nullable=True)
+    full_text: Mapped[str] = mapped_column(Text, nullable=False)
+    filename: Mapped[str | None] = mapped_column(Text, nullable=True)
+    metadata_: Mapped[dict[str, Any]] = mapped_column(
+        "metadata", JSONB, nullable=False, server_default="{}"
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+
+    chunks: Mapped[list[CaseLawChunk]] = relationship(
+        back_populates="case", cascade="all, delete-orphan"
+    )
+
+
+class CaseLawChunk(Base):
+    __tablename__ = "case_law_chunk"
+    __table_args__ = (
+        Index("ix_case_law_chunk_case", "case_id"),
+        Index("ix_case_law_chunk_tsv", "text_tsv", postgresql_using="gin"),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    case_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("case_law.id", ondelete="CASCADE"), nullable=False
+    )
+    chunk_kind: Mapped[str] = mapped_column(String(32), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    text_tsv: Mapped[Any] = mapped_column(
+        TSVECTOR,
+        Computed("to_tsvector('italian_unaccent', text)", persisted=True),
+    )
+    token_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    qdrant_point_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    metadata_: Mapped[dict[str, Any]] = mapped_column(
+        "metadata", JSONB, nullable=False, server_default="{}"
+    )
+
+    case: Mapped[CaseLaw] = relationship(back_populates="chunks")

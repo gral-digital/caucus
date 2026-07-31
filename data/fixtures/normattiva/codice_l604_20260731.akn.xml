@@ -1,0 +1,622 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/legge/stato/1966-07-15/604/!main"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/1966-07-15/604"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:stato:legge:1966-07-15;604"/>
+                    <FRBRalias name="eli" value="eli/id/1966/08/06/066U0604/CONSOLIDATED/20250724"/>
+                    <FRBRdate date="1966-07-15" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724" aknrelname="eli/id/1966/08/06/066U0604/CONSOLIDATED/20250724">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content="Norme sui licenziamenti individuali. " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="066U0604" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#LEGGE"/>
+                            <nrdfa:span content="1966-07-15" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/legge/stato/1966-07-15/604/ita@2025-07-24/!main"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/1966-07-15/604/ita@2025-07-24"/>
+                    <FRBRdate date="2025-07-24" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/legge/stato/1966-07-15/604/ita@2025-07-24/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/1966-07-15/604/ita@2025-07-24.xml"/>
+                    <FRBRdate date="1966-07-15" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="1966-08-06" name="" number="195" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="1966-08-06" eId="eventRef_0" source="ro1"/>
+                <eventRef date="1970-02-11" eId="eventRef_1" source="rp1"/>
+                <eventRef date="1971-07-21" eId="eventRef_2" source="rp2"/>
+                <eventRef date="1973-12-05" eId="eventRef_3" source="rp3"/>
+                <eventRef date="1980-12-31" eId="eventRef_4" source="rp4"/>
+                <eventRef date="1986-06-25" eId="eventRef_5" source="rp5"/>
+                <eventRef date="1986-07-16" eId="eventRef_6" source="rp6"/>
+                <eventRef date="1987-04-08" eId="eventRef_7" source="rp7"/>
+                <eventRef date="1990-05-11" eId="eventRef_8" source="rp8"/>
+                <eventRef date="1991-02-06" eId="eventRef_9" source="rp9"/>
+                <eventRef date="2003-07-14" eId="eventRef_10" source="rp10"/>
+                <eventRef date="2009-12-14" eId="eventRef_11" source="rp11"/>
+                <eventRef date="2010-11-09" eId="eventRef_12" source="rp12"/>
+                <eventRef date="2010-12-29" eId="eventRef_13" source="rp13"/>
+                <eventRef date="2012-07-03" eId="eventRef_14" source="rp14"/>
+                <eventRef date="2013-06-28" eId="eventRef_15" source="rp15"/>
+                <eventRef date="2020-03-17" eId="eventRef_16" source="rp16"/>
+                <eventRef date="2020-05-19" eId="eventRef_17" source="rp17"/>
+                <eventRef date="2020-08-14" eId="eventRef_18" source="rp18"/>
+                <eventRef date="2020-10-21" eId="eventRef_19" source="rp19"/>
+                <eventRef date="2020-10-28" eId="eventRef_20" source="rp20"/>
+                <eventRef date="2020-12-30" eId="eventRef_21" source="rp21"/>
+                <eventRef date="2021-03-22" eId="eventRef_22" source="rp22"/>
+                <eventRef date="2021-05-25" eId="eventRef_23" source="rp23"/>
+                <eventRef date="2021-06-30" eId="eventRef_24" source="rp24"/>
+                <eventRef date="2021-07-20" eId="eventRef_25" source="rp25"/>
+                <eventRef date="2021-07-24" eId="eventRef_26" source="rp26"/>
+                <eventRef date="2021-10-21" eId="eventRef_27" source="rp27"/>
+                <eventRef date="2023-03-15" eId="eventRef_28" source="rp28"/>
+                <eventRef date="2025-07-23" eId="eventRef_29" source="rp29"/>
+            </lifecycle>
+            <workflow source="">
+                <step by="#camera" date="1966-07-15" refersTo="#C.2452"/>
+                <step by="#senato" date="1966-07-15" refersTo="#S.1673"/>
+            </workflow>
+            <analysis source="">
+                <passiveModifications>
+                    <textualMod eId="pmod_0" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_1"/>
+                        <new>
+                            <nakn:text>((2. La comunicazione del licenziamento deve contenere la specificazione dei motivi che lo hanno determinato))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_1" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_2"/>
+                        <new>
+                            <nakn:text>((25))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_2" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_3"/>
+                        <new>
+                            <nakn:text>((Il licenziamento determinato da ragioni di credo politico o fede religiosa, dall'appartenenza a un sindacato, dalla partecipazione ad attivita' sindacali o conseguente all'esercizio di un diritto ovvero alla segnalazione, alla denuncia all'autorita' giudiziaria o contabile o alla divulgazione pubblica effettuate ai sensi del decreto legislativo attuativo della direttiva (UE) 2019/1937 del Parlamento europeo e del Consiglio, del 23 ottobre 2019, e' nullo.))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_3" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_4"/>
+                        <new>
+                            <nakn:text>((26))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_4" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_5"/>
+                        <new>
+                            <nakn:text>((27))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_5" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_6"/>
+                        <new>
+                            <nakn:text>((25))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_6" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_7"/>
+                        <new>
+                            <nakn:text>((1. Quando risulti accertato che non ricorrono gli estremi del licenziamento per giusta causa o giustificato motivo, il datore di lavoro e' tenuto a riassumere il prestatore di lavoro entro il termine di tre giorni o, in mancanza, a risarcire il danno versandogli un'indennita' di importo compreso tra un minimo di 2,5 ed un massimo di 6 mensilita' dell'ultima retribuzione globale di fatto, avuto riguardo al numero dei dipendenti occupati, alle dimensioni dell'impresa, all'anzianita' di servizio del prestatore di lavoro, al comportamento e alle condizioni delle parti. La misura massima della predetta indennita' puo' essere maggiorata fino a 10 mensilita' per il prestatore di lavoro con anzianita' superiore ai dieci anni e fino a 14 mensilita' per il prestatore di lavoro con anzianita' superiore ai venti anni, se dipendenti da datore di lavoro che occupa piu' di quindici prestatori di lavoro))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_7" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_8"/>
+                        <new>
+                            <nakn:text>((9))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_8" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_9"/>
+                        <new>
+                            <nakn:text>((COMMA ABROGATO DALLA L. 11 MAGGIO 1990, N. 108))</nakn:text>
+                        </new>
+                    </textualMod>
+                </passiveModifications>
+            </analysis>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/LEGGE/stato/1966-07-15/604/!main" showAs=""/>
+                <passiveRef eId="rp1" href="" showAs=""/>
+                <passiveRef eId="rp2" href="" showAs=""/>
+                <passiveRef eId="rp3" href="" showAs=""/>
+                <passiveRef eId="rp4" href="" showAs=""/>
+                <passiveRef eId="rp5" href="" showAs=""/>
+                <passiveRef eId="rp6" href="" showAs=""/>
+                <passiveRef eId="rp7" href="" showAs=""/>
+                <passiveRef eId="rp8" href="/akn/it/act/LEGGE/stato/1990-05-11/108/!main" showAs=""/>
+                <passiveRef eId="rp9" href="" showAs=""/>
+                <passiveRef eId="rp10" href="" showAs=""/>
+                <passiveRef eId="rp11" href="/akn/it/act/DECRETO_LEGISLATIVO/stato/2009-12-01/179/!main" showAs=""/>
+                <passiveRef eId="rp12" href="/akn/it/act/LEGGE/stato/2010-11-04/183/!main" showAs=""/>
+                <passiveRef eId="rp13" href="/akn/it/act/DECRETO-LEGGE/stato/2010-12-29/225/!main" showAs=""/>
+                <passiveRef eId="rp14" href="/akn/it/act/LEGGE/stato/2012-06-28/92/!main" showAs=""/>
+                <passiveRef eId="rp15" href="/akn/it/act/DECRETO-LEGGE/stato/2013-06-28/76/!main" showAs=""/>
+                <passiveRef eId="rp16" href="/akn/it/act/DECRETO-LEGGE/stato/2020-03-17/18/!main" showAs=""/>
+                <passiveRef eId="rp17" href="/akn/it/act/DECRETO-LEGGE/stato/2020-05-19/34/!main" showAs=""/>
+                <passiveRef eId="rp18" href="/akn/it/act/DECRETO-LEGGE/stato/2020-08-14/104/!main" showAs=""/>
+                <passiveRef eId="rp19" href="" showAs=""/>
+                <passiveRef eId="rp20" href="/akn/it/act/DECRETO-LEGGE/stato/2020-10-28/137/!main" showAs=""/>
+                <passiveRef eId="rp21" href="/akn/it/act/LEGGE/stato/2020-12-30/178/!main" showAs=""/>
+                <passiveRef eId="rp22" href="/akn/it/act/DECRETO-LEGGE/stato/2021-03-22/41/!main" showAs=""/>
+                <passiveRef eId="rp23" href="/akn/it/act/DECRETO-LEGGE/stato/2021-05-25/73/!main" showAs=""/>
+                <passiveRef eId="rp24" href="/akn/it/act/DECRETO-LEGGE/stato/2021-06-30/99/!main" showAs=""/>
+                <passiveRef eId="rp25" href="/akn/it/act/DECRETO-LEGGE/stato/2021-07-20/103/!main" showAs=""/>
+                <passiveRef eId="rp26" href="/akn/it/act/LEGGE/stato/2021-07-23/106/!main" showAs=""/>
+                <passiveRef eId="rp27" href="/akn/it/act/DECRETO-LEGGE/stato/2021-10-21/146/!main" showAs=""/>
+                <passiveRef eId="rp28" href="/akn/it/act/DECRETO_LEGISLATIVO/stato/2023-03-10/24/!main" showAs=""/>
+                <passiveRef eId="rp29" href="" showAs=""/>
+                <passiveRef eId="C.2452" href="/akn/it/camera-it:parlamento:scheda.progetto.legge:camera;4.legislatura;2452" showAs=""/>
+                <passiveRef eId="S.1673" href="/akn/it/l" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it">Norme sui licenziamenti individuali. </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>066U0604</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#LEGGE"/>
+                        <eli:date_document rdf:datatype="xsd:date">1966-07-15</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724"/>
+                        <eli:is_embodied_by rdf:resource="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/1966/08/06/066U0604/CONSOLIDATED/20250724/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>LEGGE</docType>
+                <docDate date="1966-07-15">15 luglio 1966</docDate>
+                <docNumber>604</docNumber>
+                <docTitle>Norme sui licenziamenti individuali.
+</docTitle>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="primaDiFormulaInizialePreambolo">
+                <p>La Camera dei deputati ed il Senato della Repubblica hanno approvato;</p>
+            </formula>
+            <formula name="formulaInizialePreambolo">
+                <p>IL PRESIDENTE DELLA REPUBBLICA</p>
+            </formula>
+            <formula name="formulaFinalePreambolo">
+                <p>PROMULGA la seguente legge:</p>
+            </formula>
+        </preamble>
+        <body>
+            <article eId="art_1">
+                <num>Art. 1.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ Nel rapporto di lavoro a tempo indeterminato, intercedente con datori di lavoro privati o con enti pubblici, ove la stabilita' non sia assicurata da norme di legge, di regolamento e di contratto collettivo o individuale, il licenziamento del prestatore di lavoro non puo' avvenire che per giusta causa ai sensi dell'<ref eId="content__ref_1" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_2119">articolo 2119 del Codice civile</ref> o per giustificato motivo.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_2">
+                <num>Art. 2.</num>
+                <heading/>
+                <paragraph eId="art_2__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il datore di lavoro, imprenditore o non imprenditore, deve comunicare per iscritto il licenziamento al prestatore di lavoro. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>((2. La comunicazione del licenziamento deve contenere la specificazione dei motivi che lo hanno determinato))</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il licenziamento intimato senza l'osservanza delle disposizioni di cui ai commi 1 e 2 e' inefficace. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Le disposizioni di cui al comma 1 e di cui all'articolo 9 si applicano anche ai dirigenti. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_3">
+                <num>Art. 3.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ 
+ Il licenziamento per giustificato motivo con preavviso e' determinato da un notevole inadempimento degli obblighi contrattuali del prestatore di lavoro ovvero da ragioni inerenti all'attivita' produttiva, all'organizzazione del lavoro e al regolare funzionamento di essa. 
+ 
+ (14) (15) (16) (18) (19) (20) (23) (21) <ins eId="ins_2">((25))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (14)</p>
+                        <p>
+ Il <ref eId="2" href="/akn/it/act/decretoLegge/stato/2020-03-17/18/!main">D.L. 17 marzo 2020, n. 18</ref> ha disposto (con l'art. 46, comma 1) che sino alla scadenza del termine di 60 giorni decorrenti dal 17/3/2020 il datore di lavoro, indipendentemente dal numero dei dipendenti, non puo' recedere dal contratto per giustificato motivo oggettivo ai sensi del presente articolo. </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (15)</p>
+                        <p>
+ Il <ref eId="3" href="/akn/it/act/decretoLegge/stato/2020-03-17/18/!main">D.L. 17 marzo 2020, n. 18</ref>, convertito con modificazioni dalla <ref eId="4" href="/akn/it/act/legge/stato/2020-04-24/27/!main">L. 24 aprile 2020, n. 27</ref>, come modificato dal <ref eId="5" href="/akn/it/act/decretoLegge/stato/2020-05-19/34/!main">D.L. 19 maggio 2020, n. 34</ref> ha disposto (con l'art. 46, comma 1) che sino alla scadenza del termine di cinque mesi decorrenti dal 17/3/2020 il datore di lavoro, indipendentemente dal numero dei dipendenti, non puo' recedere dal contratto per giustificato motivo oggettivo ai sensi del presente articolo. </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (16)</p>
+                        <p>
+ Il <ref eId="6" href="/akn/it/act/decretoLegge/stato/2020-08-14/104/!main">D.L. 14 agosto 2020, n. 104</ref> ha disposto (con l'art. 14, comma 2) che "Alle condizioni di cui al comma 1, resta, altresi', preclusa al datore di lavoro, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="7" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref>, e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (18)</p>
+                        <p>
+ Il <ref eId="8" href="/akn/it/act/decretoLegge/stato/2020-10-28/137/!main">D.L. 28 ottobre 2020, n. 137</ref> ha disposto (con l'art. 12, comma 10) che fino al 31 gennaio 2021 resta preclusa al datore di lavoro, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo di cui al presente articolo. </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (19)</p>
+                        <p>
+ La <ref eId="9" href="/akn/it/act/legge/stato/2020-12-30/178/!main">L. 30 dicembre 2020, n. 178</ref> ha disposto (con l'art. 1, comma 310) che fino al 31 marzo 2021 resta preclusa al datore di lavoro, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo di cui al presente articolo. </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (20)</p>
+                        <p>
+ Il <ref eId="10" href="/akn/it/act/decretoLegge/stato/2021-03-22/41/!main">D.L. 22 marzo 2021, n. 41</ref> ha disposto (con l'art. 8, comma 9) che fino al 30 giugno 2021 resta preclusa al datore di lavoro, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo di cui al presente articolo. 
+ Ha inoltro disposto (con l'art. 8, comma 10) che "Dal 1° luglio al 31 ottobre 2021 ai datori di lavoro di cui ai commi 2 e 8 [...] resta, altresi', preclusa indipendentemente dal numero dei dipendenti la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="11" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref> e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (23)</p>
+                        <p>
+ Il <ref eId="12" href="/akn/it/act/decretoLegge/stato/2021-07-20/103/!main">D.L. 20 luglio 2021, n. 103</ref> ha disposto (con l'art. 3, comma 2) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi del comma 1 resta precluso l'avvio delle procedure di cui agli <ref eId="13" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="14" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="15" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref> per la durata del trattamento di integrazione salariale fruito entro il 31 dicembre 2021. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="16" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref> e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (21)</p>
+                        <p>
+ Il <ref eId="17" href="/akn/it/act/decretoLegge/stato/2021-05-25/73/!main">D.L. 25 maggio 2021, n. 73</ref>, convertito con modificazioni dalla <ref eId="18" href="/akn/it/act/legge/stato/2021-07-23/106/!main">L. 23 luglio 2021, n. 106</ref>, ha disposto (con l'art. 40, comma 4) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi del comma 3 resta precluso l'avvio delle procedure di cui agli <ref eId="19" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="20" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="21" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref> per la durata del trattamento di integrazione salariale fruito entro il 31 dicembre 2021 e restano altresi' sospese nel medesimo periodo le procedure pendenti avviate successivamente al 23 febbraio 2020, fatte salve le ipotesi in cui il personale interessato dal recesso, gia' impiegato nell'appalto, sia riassunto a seguito di subentro di nuovo appaltatore in forza di legge, di contratto collettivo nazionale di lavoro o di clausola del contratto di appalto. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="22" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref> e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". 
+ Ha inoltre disposto (con l'art. 40-bis, comma 2) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi del comma 1 resta precluso l'avvio delle procedure di cui agli <ref eId="23" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="24" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="25" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref>, per la durata del trattamento di integrazione salariale fruito entro il 31 dicembre 2021 e restano altresi' sospese, nel medesimo periodo, le procedure pendenti avviate successivamente al 23 febbraio 2020, fatte salve le ipotesi in cui il personale interessato dal recesso, gia' impiegato nell'appalto, sia riassunto a seguito di subentro di un nuovo appaltatore in forza di legge, di contratto collettivo nazionale di lavoro o di clausola del contratto di appalto. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa, nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="26" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref>, e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (25)</p>
+                        <p>
+ Il <ref eId="27" href="/akn/it/act/decretoLegge/stato/2021-10-21/146/!main">D.L. 21 ottobre 2021, n. 146</ref>, ha disposto (con l'art. 11, comma 7) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi dei commi 1, 2 e 6 resta precluso l'avvio delle procedure di cui agli <ref eId="28" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="29" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="30" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref>, per la durata della fruizione del trattamento di integrazione salariale. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="31" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref>, e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_4">
+                <num>Art. 4.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+                            <ins eId="ins_3">((Il licenziamento determinato da ragioni di credo politico o fede religiosa, dall'appartenenza a un sindacato, dalla partecipazione ad attivita' sindacali o conseguente all'esercizio di un diritto ovvero alla segnalazione, alla denuncia all'autorita' giudiziaria o contabile o alla divulgazione pubblica effettuate ai sensi del decreto legislativo attuativo della direttiva (UE) 2019/1937 del Parlamento europeo e del Consiglio, del 23 ottobre 2019, e' nullo.))</ins>
+                            <ins eId="ins_4">((26))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO (26)</p>
+                        <p>
+ Il <ref eId="32" href="/akn/it/act/decretoLegislativo/stato/2023-03-10/24/!main">D.Lgs. 10 marzo 2023, n. 24</ref>, ha disposto (con l'art. 24, comma 1) che "Le disposizioni di cui al presente decreto hanno effetto a decorrere dal 15 luglio 2023". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_5">
+                <num>Art. 5.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ L'onere della prova della sussistenza della giusta causa o del giustificato motivo di licenziamento spetta al datore di lavoro.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_6">
+                <num>Art. 6.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ 
+ Il licenziamento deve essere impugnato a pena di decadenza entro sessanta giorni dalla ricezione della sua comunicazione in forma scritta, ovvero dalla comunicazione, anch' essa in forma scritta, dei motivi, ove non contestuale, con qualsiasi atto scritto, anche extragiudiziale, idoneo a rendere nota la volonta' del lavoratore anche attraverso l'intervento dell'organizzazione sindacale diretto ad impugnare il licenziamento stesso. <ins eId="ins_5">((27))</ins> 
+ L'impugnazione e' inefficace se non e' seguita, entro il successivo termine di centottanta giorni, dal deposito del ricorso nella cancelleria del tribunale in funzione di giudice del lavoro o dalla comunicazione alla controparte della richiesta di tentativo di conciliazione o arbitrato, ferma restando la possibilita' di produrre nuovi documenti formatisi dopo il deposito del ricorso. Qualora la conciliazione o l'arbitrato richiesti siano rifiutati o non sia raggiunto l'accordo necessario al relativo espletamento, il ricorso al giudice deve essere depositato a pena di decadenza entro sessanta giorni dal rifiuto o dal mancato accordo. (10) (12) (15) 
+ A conoscere delle controversie derivanti dall'applicazione della presente legge e' competente il pretore. 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (10)</p>
+                        <p>
+ La <ref eId="33" href="/akn/it/act/legge/stato/2010-11-04/183/!main">L. 4 novembre 2010, n. 183</ref>, come modificata dal <ref eId="34" href="/akn/it/act/decretoLegge/stato/2010-12-29/225/!main">D.L. 29 dicembre 2010, n. 225</ref>, convertito con modificazioni dalla <ref eId="35" href="/akn/it/act/legge/stato/2011-02-26/10/!main">L. 26 febbraio 2011, n. 10</ref>, ha disposto (con l'art. 32, comma 1-bis) che "In sede di prima applicazione, le disposizioni di cui all'<ref eId="36" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_6-com1">articolo 6, primo comma, della legge 15 luglio 1966, n. 604</ref>, come modificato dal comma 1 del presente articolo, relative al termine di sessanta giorni per l'impugnazione del licenziamento, acquistano efficacia a decorrere dal 31 dicembre 2011". </p>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (12)</p>
+                        <p>
+ La <ref eId="37" href="/akn/it/act/legge/stato/2012-06-28/92/!main">L. 28 giugno 2012, n. 92</ref>, ha disposto (con l'art. 1, comma 39) che "Il termine di cui all'articolo 6, secondo comma, primo periodo, della <ref eId="38" href="/akn/it/act/legge/stato/1966-07-15/604/!main">legge 15 luglio 1966, n. 604</ref>, come modificato dal comma 38 del presente articolo, si applica in relazione ai licenziamenti intimati dopo la data di entrata in vigore della presente legge". </p>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (15)</p>
+                        <p>
+ La Corte Costituzionale, con sentenza 22 settembre - 14 ottobre 2020, n. 212 (in G.U. 1ª s.s. 21/10/2020, n. 43) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="39" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_6-com2">art. 6, secondo comma, della legge 15 luglio 1966, n. 604</ref> (Norme sui licenziamenti individuali), come sostituito dall'<ref eId="40" href="/akn/it/act/legge/stato/2010-11-04/183/!main#art_32-com1">art. 32, comma 1, della legge 4 novembre 2010, n. 183</ref> (Deleghe al Governo in materia di lavori usuranti, di riorganizzazione di enti, di congedi, aspettative e permessi, di ammortizzatori sociali, di servizi per l'impiego, di incentivi all'occupazione, di apprendistato, di occupazione femminile, nonche' misure contro il lavoro sommerso e disposizioni in tema di lavoro pubblico e di controversie di lavoro), nella parte in cui non prevede che l'impugnazione e' inefficace se non e' seguita, entro il successivo termine di centottanta giorni, oltre che dal deposito del ricorso nella cancelleria del tribunale in funzione di giudice del lavoro o dalla comunicazione alla controparte della richiesta di tentativo di conciliazione o arbitrato, anche dal deposito del ricorso cautelare anteriore alla causa ai sensi degli <ref eId="41" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_669bis">artt. 669-bis</ref>, <ref eId="42" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_669ter">669-ter</ref> e <ref eId="43" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_700">700 del codice di procedura civile</ref>". </p>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (27)</p>
+                        <p>
+ La Corte Costituzionale, con sentenza 11 giugno - 18 luglio 2025, n. 111 (in G.U. 1ª s.s. 23/07/2025, n. 30), ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="44" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_6-com1">art. 6, primo comma, della legge 15 luglio 1966, n. 604</ref> (Norme sui licenziamenti individuali), nella parte in cui non prevede che, se al momento della ricezione della comunicazione del licenziamento o in pendenza del termine di sessanta giorni previsto per la sua impugnazione, anche extragiudiziale, il lavoratore versi in condizione di incapacita' di intendere o di volere, non opera l'onere della previa impugnazione, anche extragiudiziale, e il licenziamento puo' essere impugnato entro il complessivo termine di decadenza di duecentoquaranta giorni dalla ricezione della sua comunicazione, mediante il deposito del ricorso, anche cautelare, o la comunicazione alla controparte della richiesta di tentativo di conciliazione o di arbitrato". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_7">
+                <num>Art. 7.</num>
+                <heading/>
+                <paragraph eId="art_7__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Ferma l'applicabilita', per il licenziamento per giusta causa e per giustificato motivo soggettivo, dell'<ref eId="content__ref_45" href="/akn/it/act/legge/stato/1970-05-20/300/!main#art_7">articolo 7 della legge 20 maggio 1970, n. 300</ref>, il licenziamento per giustificato motivo oggettivo di cui all'articolo 3, seconda parte, della presente legge, qualora disposto da un datore di lavoro avente i requisiti dimensionali di cui all'<ref eId="content__ref_46" href="/akn/it/act/legge/stato/1970-05-20/300/!main#art_18-com8">articolo 18, ottavo comma, della legge 20 maggio 1970, n. 300</ref>, e successive modificazioni, deve essere preceduto da una comunicazione effettuata dal datore di lavoro alla Direzione territoriale del lavoro del luogo dove il lavoratore presta la sua opera, e trasmessa per conoscenza al lavoratore. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Nella comunicazione di cui al comma 1, il datore di lavoro deve dichiarare l'intenzione di procedere al licenziamento per motivo oggettivo e indicare i motivi del licenziamento medesimo nonche' le eventuali misure di assistenza alla ricollocazione del lavoratore interessato. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>La Direzione territoriale del lavoro trasmette la convocazione al datore di lavoro e al lavoratore nel termine perentorio di sette giorni dalla ricezione della richiesta: l'incontro si svolge dinanzi alla commissione provinciale di conciliazione di cui all'<ref eId="content__ref_47" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_410">articolo 410 del codice di procedura civile</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>La comunicazione contenente l'invito si considera validamente effettuata quando e' recapitata al domicilio del lavoratore indicato nel contratto di lavoro o ad altro domicilio formalmente comunicato dal lavoratore al datore di lavoro, ovvero e' consegnata al lavoratore che ne sottoscrive copia per ricevuta. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_5">
+                    <num>5.</num>
+                    <content>
+                        <p>Le parti possono essere assistite dalle organizzazioni di rappresentanza cui sono iscritte o conferiscono mandato oppure da un componente della rappresentanza sindacale dei lavoratori, ovvero da un avvocato o un consulente del lavoro. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_6">
+                    <num>6.</num>
+                    <content>
+                        <p>La procedura di cui al presente articolo non trova applicazione in caso di licenziamento per superamento del periodo di comporto di cui all'<ref eId="content__ref_48" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_2110">articolo 2110 del codice civile</ref>, nonche' per i licenziamenti e le interruzioni del rapporto di lavoro a tempo indeterminato di cui all'<ref eId="content__ref_49" href="/akn/it/act/legge/stato/2012-06-28/92/!main#art_2-com34">articolo 2, comma 34, della legge 28 giugno 2012, n. 92</ref>. La stessa procedura, durante la quale le parti, con la partecipazione attiva della commissione di cui al comma 3, procedono ad esaminare anche soluzioni alternative al recesso, si conclude entro venti giorni dal momento in cui la Direzione territoriale del lavoro ha trasmesso la convocazione per l'incontro, fatta salva l'ipotesi in cui le parti, di comune avviso, non ritengano di proseguire la discussione finalizzata al raggiungimento di un accordo. Se fallisce il tentativo di conciliazione e, comunque, decorso il termine di cui al comma 3, il datore di lavoro puo' comunicare il licenziamento al lavoratore. La mancata presentazione di una o entrambe le parti al tentativo di conciliazione e' valutata dal giudice ai sensi dell'<ref eId="content__ref_50" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_116">articolo 116 del codice di procedura civile</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_7">
+                    <num>7.</num>
+                    <content>
+                        <p>Se la conciliazione ha esito positivo e prevede la risoluzione consensuale del rapporto di lavoro, si applicano le disposizioni in materia di Assicurazione sociale per l'impiego (ASpI) e puo' essere previsto, al fine di favorirne la ricollocazione professionale, l'affidamento del lavoratore ad un'agenzia di cui all'<ref eId="content__ref_51" href="/akn/it/act/decretoLegislativo/stato/2003-09-10/276/!main#art_4-com1-leta">articolo 4, comma 1, lettere a)</ref>, <ref eId="content__ref_52" href="/akn/it/act/decretoLegislativo/stato/2003-09-10/276/!main#art_4-com1-letc">c)</ref> ed <ref eId="content__ref_53" href="/akn/it/act/decretoLegislativo/stato/2003-09-10/276/!main#art_4-com1-lete">e), del decreto legislativo 10 settembre 2003, n. 276</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_8">
+                    <num>8.</num>
+                    <content>
+                        <p>Il comportamento complessivo delle parti, desumibile anche dal verbale redatto in sede di commissione provinciale di conciliazione e dalla proposta conciliativa avanzata dalla stessa, e' valutato dal giudice per la determinazione dell'indennita' risarcitoria di cui all'<ref eId="content__ref_54" href="/akn/it/act/legge/stato/1970-05-20/300/!main#art_18-com7">articolo 18, settimo comma, della legge 20 maggio 1970, n. 300</ref>, e successive modificazioni, e per l'applicazione degli <ref eId="content__ref_55" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_91">articoli 91</ref> e <ref eId="content__ref_56" href="/akn/it/act/codice.procedura.civile/stato/1940-10-28/1443/!main#art_92">92 del codice di procedura civile</ref>.</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_9">
+                    <num>9.</num>
+                    <content>
+                        <p>In caso di legittimo e documentato impedimento del lavoratore a presenziare all'incontro di cui al comma 3, la procedura puo' essere sospesa per un massimo di quindici giorni. 
+ (12) (15) (16) (18) (19) (20) (23) (21) <ins eId="ins_6">((25))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (12)</p>
+                        <p>
+ La <ref eId="57" href="/akn/it/act/legge/stato/2012-06-28/92/!main">L. 28 giugno 2012, n. 92</ref> ha disposto (con l'art. 1, comma 41) che "Il licenziamento intimato all'esito del procedimento disciplinare di cui all'<ref eId="58" href="/akn/it/act/legge/stato/1970-05-20/300/!main#art_7">articolo 7 della legge 20 maggio 1970, n. 300</ref>, oppure all'esito del procedimento di cui all'<ref eId="59" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_7">articolo 7 della legge 15 luglio 1966, n. 604</ref>, come sostituito dal comma 40 del presente articolo, produce effetto dal giorno della comunicazione con cui il procedimento medesimo e' stato avviato, salvo l'eventuale diritto del lavoratore al preavviso o alla relativa indennita' sostitutiva; e' fatto salvo, in ogni caso, l'effetto sospensivo disposto dalle norme del testo unico delle disposizioni legislative in materia di tutela della maternita' e della paternita', di cui al <ref eId="60" href="/akn/it/act/decretoLegislativo/stato/2001-03-26/151/!main">decreto legislativo 26 marzo 2001, n. 151</ref>. Gli effetti rimangono altresi' sospesi in caso di impedimento derivante da infortunio occorso sul lavoro. Il periodo di eventuale lavoro svolto in costanza della procedura si considera come preavviso lavorato". </p>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (15)</p>
+                        <p>
+ Il <ref eId="61" href="/akn/it/act/decretoLegge/stato/2020-03-17/18/!main">D.L. 17 marzo 2020, n. 18</ref>, convertito con modificazioni dalla <ref eId="62" href="/akn/it/act/legge/stato/2020-04-24/27/!main">L. 24 aprile 2020, n. 27</ref>, come modificato dal <ref eId="63" href="/akn/it/act/decretoLegge/stato/2020-05-19/34/!main">D.L. 19 maggio 2020, n. 34</ref>, ha disposto (con l'art. 46, comma 1) che "A decorrere dalla data di entrata in vigore del presente decreto l'avvio delle procedure di cui agli <ref eId="64" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="65" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="66" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24, della legge 23 luglio 1991, n. 223</ref> e' precluso per cinque mesi e nel medesimo periodo sono sospese le procedure pendenti avviate successivamente alla data del 23 febbraio 2020, fatte salve le ipotesi in cui il personale interessato dal recesso, gia' impiegato nell'appalto, sia riassunto a seguito di subentro di nuovo appaltatore in forza di legge, di contratto collettivo nazionale di lavoro o di clausola del contratto d'appalto.
+Sino alla scadenza del suddetto termine, il datore di lavoro, indipendentemente dal numero dei dipendenti, non puo' recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="67" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3, della legge 15 luglio 1966, n. 604</ref>. Sono altresi' sospese le procedure di licenziamento per giustificato motivo oggettivo in corso di cui all'<ref eId="68" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_7">articolo 7 della legge 15 luglio 1966, n. 604</ref>". </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (16)</p>
+                        <p>
+ Il <ref eId="69" href="/akn/it/act/decretoLegge/stato/2020-08-14/104/!main">D.L. 14 agosto 2020, n. 104</ref> ha disposto (con l'art. 14, comma 2) che "Alle condizioni di cui al comma 1, resta, altresi', preclusa al datore di lavoro, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="70" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref>, e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (18)</p>
+                        <p>
+ Il <ref eId="71" href="/akn/it/act/decretoLegge/stato/2020-10-28/137/!main">D.L. 28 ottobre 2020, n. 137</ref> ha disposto (con l'art. 12, comma 10) che fino al 31 gennaio 2021 restano sospese le procedure in corso di cui al presente articolo. </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (19)</p>
+                        <p>
+ La <ref eId="72" href="/akn/it/act/legge/stato/2020-12-30/178/!main">L. 30 dicembre 2020, n. 178</ref> ha disposto (con l'art. 1, comma 310) che fino al 31 marzo 2021 restano sospese le procedure in corso di cui al presente articolo. </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (20)</p>
+                        <p>
+ Il <ref eId="73" href="/akn/it/act/decretoLegge/stato/2021-03-22/41/!main">D.L. 22 marzo 2021, n. 41</ref> ha disposto (con l'art. 8, comma 9) che fino al 30 giugno 2021 restano sospese le procedure in corso di cui al presente articolo. 
+ Ha inoltro disposto (con l'art. 8, comma 10) che "Dal 1° luglio al 31 ottobre 2021 ai datori di lavoro di cui ai commi 2 e 8 [...] resta, altresi', preclusa indipendentemente dal numero dei dipendenti la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="74" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref> e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (23)</p>
+                        <p>
+ Il <ref eId="75" href="/akn/it/act/decretoLegge/stato/2021-07-20/103/!main">D.L. 20 luglio 2021, n. 103</ref> ha disposto (con l'art. 3, comma 2) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi del comma 1 resta precluso l'avvio delle procedure di cui agli <ref eId="76" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="77" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="78" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref> per la durata del trattamento di integrazione salariale fruito entro il 31 dicembre 2021. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="79" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref> e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (21)</p>
+                        <p>
+ Il <ref eId="80" href="/akn/it/act/decretoLegge/stato/2021-05-25/73/!main">D.L. 25 maggio 2021, n. 73</ref>, convertito con modificazioni dalla <ref eId="81" href="/akn/it/act/legge/stato/2021-07-23/106/!main">L. 23 luglio 2021, n. 106</ref>, ha disposto (con l'art. 40, comma 4) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi del comma 3 resta precluso l'avvio delle procedure di cui agli <ref eId="82" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="83" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="84" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref> per la durata del trattamento di integrazione salariale fruito entro il 31 dicembre 2021 e restano altresi' sospese nel medesimo periodo le procedure pendenti avviate successivamente al 23 febbraio 2020, fatte salve le ipotesi in cui il personale interessato dal recesso, gia' impiegato nell'appalto, sia riassunto a seguito di subentro di nuovo appaltatore in forza di legge, di contratto collettivo nazionale di lavoro o di clausola del contratto di appalto. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="85" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref> e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". 
+ Ha inoltre disposto (con l'art. 40-bis, comma 2) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi del comma 1 resta precluso l'avvio delle procedure di cui agli <ref eId="86" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="87" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="88" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref>, per la durata del trattamento di integrazione salariale fruito entro il 31 dicembre 2021 e restano altresi' sospese, nel medesimo periodo, le procedure pendenti avviate successivamente al 23 febbraio 2020, fatte salve le ipotesi in cui il personale interessato dal recesso, gia' impiegato nell'appalto, sia riassunto a seguito di subentro di un nuovo appaltatore in forza di legge, di contratto collettivo nazionale di lavoro o di clausola del contratto di appalto. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa, nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="89" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref>, e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                        <p>--------------</p>
+                        <p>AGGIORNAMENTO (25)</p>
+                        <p>
+ Il <ref eId="90" href="/akn/it/act/decretoLegge/stato/2021-10-21/146/!main">D.L. 21 ottobre 2021, n. 146</ref>, ha disposto (con l'art. 11, comma 7) che "Ai datori di lavoro che presentano domanda di integrazione salariale ai sensi dei commi 1, 2 e 6 resta precluso l'avvio delle procedure di cui agli <ref eId="91" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_4">articoli 4</ref>, <ref eId="92" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_5">5</ref> e <ref eId="93" href="/akn/it/act/legge/stato/1991-07-23/223/!main#art_24">24 della legge 23 luglio 1991, n. 223</ref>, per la durata della fruizione del trattamento di integrazione salariale. Ai medesimi soggetti di cui al primo periodo resta, altresi', preclusa nel medesimo periodo, indipendentemente dal numero dei dipendenti, la facolta' di recedere dal contratto per giustificato motivo oggettivo ai sensi dell'<ref eId="94" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_3">articolo 3 della legge 15 luglio 1966, n. 604</ref>, e restano altresi' sospese le procedure in corso di cui all'articolo 7 della medesima legge". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_8">
+                <num>Art. 8.</num>
+                <heading/>
+                <paragraph>
+                    <content/>
+                </paragraph>
+            </article>
+            <article eId="art_9">
+                <num>Art. 9.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ L'indennita' di anzianita' e' dovuta al prestatore di lavoro in ogni caso di risoluzione del rapporto di lavoro.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_10">
+                <num>Art. 10.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ Le norme della presente legge si applicano nei confronti dei prestatori di lavoro che rivestano la qualifica di impiegato e di operaio, ai sensi dell'<ref eId="content__ref_95" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_2095">articolo 2095 del Codice civile</ref> e, per quelli assunti in prova, si applicano dal momento in cui l'assunzione diviene definitiva e, in ogni caso, quando sono decorsi sei mesi dall'inizio del rapporto di lavoro.(1)(3)(5)(7)<ins eId="ins_8">((9))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO(1)</p>
+                        <p> La Corte Costituzionale, con sentenza 29 gennaio-4 febbraio 1970 n. 14 (in G.U. 1a s.s. 11/02/1970 n. 37) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="96" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_10">art. 10 della legge 15 luglio 1966, n. 604</ref> (contenente norme sui licenziamenti individuali) nella parte in cui non comprende gli apprendisti tra i beneficiari della indennita' dovuta ai sensi dell'art. 9 della stessa legge".</p>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO(3)</p>
+                        <p> La Corte Costituzionale, con sentenza 22 - 28 novembre 1973 n. 169 (in G.U. 1a s.s. 05/12/1973 n. 314) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="97" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_10">art. 10 della legge 15 luglio 1966, n. 604</ref> (norme sui licenziamenti individuali), nella parte in cui esclude gli apprendisti dall'applicabilita' nei loro confronti degli artt. l, 2, 3, 4, 5, 6, 7, 8 e 11, 12, 13 della medesima legge, nel corso del rapporto di apprendistato".</p>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO(5)</p>
+                        <p> La Corte Costituzionale, con sentenza 16 - 22 dicembre 1980 n. 189 (in G.U. 1a s.s. 31/12/1980 n. 357) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="98" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_10">art. 10 della legge 15 luglio 1966, n. 604</ref> nella parte in cui esclude il diritto del prestatore di lavoro, che riveste la qualifica di impiegato o di operaio a sensi dell'<ref eId="99" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_2095">art. 2095 cod. civ.</ref>, a percepire l'indennita' di anzianita' di cui all'art. 9 della medesima <ref eId="100" href="/akn/it/act/legge/stato/1966/604/!main">legge 604 del 1966</ref>, quando assunto in prova e' licenziato durante il periodo di prova medesimo".</p>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO(7)</p>
+                        <p> La Corte Costituzionale, con sentenza 26 marzo-3 aprile 1987 n. 96 (in G.U. 1a s.s. 08/04/1987 n. 15) ha dichiarato "la illegittimita' costituzionale dell'<ref eId="101" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_10">art. 10 della l. 15 luglio 1966, n. 604</ref> (Norme sui licenziamenti individuali), nella parte in cui non prevede l'applicabilita' della legge stessa al personale marittimo navigante delle imprese di navigazione".</p>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO(9)</p>
+                        <p> La Corte Costituzionale, con sentenza 17 - 31 gennaio 1991 n. 41 (in G.U. 1a s.s. 06/02/1991 n. 6) ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="102" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_10">art. 10 della legge 15 luglio 1966, n. 604</ref> (Norme sui licenziamenti individuali), nella parte in cui non prevede l'applicabilita' della legge stessa al personale navigante delle imprese di navigazione (aerea)".</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_11">
+                <num>Art. 11.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+                            <ins eId="ins_9">((COMMA ABROGATO DALLA L. 11 MAGGIO 1990, N. 108))</ins>. 
+ La materia dei licenziamenti collettivi per riduzione di personale e' esclusa dalle disposizioni della presente legge.(5) 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO(5)</p>
+                        <p>
+ La Corte Costituzionale, con sentenza 11 - 18 giugno 1986 n. 137 (in G.U. 1a s.s. 25/06/1986 n. 30) ha dichiarato "la illegittimita' costituzionale dell'<ref eId="103" href="/akn/it/act/legge/stato/1966-07-15/604/!main#art_11">art. 11 della legge 15 luglio 1966 n. 604</ref>, [...] nella parte in cui prevedono il conseguimento della pensione di vecchiaia e, quindi, il licenziamento della donna lavoratrice per detto motivo, al compimento del cinquantacinquesimo anno d'eta' anziche' al compimento del sessantesimo anno come per l'uomo". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_12">
+                <num>Art. 12.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ Sono fatte salve le disposizioni di contratti collettivi e accordi sindacali che contengano, per la materia disciplinata dalla presente legge, condizioni piu' favorevoli ai prestatori di lavoro.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_13">
+                <num>Art. 13.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ Tutti gli atti e i documenti relativi ai giudizi o alle procedure di conciliazione previsti dalla presente legge sono esenti da bollo, imposta di registro e da ogni altra tassa o spesa.
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_14">
+                <num>Art. 14.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+ La presente legge entra in vigore il giorno successivo a quello della sua pubblicazione nella Gazzetta Ufficiale.
+
+ </p>
+                    </content>
+                </paragraph>
+            </article>
+        </body>
+        <conclusions>
+            <formula name="formulaFinaleConclusioni">
+                <p>La presente legge, munita del sigillo dello Stato, sara' inserta nella Raccolta ufficiale delle leggi e dei decreti della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarla e di farla osservare come legge dello Stato.</p>
+            </formula>
+            <p> Data a Roma, addi' 15 luglio 1966</p>
+            <p>SARAGAT MORO - BOSCO - REALE - RESTIVO - ANDREOTTI Visto, il Guardasigilli: - REALE</p>
+        </conclusions>
+    </act>
+</akomaNtoso>

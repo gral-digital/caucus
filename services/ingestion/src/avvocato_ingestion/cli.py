@@ -184,7 +184,14 @@ async def _run_ingest(codice: str, from_fixture: bool, skip_embeddings: bool) ->
     else:
         fetcher = NormattivaFetcher(user_agent=settings.normattiva_user_agent)
         dl = await fetcher.fetch_codice(codice)
-        act = parser.parse_bytes(dl.xml_bytes, short_id=codice)
+        hint = None
+        if len(dl.dataVigenza) == 8 and dl.dataVigenza.isdigit():
+            from datetime import date as _date
+
+            hint = _date(
+                int(dl.dataVigenza[:4]), int(dl.dataVigenza[4:6]), int(dl.dataVigenza[6:8])
+            )
+        act = parser.parse_bytes(dl.xml_bytes, short_id=codice, expression_date_hint=hint)
 
     # 2. Persistence
     engine = create_async_engine(settings.database_url)
@@ -225,3 +232,170 @@ async def _run_ingest(codice: str, from_fixture: bool, skip_embeddings: bool) ->
 
 if __name__ == "__main__":  # pragma: no cover
     app()
+
+
+# ----------------------------------------------------------------------
+# EUR-Lex (regolamenti e direttive UE in italiano)
+# ----------------------------------------------------------------------
+
+EURLEX_FIXTURE_DIR = Path("data/fixtures/eurlex")
+
+
+def _eurlex_fixture_path(short_id: str) -> Path:
+    from avvocato_ingestion.fetchers.eurlex import EURLEX_CATALOG
+
+    if short_id not in EURLEX_CATALOG:
+        raise typer.BadParameter(
+            f"Atto UE sconosciuto: {short_id!r}. Validi: {', '.join(sorted(EURLEX_CATALOG))}"
+        )
+    candidates = sorted(EURLEX_FIXTURE_DIR.glob(f"{short_id}_*.html"))
+    if not candidates:
+        raise typer.BadParameter(
+            f"Nessuna fixture per {short_id!r} in {EURLEX_FIXTURE_DIR}. "
+            f"Esegui `avvocato-ingest fetch-eu -c {short_id}`."
+        )
+    return candidates[-1]
+
+
+@app.command("fetch-eu")
+def cmd_fetch_eu(
+    atto: Annotated[str, typer.Option("--atto", "-c", help="short_id UE (gdpr, aiact, ...)")],
+) -> None:
+    """Scarica l'HTML italiano di un atto UE da EUR-Lex e lo salva come fixture."""
+    asyncio.run(_run_fetch_eu(atto))
+
+
+async def _run_fetch_eu(atto: str) -> None:
+    from datetime import date as _date
+
+    from avvocato_ingestion.fetchers.eurlex import EurlexFetcher
+
+    settings = get_settings()
+    fetcher = EurlexFetcher(user_agent=settings.normattiva_user_agent)
+    html = await fetcher.fetch(atto)
+    EURLEX_FIXTURE_DIR.mkdir(parents=True, exist_ok=True)
+    target = EURLEX_FIXTURE_DIR / f"{atto}_{_date.today().strftime('%Y%m%d')}.html"
+    target.write_bytes(html)
+    typer.echo(f"✓ {atto} scaricato: {target} ({len(html) / 1024:.0f} KB)")
+
+
+@app.command("ingest-eu")
+def cmd_ingest_eu(
+    atto: Annotated[str, typer.Option("--atto", "-c", help="short_id UE (gdpr, aiact, ...)")],
+    from_fixture: Annotated[bool, typer.Option("--from-fixture")] = False,
+    skip_embeddings: Annotated[bool, typer.Option("--skip-embeddings")] = False,
+) -> None:
+    """Ingesta un atto UE in Postgres + (opzionale) Qdrant."""
+    asyncio.run(_run_ingest_eu(atto, from_fixture, skip_embeddings))
+
+
+async def _run_ingest_eu(atto: str, from_fixture: bool, skip_embeddings: bool) -> None:
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from avvocato_ingestion.fetchers.eurlex import EurlexFetcher, EurlexParser
+    from avvocato_ingestion.loader import Loader
+    from avvocato_rag_core.embeddings.factory import create_embedding_provider
+    from avvocato_rag_core.vectorstore.qdrant_store import QdrantStore
+
+    settings = get_settings()
+    parser = EurlexParser()
+
+    if from_fixture:
+        html = _eurlex_fixture_path(atto).read_bytes()
+    else:
+        html = await EurlexFetcher(user_agent=settings.normattiva_user_agent).fetch(atto)
+    act = parser.parse_bytes(html, short_id=atto)
+
+    engine = create_async_engine(settings.database_url)
+    session_maker = async_sessionmaker(engine, expire_on_commit=False)
+
+    embedder = None
+    vectorstore = None
+    if not skip_embeddings:
+        embedder = create_embedding_provider(settings)
+        vectorstore = QdrantStore(
+            url=settings.qdrant_url,
+            api_key=settings.qdrant_api_key,
+            dense_dim=settings.embedding_dim,
+        )
+
+    async with session_maker() as session:
+        loader = Loader(
+            session=session,
+            embedder=embedder,
+            vectorstore=vectorstore,
+            qdrant_collection=settings.qdrant_collection_codici,
+            skip_embeddings=skip_embeddings,
+        )
+        await loader.load(act)
+        await session.commit()
+    if vectorstore is not None:
+        await vectorstore.close()
+    typer.echo(f"✓ {atto} (EUR-Lex) ingesto in Postgres{'' if skip_embeddings else ' + Qdrant'}.")
+
+
+# ----------------------------------------------------------------------
+# Cassazione (SentenzeWeb)
+# ----------------------------------------------------------------------
+
+
+@app.command("ingest-cassazione")
+def cmd_ingest_cassazione(
+    kind: Annotated[str, typer.Option("--kind", "-k", help="snciv | snpen")] = "snpen",
+    max_docs: Annotated[int, typer.Option("--max", help="Numero massimo di sentenze")] = 500,
+    start: Annotated[int, typer.Option("--start", help="Offset di partenza (paginazione)")] = 0,
+    rows: Annotated[int, typer.Option("--rows", help="Sentenze per pagina")] = 50,
+) -> None:
+    """Harvest incrementale da SentenzeWeb → Postgres + Qdrant (collection cassazione).
+
+    Idempotente per external_id: rilanciare riprende senza duplicare.
+    """
+    if kind not in ("snciv", "snpen"):
+        raise typer.BadParameter("kind deve essere snciv o snpen")
+    asyncio.run(_run_ingest_cassazione(kind, max_docs, start, rows))
+
+
+async def _run_ingest_cassazione(kind: str, max_docs: int, start: int, rows: int) -> None:
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from avvocato_ingestion.cassazione_loader import CassazioneLoader
+    from avvocato_ingestion.fetchers.cassazione import SentenzeWebFetcher
+    from avvocato_rag_core.embeddings.factory import create_embedding_provider
+    from avvocato_rag_core.vectorstore.qdrant_store import QdrantStore
+
+    settings = get_settings()
+    engine = create_async_engine(settings.database_url)
+    session_maker = async_sessionmaker(engine, expire_on_commit=False)
+    vectorstore = QdrantStore(
+        url=settings.qdrant_url,
+        api_key=settings.qdrant_api_key,
+        dense_dim=settings.embedding_dim,
+    )
+    embedder = create_embedding_provider(settings)
+
+    loaded = 0
+    offset = start
+    async with (
+        SentenzeWebFetcher(user_agent=settings.normattiva_user_agent) as fetcher,
+        session_maker() as session,
+    ):
+        loader = CassazioneLoader(
+            session=session,
+            embedder=embedder,
+            vectorstore=vectorstore,
+            collection=settings.qdrant_collection_cassazione,
+        )
+        while loaded < max_docs:
+            num_found, docs, received = await fetcher.search(kind=kind, start=offset, rows=rows)
+            if received == 0:
+                break
+            n = await loader.load_batch(docs[: max_docs - loaded])
+            loaded += n
+            offset += received
+            typer.echo(
+                f"  {kind}: +{n} nuove (tot {loaded}/{max_docs}, offset {offset}/{num_found})"
+            )
+            if offset >= num_found:
+                break
+    await vectorstore.close()
+    typer.echo(f"✓ Cassazione {kind}: {loaded} sentenze indicizzate.")

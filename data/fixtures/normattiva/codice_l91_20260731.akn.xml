@@ -1,0 +1,1624 @@
+<?xml version="1.0" encoding="UTF-8"?><akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0" xmlns:eli="http://data.europa.eu/eli/ontology#" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" xmlns:gu="http://www.gazzettaufficiale.it/eli/" xmlns:html="http://www.w3.org/1999/xhtml" xmlns:na="http://www.normattiva.it/eli/" xmlns:nakn="http://normattiva.it/akn/vocabulary" xmlns:nrdfa="http://www.normattiva.it/rdfa/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfa="http://www.w3.org/1999/xhtml#">
+    <act name="monovigente">
+        <meta>
+            <identification source="">
+                <FRBRWork>
+                    <FRBRthis value="/akn/it/act/legge/stato/1992-02-05/91/!main"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/1992-02-05/91"/>
+                    <FRBRalias name="urn:nir" value="urn:nir:stato:legge:1992-02-05;91"/>
+                    <FRBRalias name="eli" value="eli/id/1992/02/15/092G0162/CONSOLIDATED/20260101"/>
+                    <FRBRdate date="1992-02-05" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101" aknrelname="eli/id/1992/02/15/092G0162/CONSOLIDATED/20260101">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalResource"/>
+                            <nrdfa:span content=" Nuove norme sulla cittadinanza. " lang="it" property="eli:title" xml:lang="it"/>
+                            <nrdfa:span content="http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}" property="eli:uri_schema"/>
+                            <nrdfa:span content="092G0162" property="eli:id_local"/>
+                            <nrdfa:span property="eli:type_document" resource="gu:tables/resource-type#LEGGE"/>
+                            <nrdfa:span content="1992-02-05" datatype="xsd:date" property="eli:date_document"/>
+                            <nrdfa:span property="eli:version" resource="gu:tables/versions#ORIGINAL"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRcountry value="it"/>
+                </FRBRWork>
+                <FRBRExpression>
+                    <FRBRthis value="/akn/it/act/legge/stato/1992-02-05/91/ita@2026-01-01/!main"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/1992-02-05/91/ita@2026-01-01"/>
+                    <FRBRdate date="2026-01-01" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101/ita">
+                            <nrdfa:span property="rdf:type" resource="eli:LegalExpression"/>
+                            <nrdfa:span property="eli:realizes" resource="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101"/>
+                            <nrdfa:span property="eli:is_embodied_by" resource="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101/ita/akn"/>
+                            <nrdfa:span property="eli:language" resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                            <nrdfa:span property="eli:publisher_agent" resource="http://www.ipzs.it"/>
+                        </nrdfa:eli>
+                    </preservation>
+                    <FRBRlanguage language="ita"/>
+                </FRBRExpression>
+                <FRBRManifestation>
+                    <FRBRthis value="/akn/it/act/legge/stato/1992-02-05/91/ita@2026-01-01/!main.xml"/>
+                    <FRBRuri value="/akn/it/act/legge/stato/1992-02-05/91/ita@2026-01-01.xml"/>
+                    <FRBRdate date="1992-02-05" name=""/>
+                    <FRBRauthor as="#author" href=""/>
+                    <preservation>
+                        <nrdfa:eli about="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101/ita/akn">
+                            <nrdfa:span property="rdf:type" resource="eli:Format"/>
+                            <nrdfa:span property="eli:format" resource="http://www.iana.org/assignments/media-types/xml"/>
+                        </nrdfa:eli>
+                    </preservation>
+                </FRBRManifestation>
+            </identification>
+            <publication date="1992-02-15" name="" number="38" showAs=""/>
+            <lifecycle source="">
+                <eventRef date="1992-02-15" eId="eventRef_0" source="ro1"/>
+                <eventRef date="1992-11-26" eId="eventRef_1" source="rp1"/>
+                <eventRef date="1994-06-13" eId="eventRef_2" source="rp2"/>
+                <eventRef date="1995-01-04" eId="eventRef_3" source="rp3"/>
+                <eventRef date="1996-12-28" eId="eventRef_4" source="rp4"/>
+                <eventRef date="1997-08-20" eId="eventRef_5" source="rp5"/>
+                <eventRef date="1997-11-19" eId="eventRef_6" source="rp6"/>
+                <eventRef date="1999-10-27" eId="eventRef_7" source="rp7"/>
+                <eventRef date="2000-12-19" eId="eventRef_8" source="rp8"/>
+                <eventRef date="2000-12-30" eId="eventRef_9" source="rp9"/>
+                <eventRef date="2002-06-04" eId="eventRef_10" source="rp10"/>
+                <eventRef date="2006-03-28" eId="eventRef_11" source="rp11"/>
+                <eventRef date="2009-07-24" eId="eventRef_12" source="rp12"/>
+                <eventRef date="2017-12-13" eId="eventRef_13" source="rp13"/>
+                <eventRef date="2018-10-04" eId="eventRef_14" source="rp14"/>
+                <eventRef date="2018-12-17" eId="eventRef_15" source="rp15"/>
+                <eventRef date="2020-10-21" eId="eventRef_16" source="rp16"/>
+                <eventRef date="2020-12-19" eId="eventRef_17" source="rp17"/>
+                <eventRef date="2022-07-27" eId="eventRef_18" source="rp18"/>
+                <eventRef date="2023-10-18" eId="eventRef_19" source="rp19"/>
+                <eventRef date="2025-03-12" eId="eventRef_20" source="rp20"/>
+                <eventRef date="2025-03-28" eId="eventRef_21" source="rp21"/>
+                <eventRef date="2025-04-11" eId="eventRef_22" source="rp22"/>
+                <eventRef date="2025-05-23" eId="eventRef_23" source="rp23"/>
+                <eventRef date="2025-12-30" eId="eventRef_24" source="rp24"/>
+            </lifecycle>
+            <workflow source="">
+                <step by="#senato" date="1992-02-05" refersTo="#S.1460"/>
+                <step by="#camera" date="1992-02-05" refersTo="#C.5702"/>
+            </workflow>
+            <analysis source="">
+                <activeModifications>
+                    <textualMod eId="amod_0" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_1" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_2" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#3"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_3" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#4"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_4" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#5"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_5" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#6"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_6" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#7"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_7" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#8"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_8" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#9"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_9" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#10"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_10" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#11"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_11" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#12"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_12" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#13"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_13" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#14"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_14" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#15"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_15" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#16"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_16" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#17"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_17" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#18"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_18" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#19"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_19" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1912-06-13;555#20"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_20" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1926-01-31;108#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_21" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:regio.decreto.legge:1934-12-01;1997#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_22" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:regio.decreto.legge:1934-12-01;1997#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_23" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:regio.decreto:1942-03-16;262#CODICE CIVILE-art. 143 ter"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'art. 143-ter.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_24" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_25" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_26" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#3"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_27" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#4"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_28" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#5"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_29" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#6"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_30" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#7"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_31" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#8"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_32" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-04-21;123#9"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_33" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1983-05-04;184#39"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art.26 comma 1) l'abrogazione dell'art.39.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_34" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1986-05-15;180#1"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, 1 comma) l'abrogazione dell 'intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="amod_35" type="insertion">
+                        <source href="urn:nir:stato:legge:1992-02-05;91#26"/>
+                        <destination href="urn:nir:stato:legge:1986-05-15;180#2"/>
+                        <new>
+                            <nakn:text>ha disposto (con l'art. 26, comma 1) l'abrogazione dell' intero provvedimento.</nakn:text>
+                        </new>
+                    </textualMod>
+                </activeModifications>
+                <passiveModifications>
+                    <textualMod eId="pmod_0" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_1"/>
+                        <new>
+                            <nakn:text>((lo stato di cittadino dell'interessato e' riconosciuto, nel rispetto della normativa applicabile al 27 marzo 2025, a seguito di domanda, corredata della necessaria documentazione, presentata all'ufficio consolare o al sindaco competenti nel giorno indicato da appuntamento comunicato all'interessato dall'ufficio competente entro le 23:59, ora di Roma, della medesima data del 27 marzo 2025))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_1" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_2"/>
+                        <new>
+                            <nakn:text>((un ascendente di primo o di secondo grado possiede, o possedeva al momento della morte, esclusivamente la cittadinanza italiana))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_2" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_3"/>
+                        <new>
+                            <nakn:text>((un genitore o adottante e' stato residente in Italia per almeno due anni continuativi successivamente all'acquisto della cittadinanza italiana e prima della data di nascita o di adozione del figlio))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_3" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_4"/>
+                        <new>
+                            <nakn:text>((LETTERA SOPPRESSA DAL D.L. 28 MARZO 2025, N. 36, CONVERTITO CON MODIFICAZIONI DALLA L. 23 MAGGIO 2025, N. 74))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_4" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_5"/>
+                        <new>
+                            <nakn:text>((entro tre anni))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_5" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_6"/>
+                        <new>
+                            <nakn:text>((13))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_6" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_7"/>
+                        <new>
+                            <nakn:text>((1))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_7" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_8"/>
+                        <new>
+                            <nakn:text>((COMMA ABROGATO DAL D.L. 4 OTTOBRE 2018, N. 113, CONVERTITO CON MODIFICAZIONI DALLA L. 1 DICEMBRE 2018, N. 132))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_8" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_9"/>
+                        <new>
+                            <nakn:text>((sono o))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_9" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_10"/>
+                        <new>
+                            <nakn:text>((e che risiede legalmente nel territorio della Repubblica da almeno due anni))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_10" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_11"/>
+                        <new>
+                            <nakn:text>((allo straniero nato nel territorio della Repubblica che vi risiede legalmente da almeno tre anni))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_11" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_12"/>
+                        <new>
+                            <nakn:text>((15))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_12" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_13"/>
+                        <new>
+                            <nakn:text>(( Il presente comma non si applica alle dichiarazioni di cui all'articolo 4, comma 1-bis, lettera b) ))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_13" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_14"/>
+                        <new>
+                            <nakn:text>((primo periodo del comma 2))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_14" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_15"/>
+                        <new>
+                            <nakn:text>((Tenuto conto di quanto previsto dal secondo periodo del comma 2, e' autorizzata la spesa di 1,2 milioni di euro annui a decorrere dall'anno 2026 per il finanziamento di progetti del Dipartimento per le liberta' civili e l'immigrazione del Ministero dell'interno, diretti alla collaborazione internazionale e alla cooperazione e assistenza ai Paesi terzi in materia di immigrazione anche attraverso la partecipazione a programmi finanziati dall'Unione europea e alla copertura degli oneri connessi alle attivita' istruttorie inerenti ai procedimenti di competenza del medesimo Dipartimento in materia di immigrazione, asilo e cittadinanza e ad interventi assistenziali straordinari))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_15" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_16"/>
+                        <new>
+                            <nakn:text>((ventiquattro mesi prorogabili fino al massimo di trentasei mesi))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_16" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_17"/>
+                        <new>
+                            <nakn:text>((11))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_17" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_18"/>
+                        <new>
+                            <nakn:text>((8))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_18" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_19"/>
+                        <new>
+                            <nakn:text>((, a condizione che l'interessato possieda o possa acquisire un'altra cittadinanza))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_19" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_20"/>
+                        <new>
+                            <nakn:text>((dieci))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_20" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_21"/>
+                        <new>
+                            <nakn:text>((Il primo periodo si applica se, alla data di acquisto o riacquisto della cittadinanza da parte del genitore, il minore risiede legalmente in Italia da almeno due anni continuativi o, se di eta' inferiore ai due anni, dalla nascita))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_21" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_22"/>
+                        <new>
+                            <nakn:text>((Fermo restando quanto previsto dall'articolo 3-bis, chi e' nato in Italia o e' stato ivi residente per almeno due anni continuativi e ha perduto la cittadinanza in applicazione dell'articolo 8, numeri 1 e 2, o dell'articolo 12 della legge 13 giugno 1912, n. 555, la riacquista se effettua una dichiarazione in tal senso in data compresa tra il 1° luglio 2025 e il 31 dicembre 2027))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_22" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_23"/>
+                        <new>
+                            <nakn:text>(( 1. Il diritto alla cittadinanza italiana e' riconosciuto: 
+ a) ai soggetti che siano stati cittadini italiani, gia' residenti nei territori facenti parte dello Stato italiano successivamente ceduti alla Repubblica jugoslava in forza del Trattato di pace firmato a Parigi il 10 febbraio 1947, reso esecutivo dal decreto legislativo del Capo provvisorio dello Stato 28 novembre 1947, n. 1430, ratificato dalla legge 25 novembre 1952, n. 3054, ovvero in forza del Trattato di Osimo del 10 novembre 1975, reso esecutivo dalla legge 14 marzo 1977, n. 73, alle condizioni previste e in possesso dei requisiti per il diritto di opzione di cui all'articolo 19 del Trattato di pace di Parigi e all'articolo 3 del Trattato di Osimo; 
+ b) alle persone di lingua e cultura italiane che siano figli o discendenti in linea retta dei soggetti di cui alla lettera a). ))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_23" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_24"/>
+                        <new>
+                            <nakn:text>(( 1. Il diritto al riconoscimento della cittadinanza italiana di cui all'articolo 17-bis e' esercitato dagli interessati mediante la presentazione di una istanza all'autorita' comunale italiana competente per territorio in relazione alla residenza dell'istante, ovvero, qualora ne ricorrano i presupposti, all'autorita' consolare, previa produzione da parte dell'istante di idonea documentazione, ai sensi di quanto disposto con circolare del Ministero dell'interno, emanata di intesa con il Ministero degli affari esteri. ((5))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_24" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_25"/>
+                        <new>
+                            <nakn:text>((ARTICOLO ABROGATO DALLA L. 14 DICEMBRE 2000, N. 379))</nakn:text>
+                        </new>
+                    </textualMod>
+                    <textualMod eId="pmod_25" type="insertion">
+                        <source href="#"/>
+                        <destination href="#ins_26"/>
+                        <new>
+                            <nakn:text>(( ARTICOLO ABROGATO DAL D.P.R. 3 NOVEMBRE 2000, N. 396 ))</nakn:text>
+                        </new>
+                    </textualMod>
+                </passiveModifications>
+            </analysis>
+            <references source="">
+                <original eId="ro1" href="/akn/it/act/LEGGE/stato/1992-02-05/91/!main" showAs=""/>
+                <passiveRef eId="rp1" href="/akn/it/act/CIRCOLARE/MINISTERO_DELL'INTERNO/1992-11-11/601/!main" showAs=""/>
+                <passiveRef eId="rp2" href="/akn/it/act/DECRETO_DEL_PRESIDENTE_DELLA_REPUBBLICA/stato/1994-04-18/362/!main" showAs=""/>
+                <passiveRef eId="rp3" href="/akn/it/act/LEGGE/stato/1994-12-22/736/!main" showAs=""/>
+                <passiveRef eId="rp4" href="/akn/it/act/LEGGE/stato/1996-12-23/662/!main" showAs=""/>
+                <passiveRef eId="rp5" href="/akn/it/act/CIRCOLARE/MINISTERO_DELLA_DIFESA/1997-06-12/56/!main" showAs=""/>
+                <passiveRef eId="rp6" href="/akn/it/act/CIRCOLARE/MINISTERO_DELLA_DIFESA/1997-10-17/58/!main" showAs=""/>
+                <passiveRef eId="rp7" href="/akn/it/act/CIRCOLARE/MINISTERO_DELLA_DIFESA/1997-06-12/56/!main" showAs=""/>
+                <passiveRef eId="rp8" href="/akn/it/act/LEGGE/stato/2000-12-14/379/!main" showAs=""/>
+                <passiveRef eId="rp9" href="/akn/it/act/DECRETO_DEL_PRESIDENTE_DELLA_REPUBBLICA/stato/2000-11-03/396/!main" showAs=""/>
+                <passiveRef eId="rp10" href="/akn/it/act/CIRCOLARE/MINISTERO_DELLA_DIFESA/2002-01-24/101/!main" showAs=""/>
+                <passiveRef eId="rp11" href="/akn/it/act/LEGGE/stato/2006-03-08/124/!main" showAs=""/>
+                <passiveRef eId="rp12" href="/akn/it/act/LEGGE/stato/2009-07-15/94/!main" showAs=""/>
+                <passiveRef eId="rp13" href="" showAs=""/>
+                <passiveRef eId="rp14" href="/akn/it/act/DECRETO-LEGGE/stato/2018-10-04/113/!main" showAs=""/>
+                <passiveRef eId="rp15" href="" showAs=""/>
+                <passiveRef eId="rp16" href="/akn/it/act/DECRETO-LEGGE/stato/2020-10-21/130/!main" showAs=""/>
+                <passiveRef eId="rp17" href="/akn/it/act/LEGGE/stato/2020-12-18/173/!main" showAs=""/>
+                <passiveRef eId="rp18" href="" showAs=""/>
+                <passiveRef eId="rp19" href="/akn/it/act/DECRETO-LEGGE/stato/2023-10-18/145/!main" showAs=""/>
+                <passiveRef eId="rp20" href="" showAs=""/>
+                <passiveRef eId="rp21" href="/akn/it/act/DECRETO-LEGGE/stato/2025-03-28/36/!main" showAs=""/>
+                <passiveRef eId="rp22" href="/akn/it/act/DECRETO-LEGGE/stato/2025-04-11/48/!main" showAs=""/>
+                <passiveRef eId="rp23" href="/akn/it/act/LEGGE/stato/2025-05-23/74/!main" showAs=""/>
+                <passiveRef eId="rp24" href="/akn/it/act/LEGGE/stato/2025-12-30/199/!main" showAs=""/>
+                <passiveRef eId="S.1460" href="/akn/it/senato-it:parl:ddl:senato;10.legislatura;1460" showAs=""/>
+                <passiveRef eId="C.5702" href="/akn/it/camera-it:parlamento:scheda.progetto.legge:camera;10.legislatura;5702" showAs=""/>
+            </references>
+            <proprietary source="">
+                <rdf:RDF>
+                    <rdf:Description rdf:about="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101">
+                        <rdf:type rdf:resource="eli:LegalResource"/>
+                        <eli:title xml:lang="it"> Nuove norme sulla cittadinanza. </eli:title>
+                        <eli:uri_schema>http://www.normattiva.it/eli/id/{yyyy}/{mm}/{dd}/{codiceRedazionale}/{tipoVersione}</eli:uri_schema>
+                        <eli:id_local>092G0162</eli:id_local>
+                        <eli:type_document rdf:resource="gu:tables/resource-type#LEGGE"/>
+                        <eli:date_document rdf:datatype="xsd:date">1992-02-05</eli:date_document>
+                        <eli:version rdf:resource="gu:tables/versions#ORIGINAL"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101/ita">
+                        <rdf:type rdf:resource="eli:LegalExpression"/>
+                        <eli:realizes rdf:resource="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101"/>
+                        <eli:is_embodied_by rdf:resource="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101/ita/akn"/>
+                        <eli:language rdf:resource="http://publications.europa.eu/resource/authority/language/ITA"/>
+                        <eli:publisher_agent rdf:resource="http://www.ipzs.it"/>
+                    </rdf:Description>
+                    <rdf:Description rdf:about="na:id/1992/02/15/092G0162/CONSOLIDATED/20260101/ita/akn">
+                        <rdf:type rdf:resource="eli:format"/>
+                        <eli:format rdf:resource="http://www.iana.org/assignments/media-types/xml"/>
+                    </rdf:Description>
+                </rdf:RDF>
+            </proprietary>
+        </meta>
+        <preface>
+            <p>
+                <docType>LEGGE</docType>
+                <docDate date="1992-02-05">05 febbraio 1992</docDate>
+                <docNumber>91</docNumber>
+                <docTitle> Nuove norme sulla cittadinanza.
+</docTitle>
+            </p>
+            <p>
+                <authorialNote eId="atn1" placement="bottom">
+                    <p>Entrata in vigore della legge: 16-8-1992</p>
+                </authorialNote>
+            </p>
+        </preface>
+        <preamble>
+            <formula name="formulaInizialePreambolo">
+                <p>La Camera dei deputati ed il Senato della Repubblica hanno</p>
+            </formula>
+            <p>approvato;</p>
+            <p>IL PRESIDENTE DELLA REPUBBLICA</p>
+            <formula name="formulaFinalePreambolo">
+                <p>PROMULGA la seguente legge:</p>
+            </formula>
+        </preamble>
+        <body>
+            <article eId="art_1">
+                <num>Art. 1.</num>
+                <heading/>
+                <paragraph eId="art_1__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_1__para_1__intro_1">
+                            <p>E' cittadino per nascita: 
+ </p>
+                        </intro>
+                        <point eId="art_1__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>il figlio di padre o di madre cittadini; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_1__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>chi e' nato nel territorio della Repubblica se entrambi i genitori sono ignoti o apolidi, ovvero se il figlio non segue la cittadinanza dei genitori secondo la legge dello Stato al quale questi appartengono. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_1__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>E' considerato cittadino per nascita il figlio di ignoti trovato nel territorio della Repubblica, se non venga provato il possesso di altra cittadinanza. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_1" placement="bottom">
+                                <p> AVVERTENZA:
+ Il testo delle note qui pubblicato e' stato redatto ai sensi dell'art. 10, commi 2 e 3, del testo unico delle disposizioni sulla promulgazione delle leggi, sull'emanazione dei decreti del Presidente della Repubblica e sulle pubblicazioni ufficiali della Repubblica italiana, approvato con <ref eId="content__ref_1" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1985-12-28/1092/!main">decreto del Presidente della Repubblica 28 dicembre 1985, n. 1092</ref>, al solo fine di facilitare la lettura delle disposizioni di legge modificate o alle quali e' operato il rinvio. Restano invariati il valore e l'efficacia degli atti legislativi qui trascritti.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_2">
+                <num>Art. 2.</num>
+                <heading/>
+                <paragraph eId="art_2__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il riconoscimento o la dichiarazione giudiziale della filiazione durante la minore eta' del figlio ne determina la cittadinanza secondo le norme della presente legge. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Se il figlio riconosciuto o dichiarato e' maggiorenne conserva il proprio stato di cittadinanza, ma puo' dichiarare, entro un anno dal riconoscimento o dalla dichiarazione giudiziale, ovvero dalla dichiarazione di efficacia del provvedimento straniero, di eleggere la cittadinanza determinata dalla filiazione. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_2__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Le disposizioni del presente articolo si applicano anche ai figli per i quali la paternita' o maternita' non puo' essere dichiarata, purche' sia stato riconosciuto giudizialmente il loro diritto al mantenimento o agli alimenti. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_3">
+                <num>Art. 3.</num>
+                <heading/>
+                <paragraph eId="art_3__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il minore straniero adottato da cittadino italiano acquista la cittadinanza. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>La disposizione del comma 1 si applica anche nei confronti degli adottati prima della data di entrata in vigore della presente legge. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Qualora l'adozione sia revocata per fatto dell'adottato, questi perde la cittadinanza italiana, sempre che sia in possesso di altra cittadinanza o la riacquisti. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_3__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>Negli altri casi di revoca l'adottato conserva la cittadinanza italiana. Tuttavia, qualora la revoca intervenga durante la maggiore eta' dell'adottato, lo stesso, se in possesso di altra cittadinanza o se la riacquisti, potra' comunque rinunciare alla cittadinanza italiana entro un anno dalla revoca stessa. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_3-bis">
+                <num>Art. 3-bis.</num>
+                <heading/>
+                <paragraph eId="art_3-bis__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_3-bis__para_1__intro_1">
+                            <p>In deroga agli articoli 1, 2, 3, 14 e 20 della presente legge, all'<ref eId="content__ref_2" href="/akn/it/act/legge/stato/1983-04-21/123/!main#art_5">articolo 5 della legge 21 aprile 1983, n. 123</ref>, agli <ref eId="content__ref_3" href="/akn/it/act/legge/stato/1912-06-13/555/!main#art_1">articoli 1</ref>, <ref eId="content__ref_4" href="/akn/it/act/legge/stato/1912-06-13/555/!main#art_2">2</ref>, <ref eId="content__ref_5" href="/akn/it/act/legge/stato/1912-06-13/555/!main#art_7">7</ref>, <ref eId="content__ref_6" href="/akn/it/act/legge/stato/1912-06-13/555/!main#art_10">10</ref>, <ref eId="content__ref_7" href="/akn/it/act/legge/stato/1912-06-13/555/!main#art_12">12</ref> e <ref eId="content__ref_8" href="/akn/it/act/legge/stato/1912-06-13/555/!main#art_19">19 della legge 13 giugno 1912, n. 555</ref>, nonche' agli <ref eId="content__ref_9" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_4">articoli 4</ref>, <ref eId="content__ref_10" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_5">5</ref>, <ref eId="content__ref_11" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_7">7</ref>, <ref eId="content__ref_12" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_8">8</ref> e <ref eId="content__ref_13" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_9">9 del codice civile</ref> approvato con <ref eId="content__ref_14" href="/akn/it/act/regio.decreto/stato/1865-06-25/2358/!main">regio decreto 25 giugno 1865, n. 2358</ref>, e' considerato non avere mai acquistato la cittadinanza italiana chi e' nato all'estero anche prima della data di entrata in vigore del presente articolo ed e' in possesso di altra cittadinanza, salvo che ricorra una delle seguenti condizioni: 
+ </p>
+                        </intro>
+                        <point eId="art_3-bis__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>lo stato di cittadino dell'interessato e' riconosciuto, nel rispetto della normativa applicabile al 27 marzo 2025, a seguito di domanda, corredata della necessaria documentazione, presentata all'ufficio consolare o al sindaco competenti non oltre le 23:59, ora di Roma, della medesima data; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3-bis__para_1.__point_a-bis">
+                            <num>a-bis)</num>
+                            <content>
+                                <p>
+                                    <ins eId="ins_1">((lo stato di cittadino dell'interessato e' riconosciuto, nel rispetto della normativa applicabile al 27 marzo 2025, a seguito di domanda, corredata della necessaria documentazione, presentata all'ufficio consolare o al sindaco competenti nel giorno indicato da appuntamento comunicato all'interessato dall'ufficio competente entro le 23:59, ora di Roma, della medesima data del 27 marzo 2025))</ins>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3-bis__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>lo stato di cittadino dell'interessato e' accertato giudizialmente, nel rispetto della normativa applicabile al 27 marzo 2025, a seguito di domanda giudiziale presentata non oltre le 23:59, ora di Roma, della medesima data; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_3-bis__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>
+                                    <ins eId="ins_2">((un ascendente di primo o di secondo grado possiede, o possedeva al momento della morte, esclusivamente la cittadinanza italiana))</ins>;</p>
+                            </content>
+                        </point>
+                        <point eId="art_3-bis__para_1.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>
+                                    <ins eId="ins_3">((un genitore o adottante e' stato residente in Italia per almeno due anni continuativi successivamente all'acquisto della cittadinanza italiana e prima della data di nascita o di adozione del figlio))</ins>;</p>
+                            </content>
+                        </point>
+                        <point eId="art_3-bis__para_1.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>
+                                    <ins eId="ins_4">((LETTERA SOPPRESSA DAL D.L. 28 MARZO 2025, N. 36, CONVERTITO CON MODIFICAZIONI DALLA L. 23 MAGGIO 2025, N. 74))</ins>. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+            </article>
+            <article eId="art_4">
+                <num>Art. 4.</num>
+                <heading/>
+                <paragraph eId="art_4__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_4__para_1__intro_1">
+                            <p>Lo straniero o l'apolide, del quale il padre o la madre o uno degli ascendenti in linea retta di secondo grado sono o sono stati cittadini per nascita, diviene cittadino: 
+ </p>
+                        </intro>
+                        <point eId="art_4__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>se presta effettivo servizio militare per lo Stato italiano e dichiara preventivamente di voler acquistare la cittadinanza italiana; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>se assume pubblico impiego alle dipendenze dello Stato, anche all'estero, e dichiara di voler acquistare la cittadinanza italiana; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>se, al raggiungimento della maggiore eta', risiede legalmente da almeno due anni nel territorio della Repubblica e dichiara, entro un anno dal raggiungimento, di voler acquistare la cittadinanza italiana. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_4__para_1-bis">
+                    <num>1-bis.</num>
+                    <list>
+                        <intro eId="art_4__para_1-bis__intro_1">
+                            <p>Il minore straniero o apolide, del quale il padre o la madre sono cittadini per nascita, diviene cittadino se i genitori o il tutore dichiarano la volonta' dell'acquisto della cittadinanza e ricorre uno dei seguenti requisiti: 
+ </p>
+                        </intro>
+                        <point eId="art_4__para_1-bis.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>successivamente alla dichiarazione, il minore risiede legalmente per almeno due anni continuativi in Italia; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_4__para_1-bis.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>la dichiarazione e' presentata <ins eId="ins_5">((entro tre anni))</ins> dalla nascita del minore o dalla data successiva in cui e' stabilita la filiazione, anche adottiva, da cittadino italiano. (16) 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_4__para_1-ter">
+                    <num>1-ter.</num>
+                    <content>
+                        <p>Divenuto maggiorenne, chi ha acquistato la cittadinanza ai sensi del comma 1-bis puo' rinunciarvi se in possesso di altra cittadinanza. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_4__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Lo straniero nato in Italia, che vi abbia risieduto legalmente senza interruzioni fino al raggiungimento della maggiore eta', diviene cittadino se dichiara di voler acquistare la cittadinanza italiana entro un anno dalla suddetta data. 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>-------------</p>
+                        <p>AGGIORNAMENTO (16)</p>
+                        <p>
+ Il <ref eId="15" href="/akn/it/act/decretoLegge/stato/2025-03-28/36/!main">D.L. 28 marzo 2025, n. 36</ref>, convertito con modificazioni dalla <ref eId="16" href="/akn/it/act/legge/stato/2025-05-23/74/!main">L. 23 maggio 2025, n. 74</ref>, ha disposto (con l'art. 1, comma 1-ter) che "Per i minorenni alla data di entrata in vigore della legge di conversione del presente decreto, figli di cittadini per nascita di cui all'<ref eId="17" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_3bis-com1-leta">articolo 3-bis, comma 1, lettere a)</ref>, <ref eId="18" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_3bis-com1-letabis">a-bis)</ref> e <ref eId="19" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_3bis-com1-letb">b), della legge 5 febbraio 1992, n. 91</ref>, la dichiarazione prevista dall'articolo 4, comma 1-bis, lettera b), della medesima legge puo' essere presentata entro le 23:59, ora di Roma, del 31 maggio 2026". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_5">
+                <num>Art. 5.</num>
+                <heading/>
+                <paragraph eId="art_5__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il coniuge, straniero o apolide, di cittadino italiano puo' acquistare la cittadinanza italiana quando, dopo il matrimonio, risieda legalmente da almeno due anni nel territorio della Repubblica, oppure dopo tre anni dalla data del matrimonio se residente all'estero, qualora, al momento dell'adozione del decreto di cui all'articolo 7, comma 1, non sia intervenuto lo scioglimento, l'annullamento o la cessazione degli effetti civili del matrimonio e non sussista la separazione personale dei coniugi. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_5__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>I termini di cui al comma 1 sono ridotti della meta' in presenza di figli nati o adottati dai coniugi. 
+ <ins eId="ins_6">((13))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO (13)</p>
+                        <p>
+ La Corte Costituzionale, con sentenza 23 giugno - 26 luglio 2022, n. 195 (in G.U. 1ª s.s. 27/07/2022 n. 30), ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="20" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_5">art. 5 della legge 5 febbraio 1992, n. 91</ref> (Nuove norme sulla cittadinanza), nella parte in cui non esclude, dal novero delle cause ostative al riconoscimento del diritto di cittadinanza, la morte del coniuge del richiedente, sopravvenuta in pendenza dei termini previsti per la conclusione del procedimento di cui al successivo art. 7, comma 1". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_6">
+                <num>Art. 6.</num>
+                <heading/>
+                <paragraph eId="art_6__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_6__para_1__intro_1">
+                            <p>Precludono l'acquisto della cittadinanza ai sensi dell'articolo 5: 
+ </p>
+                        </intro>
+                        <point eId="art_6__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>la condanna per uno dei delitti previsti nel libro secondo, titolo I, capi I, II e III, del <ref eId="content__ref_21" href="/akn/it/act/regioDecreto/stato/1930-10-19/1398/!main">codice penale</ref>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_6__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>la condanna per un delitto non colposo per il quale la legge preveda una pena edittale non inferiore nel massimo a tre anni di reclusione; ovvero la condanna per un reato non politico ad una pena detentiva superiore ad un anno da parte di una autorita' giudiziaria straniera, quando la sentenza sia stata riconosciuta in Italia; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_6__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>la sussistenza, nel caso specifico, di comprovati motivi inerenti alla sicurezza della Repubblica. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_6__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il riconoscimento della sentenza straniera e' richiesto dal procuratore generale del distretto dove ha sede l'ufficio dello stato civile in cui e' iscritto o trascritto il matrimonio, anche ai soli fini ed effetti di cui al comma 1, lettera b). 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>La riabilitazione fa cessare gli effetti preclusivi della condanna. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_6__para_4">
+                    <num>4.</num>
+                    <content>
+                        <p>L'acquisto della cittadinanza e' sospeso fino a comunicazione della sentenza definitiva, se sia stata promossa azione penale per uno dei delitti di cui al comma 1, lettera a) e lettera b), primo periodo, nonche' per il tempo in cui e' pendente il procedimento di riconoscimento della sentenza straniera, di cui al medesimo comma 1, lettera b), secondo periodo. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_2" placement="bottom">
+                                <p> Nota all'art. 6:
+ - I delitti previsti nel libro secondo, titolo I, capi I, II e III, del <ref eId="content__ref_22" href="/akn/it/act/regioDecreto/stato/1930-10-19/1398/!main">codice penale</ref>, sono quelli contro la personalita' internazionale e interna dello Stato e contro i diritti politici del cittadino.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_7">
+                <num>Art. 7.</num>
+                <heading/>
+                <paragraph eId="art_7__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Ai sensi dell'articolo 5, la cittadinanza si acquista con decreto del Ministro dell'interno, a istanza dell'interessato, presentata al sindaco del comune di residenza o alla competente autorita' consolare. <ins eId="ins_7">((1))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_7__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Si applicano le disposizioni di cui all'<ref eId="content__ref_23" href="/akn/it/act/legge/stato/1991-01-12/13/!main#art_3">articolo 3 della legge 12 gennaio 1991, n. 13</ref>. 
+ 
+---------------------
+ 
+AGGIORNAMENTO (1) 
+ Il <ref eId="content__ref_24" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1994-04-18/362/!main">D.P.R. 18 aprile 1994, n. 362</ref>, ha disposto (con l'art. 8, comma 1) che "Ai sensi dell'<ref eId="content__ref_25" href="/akn/it/act/legge/stato/1993-12-24/537/!main#art_2-com8">articolo 2, comma 8, della legge 24 dicembre 1993, n. 537</ref>, a decorrere dalla data di entrata in vigore del presente regolamento sono abrogate, limitatamente alle parti modificate con il presente regolamento, le seguenti norme: l'<ref eId="content__ref_26" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_7-com1">articolo 7, comma 1, della legge 5 febbraio 1992, n. 91</ref>, e gli <ref eId="content__ref_27" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1993-10-12/572/!main#art_4">articoli 4</ref>, <ref eId="content__ref_28" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1993-10-12/572/!main#art_7">7</ref>, <ref eId="content__ref_29" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1993-10-12/572/!main#art_14-com1">14, commi 1</ref>, <ref eId="content__ref_30" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1993-10-12/572/!main#art_14-com2">2</ref> e <ref eId="content__ref_31" href="/akn/it/act/decretoDelPresidenteDellaRepubblica/stato/1993-10-12/572/!main#art_14-com4">4 del decreto del Presidente della Repubblica 12 ottobre 1993, n. 572</ref>." 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_8">
+                <num>Art. 8.</num>
+                <heading/>
+                <paragraph eId="art_8__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Con decreto motivato, il Ministro dell'interno respinge l'istanza di cui all'articolo 7 ove sussistano le cause ostative previste nell'articolo 6. Ove si tratti di ragioni inerenti alla sicurezza della Repubblica, il decreto e' emanato su conforme parere del Consiglio di Stato. L'istanza respinta puo' essere riproposta dopo cinque anni dall'emanazione del provvedimento. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_8__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>
+                            <ins eId="ins_8">((COMMA ABROGATO DAL D.L. 4 OTTOBRE 2018, N. 113, CONVERTITO CON MODIFICAZIONI DALLA L. 1 DICEMBRE 2018, N. 132))</ins>. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9">
+                <num>Art. 9.</num>
+                <heading/>
+                <paragraph eId="art_9__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_9__para_1__intro_1">
+                            <p>La cittadinanza italiana puo' essere concessa con decreto del Presidente della Repubblica, sentito il Consiglio di Stato, su proposta del Ministro dell'interno: 
+ </p>
+                        </intro>
+                        <point eId="art_9__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>allo straniero del quale il padre o la madre o uno degli ascendenti in linea retta di secondo grado <ins eId="ins_9">((sono o))</ins> sono stati cittadini per nascita <ins eId="ins_10">((e che risiede legalmente nel territorio della Repubblica da almeno due anni))</ins>, comunque fatto salvo quanto previsto dall'articolo 4, comma 1, lettera c); 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_9__para_1.__point_a-bis">
+                            <num>a-bis)</num>
+                            <content>
+                                <p>
+                                    <ins eId="ins_11">((allo straniero nato nel territorio della Repubblica che vi risiede legalmente da almeno tre anni))</ins>; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_9__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>allo straniero maggiorenne adottato da cittadino italiano che risiede legalmente nel territorio della Repubblica da almeno cinque anni successivamente alla adozione; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_9__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>allo straniero che ha prestato servizio, anche all'estero, per almeno cinque anni alle dipendenze dello Stato; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_9__para_1.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>al cittadino di uno Stato membro delle Comunita' europee se risiede legalmente da almeno quattro anni nel territorio della Repubblica; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_9__para_1.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>all'apolide che risiede legalmente da almeno cinque anni nel territorio della Repubblica; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_9__para_1.__point_f">
+                            <num>f)</num>
+                            <content>
+                                <p>allo straniero che risiede legalmente da almeno dieci anni nel territorio della Repubblica. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_9__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Con decreto del Presidente della Repubblica, sentito il Consiglio di Stato e previa deliberazione del Consiglio dei Ministri, su proposta del Ministro dell'interno, di concerto con il Ministro degli affari esteri, la cittadinanza puo' essere concessa allo straniero quando questi abbia reso eminenti servizi all'Italia, ovvero quando ricorra un eccezionale interesse dello Stato. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9.1">
+                <num>Art. 9.1.</num>
+                <heading/>
+                <paragraph eId="art_9.1__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>La concessione della cittadinanza italiana ai sensi degli articoli 5 e 9 e' subordinata al possesso, da parte dell'interessato, di un'adeguata conoscenza della lingua italiana, non inferiore al livello B1 del Quadro comune europeo di riferimento per la conoscenza delle lingue (QCER). A tal fine, i richiedenti, che non abbiano sottoscritto l'accordo di integrazione di cui all'articolo 4-bis del testo unico di cui al <ref eId="content__ref_32" href="/akn/it/act/decretoLegislativo/stato/1998-07-25/286/!main">decreto legislativo 25 luglio 1998, n. 286</ref>, o che non siano titolari di permesso di soggiorno UE per soggiornanti di lungo periodo di cui all'articolo 9 del medesimo testo unico, sono tenuti, all'atto della presentazione dell'istanza, ad attestare il possesso di un titolo di studio rilasciato da un istituto di istruzione pubblico o paritario riconosciuto dal Ministero dell'istruzione, dell'universita' e della ricerca e dal Ministero degli affari esteri e della cooperazione internazionale o dal Ministero dell'istruzione, dell'universita' e della ricerca, ovvero a produrre apposita certificazione rilasciata da un ente certificatore riconosciuto dal Ministero dell'istruzione, dell'universita' e della ricerca e dal Ministero degli affari esteri e della cooperazione internazionale o dal Ministero dell'istruzione, dell'universita' e della ricerca. 
+ <ins eId="ins_12">((15))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>------------</p>
+                        <p>AGGIORNAMENTO (15)</p>
+                        <p>
+ La Corte costituzionale con sentenza 30 gennaio - 7 marzo 2025, n. 25 (in G.U. 1ª s.s. 12/03/2025, n. 11) ha dichiarato "l'illegittimita' costituzionale dell'art. 9.1 della <ref eId="33" href="/akn/it/act/legge/stato/1992-02-05/91/!main">legge 5 febbraio 1992, n. 91</ref> (Nuove norme sulla cittadinanza), introdotto dall'<ref eId="34" href="/akn/it/act/decretoLegge/stato/2018-10-04/113/!main#art_14-com1-letabis">art. 14, comma 1, lettera a-bis), del decreto-legge 4 ottobre 2018, n. 113</ref> (Disposizioni urgenti in materia di protezione internazionale e immigrazione, sicurezza pubblica, nonche' misure per la funzionalita' del Ministero dell'interno e l'organizzazione e il funzionamento dell'Agenzia nazionale per l'amministrazione e la destinazione dei beni sequestrati e confiscati alla criminalita' organizzata), convertito, con modificazioni, nella <ref eId="35" href="/akn/it/act/legge/stato/2018-12-01/132/!main">legge 1° dicembre 2018, n. 132</ref>, nella parte in cui non esonera dalla prova della conoscenza della lingua italiana il richiedente affetto da gravi limitazioni alla capacita' di apprendimento linguistico derivanti dall'eta', da patologie o da disabilita', attestate mediante certificazione rilasciata dalla struttura sanitaria pubblica". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9-bis">
+                <num>Art. 9-bis.</num>
+                <heading/>
+                <paragraph eId="art_9-bis__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Ai fini dell'elezione, acquisto, riacquisto, rinuncia o concessione della cittadinanza, all'istanza o dichiarazione dell'interessato deve essere comunque allegata la certificazione comprovante il possesso dei requisiti richiesti per legge. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9-bis__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Le istanze o dichiarazioni di elezione, acquisto, riacquisto, rinuncia o concessione della cittadinanza, ad eccezione delle dichiarazioni di riacquisto presentate innanzi a un ufficio consolare, sono soggette al pagamento di un contributo di importo pari a 250 euro. <ins eId="ins_13">(( Il presente comma non si applica alle dichiarazioni di cui all'articolo 4, comma 1-bis, lettera b) ))</ins>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9-bis__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Il gettito derivante dal contributo di cui al <ins eId="ins_14">((primo periodo del comma 2))</ins> e' versato all'entrata del bilancio dello Stato per essere riassegnato allo stato di previsione del Ministero dell'interno che lo destina al finanziamento di progetti del Dipartimento per le liberta' civili e l'immigrazione diretti alla collaborazione internazionale e alla cooperazione e assistenza ai Paesi terzi in materia di immigrazione anche attraverso la partecipazione a programmi finanziati dall'Unione europea e alla copertura degli oneri connessi alle attivita' istruttorie inerenti ai procedimenti di competenza del medesimo Dipartimento in materia di immigrazione, asilo e cittadinanza e ad interventi assistenziali straordinari. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_9-bis__para_3-bis">
+                    <num>3-bis.</num>
+                    <content>
+                        <p>
+                            <ins eId="ins_15">((Tenuto conto di quanto previsto dal secondo periodo del comma 2, e' autorizzata la spesa di 1,2 milioni di euro annui a decorrere dall'anno 2026 per il finanziamento di progetti del Dipartimento per le liberta' civili e l'immigrazione del Ministero dell'interno, diretti alla collaborazione internazionale e alla cooperazione e assistenza ai Paesi terzi in materia di immigrazione anche attraverso la partecipazione a programmi finanziati dall'Unione europea e alla copertura degli oneri connessi alle attivita' istruttorie inerenti ai procedimenti di competenza del medesimo Dipartimento in materia di immigrazione, asilo e cittadinanza e ad interventi assistenziali straordinari))</ins>. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_9-ter">
+                <num>Art. 9-ter.</num>
+                <heading/>
+                <paragraph eId="art_9-ter__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il termine di definizione dei procedimenti di cui agli articoli 5 e 9 e' fissato in <ins eId="ins_16">((ventiquattro mesi prorogabili fino al massimo di trentasei mesi))</ins> dalla data di presentazione della domanda. 
+ <ins eId="ins_17">((11))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO (9)</p>
+                        <p>
+ Il <ref eId="36" href="/akn/it/act/decretoLegge/stato/2018-10-04/113/!main">D.L. 4 ottobre 2018, n. 113</ref>, convertito con modificazioni dalla <ref eId="37" href="/akn/it/act/legge/stato/2018-12-01/132/!main">L. 1 dicembre 2018, n. 132</ref>, ha disposto (con l'art. 14, comma 2) che la presente modifica si applica ai procedimenti di conferimento della cittadinanza in corso alla data di entrata in vigore del presente decreto. </p>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO (11)</p>
+                        <p>
+ Il <ref eId="38" href="/akn/it/act/decretoLegge/stato/2020-10-21/130/!main">D.L. 21 ottobre 2020, n. 130</ref>, convertito con modificazioni dalla <ref eId="39" href="/akn/it/act/legge/stato/2020-12-18/173/!main">L. 18 dicembre 2020, n. 173</ref>, ha disposto (con l'art. 4, comma 6) che "Il termine di cui all'<ref eId="40" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_9ter">articolo 9-ter della legge 5 febbraio 1992, n. 91</ref>, come sostituito dal comma 5 del presente articolo, trova applicazione per le domande di cittadinanza presentate dalla data di entrata in vigore della legge di conversione del presente decreto".</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_10">
+                <num>Art. 10.</num>
+                <heading/>
+                <paragraph eId="art_10__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il decreto di concessione della cittadinanza non ha effetto se la persona a cui si riferisce non presta, entro sei mesi dalla notifica del decreto medesimo, giuramento di essere fedele alla Repubblica e di osservare la Costituzione e le leggi dello Stato. 
+ <ins eId="ins_18">((8))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>---------------</p>
+                        <p>AGGIORNAMENTO (8)</p>
+                        <p>
+ La Corte Costituzionale, con sentenza 8 novembre - 7 dicembre 2017, n. 258 (in G.U. 1ª s.s. 13/12/2017, n. 50), ha dichiarato "l'illegittimita' costituzionale dell'<ref eId="41" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_10">art. 10 della legge 5 febbraio 1992, n. 91</ref> (Nuove norme sulla cittadinanza), nella parte in cui non prevede che sia esonerata dal giuramento la persona incapace di soddisfare tale adempimento in ragione di grave e accertata condizione di disabilita'". </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_10-bis">
+                <num>Art. 10-bis.</num>
+                <heading/>
+                <paragraph eId="art_10-bis__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>La cittadinanza italiana acquisita ai sensi degli articoli 4, comma 2, 5 e 9, e' revocata in caso di condanna definitiva per i reati previsti dall'<ref eId="content__ref_42" href="/akn/it/act/codice.procedura.penale/presidente.repubblica/1988-09-22/447/!main#art_407-com2-leta-num4">articolo 407, comma 2, lettera a), n. 4), del codice di procedura penale</ref>, nonche' per i reati di cui agli articoli 270-ter e 270-quinquies.2, del <ref eId="content__ref_43" href="/akn/it/act/regioDecreto/stato/1930-10-19/1398/!main">codice penale</ref> <ins eId="ins_19">((, a condizione che l'interessato possieda o possa acquisire un'altra cittadinanza))</ins>. La revoca della cittadinanza e' adottata, entro <ins eId="ins_20">((dieci))</ins> anni dal passaggio in giudicato della sentenza di condanna per i reati di cui al primo periodo, con decreto del Presidente della Repubblica, su proposta del Ministro dell'interno. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_11">
+                <num>Art. 11.</num>
+                <heading/>
+                <paragraph eId="art_11__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il cittadino che possiede, acquista o riacquista una cittadinanza straniera conserva quella italiana, ma puo' ad essa rinunciare qualora risieda o stabilisca la residenza all'estero. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_12">
+                <num>Art. 12.</num>
+                <heading/>
+                <paragraph eId="art_12__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il cittadino italiano perde la cittadinanza se, avendo accettato un impiego pubblico od una carica pubblica da uno Stato o ente pubblico estero o da un ente internazionale cui non partecipi l'Italia, ovvero prestando servizio militare per uno Stato estero, non ottempera, nel termine fissato, all'intimazione che il Governo italiano puo' rivolgergli di abbandonare l'impiego, la carica o il servizio militare. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_12__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Il cittadino italiano che, durante lo stato di guerra con uno Stato estero, abbia accettato o non abbia abbandonato un impiego pubblico od una carica pubblica, od abbia prestato servizio militare per tale Stato senza esservi obbligato, ovvero ne abbia acquistato volontariamente la cittadinanza, perde la cittadinanza italiana al momento della cessazione dello stato di guerra. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_13">
+                <num>Art. 13.</num>
+                <heading/>
+                <paragraph eId="art_13__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_13__para_1__intro_1">
+                            <p>Chi ha perduto la cittadinanza la riacquista: 
+ </p>
+                        </intro>
+                        <point eId="art_13__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>se presta effettivo servizio militare per lo Stato italiano e dichiara previamente di volerla riacquistare; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_13__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>se, assumendo o avendo assunto un pubblico impiego alle dipendenze dello Stato, anche all'estero, dichiara di volerla riacquistare; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_13__para_1.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>se dichiara di volerla riacquistare ed ha stabilito o stabilisce, entro un anno dalla dichiarazione, la residenza nel territorio della Repubblica; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_13__para_1.__point_d">
+                            <num>d)</num>
+                            <content>
+                                <p>dopo un anno dalla data in cui ha stabilito la residenza nel territorio della Repubblica, salvo espressa rinuncia entro lo stesso termine; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_13__para_1.__point_e">
+                            <num>e)</num>
+                            <content>
+                                <p>se, avendola perduta per non aver ottemperato all'intimazione di abbandonare l'impiego o la carica accettati da uno Stato, da un ente pubblico estero o da un ente internazionale, ovvero il servizio militare per uno Stato estero, dichiara di volerla riacquistare, sempre che abbia stabilito la residenza da almeno due anni nel territorio della Repubblica e provi di aver abbandonato l'impiego o la carica o il servizio militare, assunti o prestati nonostante l'intimazione di cui all'articolo 12, comma 1. 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph eId="art_13__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Non e' ammesso il riacquisto della cittadinanza a favore di chi l'abbia perduta in applicazione dell'articolo 3, comma 3, nonche' dell'articolo 12, comma 2. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_13__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Nei casi indicati al comma 1, lettera c), d) ed e), il riacquisto della cittadinanza non ha effetto se viene inibito con decreto del Ministro dell'interno, per gravi e comprovati motivi e su conforme parere del Consiglio di Stato. Tale inibizione puo' intervenire entro il termine di un anno dal verificarsi delle condizioni stabilite. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_14">
+                <num>Art. 14.</num>
+                <heading/>
+                <paragraph eId="art_14__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>I figli minori di chi acquista o riacquista la cittadinanza italiana, se convivono con esso, acquistano la cittadinanza italiana, ma, divenuti maggiorenni, possono rinunciarvi, se in possesso di altra cittadinanza. <ins eId="ins_21">((Il primo periodo si applica se, alla data di acquisto o riacquisto della cittadinanza da parte del genitore, il minore risiede legalmente in Italia da almeno due anni continuativi o, se di eta' inferiore ai due anni, dalla nascita))</ins>. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_15">
+                <num>Art. 15.</num>
+                <heading/>
+                <paragraph eId="art_15__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>L'acquisto o il riacquisto della cittadinanza ha effetto, salvo quanto stabilito dall'articolo 13, comma 3, dal giorno successivo a quello in cui sono adempiute le condizioni e le formalita' richieste. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_16">
+                <num>Art. 16.</num>
+                <heading/>
+                <paragraph eId="art_16__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>L'apolide che risiede legalmente nel territorio della Repubblica e' soggetto alla legge italiana per quanto si riferisce all'esercizio dei diritti civili ed agli obblighi del servizio militare. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_16__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Lo straniero riconosciuto rifugiato dallo Stato italiano secondo le condizioni stabilite dalla legge o dalle convenzioni internazionali e' equiparato all'apolide ai fini dell'applicazione della presente legge, con esclusione degli obblighi inerenti al servizio militare. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_17">
+                <num>Art. 17.</num>
+                <heading/>
+                <paragraph eId="art_17__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>
+                            <ins eId="ins_22">((Fermo restando quanto previsto dall'articolo 3-bis, chi e' nato in Italia o e' stato ivi residente per almeno due anni continuativi e ha perduto la cittadinanza in applicazione dell'articolo 8, numeri 1 e 2, o dell'articolo 12 della legge 13 giugno 1912, n. 555, la riacquista se effettua una dichiarazione in tal senso in data compresa tra il 1° luglio 2025 e il 31 dicembre 2027))</ins>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_17__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Resta fermo quanto disposto dall'<ref eId="content__ref_44" href="/akn/it/act/legge/stato/1975-05-19/151/!main#art_219">articolo 219 della legge 19 
+maggio 1975, n. 151</ref>. (2) (3) 
+ 
+ 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>----------------</p>
+                        <p>AGGIORNAMENTO (2)</p>
+                        <p>La <ref eId="45" href="/akn/it/act/legge/stato/1994-12-22/736/!main">legge 22 dicembre 1994, n. 736</ref> ha disposto che "il termine di
+due anni, previsto dal presente art. 17, e' prorogato fino al 15 agosto 1995".
+-----------------
+
+
+AGGIORNAMENTO (3)
+La <ref eId="46" href="/akn/it/act/legge/stato/1996-12-23/662/!main">L. 23 dicembre 1996, n. 662</ref>, ha disposto (con l'art. 2, comma
+195) che "Il termine per la presentazione della dichiarazione di cui al <ref eId="47" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_17-com1">comma 1 dell'articolo 17 della legge 5 febbraio 1992, n. 91</ref>, gia' prorogato con <ref eId="48" href="/akn/it/act/legge/stato/1994-12-22/736/!main">legge 22 dicembre 1994, n. 736</ref>, e' ulteriormente prorogato al 31 dicembre 1997".
+ </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_17-bis">
+                <num>Art. 17-bis.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>((</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_17-bis__para_1">
+                    <num>1.</num>
+                    <list>
+                        <intro eId="art_17-bis__para_1__intro_1">
+                            <p>Il diritto alla cittadinanza italiana e' riconosciuto: 
+ </p>
+                        </intro>
+                        <point eId="art_17-bis__para_1.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>ai soggetti che siano stati cittadini italiani, gia' residenti nei territori facenti parte dello Stato italiano successivamente ceduti alla Repubblica jugoslava in forza del Trattato di pace firmato a Parigi il 10 febbraio 1947, reso esecutivo dal <ref eId="content__ref_49" href="/akn/it/act/decreto.legislativo/capo.provvisorio.stato/1947-11-28/1430/!main">decreto legislativo del Capo provvisorio dello Stato 28 novembre 1947, n. 1430</ref>, ratificato dalla <ref eId="content__ref_50" href="/akn/it/act/legge/stato/1952-11-25/3054/!main">legge 25 novembre 1952, n. 3054</ref>, ovvero in forza del Trattato di Osimo del 10 novembre 1975, reso esecutivo dalla <ref eId="content__ref_51" href="/akn/it/act/legge/stato/1977-03-14/73/!main">legge 14 marzo 1977, n. 73</ref>, alle condizioni previste e in possesso dei requisiti per il diritto di opzione di cui all'articolo 19 del Trattato di pace di Parigi e all'articolo 3 del Trattato di Osimo; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_17-bis__para_1.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>alle persone di lingua e cultura italiane che siano figli o discendenti in linea retta dei soggetti di cui alla lettera a). </p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>))</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_17-ter">
+                <num>Art. 17-ter.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>((</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_17-ter__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Il diritto al riconoscimento della cittadinanza italiana di cui all'articolo 17-bis e' esercitato dagli interessati mediante la presentazione di una istanza all'autorita' comunale italiana competente per territorio in relazione alla residenza dell'istante, ovvero, qualora ne ricorrano i presupposti, all'autorita' consolare, previa produzione da parte dell'istante di idonea documentazione, ai sensi di quanto disposto con circolare del Ministero dell'interno, emanata di intesa con il Ministero degli affari esteri. ((5</p>
+                    </content>
+                </paragraph>
+                <paragraph>
+                    <content>
+                        <p>))</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_17-ter__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Al fine di attestare la sussistenza dei requisiti di cui alla lettera a) del comma 1 dell'articolo 17-bis, all'istanza deve essere comuque allegata la certificazione comprovante il possesso, all'epoca, della cittadinanza italiana e della residenza nei territori facenti parte dello Stato italiano e successivamente ceduti alla Repubblica jugoslava in forza dei Trattati di cui al medesimo comma 1 dell'articolo 17-bis. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_17-ter__para_3">
+                    <num>3.</num>
+                    <list>
+                        <intro eId="art_17-ter__para_3__intro_1">
+                            <p>Al fine di attestare la sussistenza dei requisiti di cui alla lettera b) del comma 1 dell'articolo 17-bis, all'istanza deve essere comuque allegata la seguente documentazione: 
+ </p>
+                        </intro>
+                        <point eId="art_17-ter__para_3.__point_a">
+                            <num>a)</num>
+                            <content>
+                                <p>i certificati di nascita attestanti il rapporto di discendenza diretta tra l'istante e il genitore o l'ascendente; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_17-ter__para_3.__point_b">
+                            <num>b)</num>
+                            <content>
+                                <p>la certificazione storica, prevista per l'esercizio del diritto di opzione di cui alla lettera a) del comma 1 dell'articolo 17-bis, attestante la cittadinanza italiana del genitore dell'istante o del suo ascendente in linea retta e la residenza degli stessi nei territori facenti parte dello Stato italiano e successivamente ceduti alla Repubblica jugoslava in forza dei Trattati di cui al medesimo comma 1 dell'articolo 17-bis; 
+</p>
+                            </content>
+                        </point>
+                        <point eId="art_17-ter__para_3.__point_c">
+                            <num>c)</num>
+                            <content>
+                                <p>la documentazione atta a dimostrare il requisito della lingua e della cultura italiane dell'istante. )) 
+ 
+---------------
+
+ 
+AGGIORNAMENTO (5) 
+ La <ref eId="content__ref_52" href="/akn/it/act/legge/stato/2006-03-08/124/!main">L. 8 marzo 2006, n. 124</ref> ha disposto (con l'art. 1, comma 2) che "La circolare di cui all'<ref eId="content__ref_53" href="/akn/it/act/legge/stato/1992-02-05/91/!main#art_17ter-com1">articolo 17-ter, comma 1, della legge 5 febbraio 1992, n. 91</ref>, introdotto dal comma 1 del presente articolo, e' emanata entro sessanta giorni dalla data di entrata in vigore della presente legge.". 
+</p>
+                            </content>
+                        </point>
+                    </list>
+                </paragraph>
+            </article>
+            <article eId="art_18">
+                <num>Art. 18.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+                            <ins eId="ins_25">((ARTICOLO ABROGATO DALLA L. 14 DICEMBRE 2000, N. 379))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_19">
+                <num>Art. 19.</num>
+                <heading/>
+                <paragraph eId="art_19__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Restano salve le disposizioni della <ref eId="content__ref_54" href="/akn/it/act/legge/stato/1956-01-09/27/!main">legge 9 gennaio 1956, n. 27</ref>, sulla trascrizione nei registri dello stato civile dei provvedimenti di riconoscimento delle opzioni per la cittadinanza italiana, effettuate ai sensi dell'articolo 19 del Trattato di pace tra le potenze alleate ed associate e l'Italia, firmato a Parigi il 10 febbraio 1947. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_3" placement="bottom">
+                                <p> Nota all'art. 19:
+ - L'art. 19 del Trattato di pace fra l'Italia e le Potenze alleate ed associate, firmato a Parigi il 10 febbraio 1947, e' cosi' formulato:
+ "Art. 19. - 1. I cittadini italiani che, al 10 giugno 1940, erano domiciliati in territorio ceduto dall'Italia ad un altro Stato per effetto del presente Trattato, ed i loro figli nati dopo quella data diverranno, sotto riserva di quanto dispone il paragrafo seguente, cittadini godenti di pieni diritti civili e politici dello Stato al quale il territorio viene ceduto, secondo le leggi che a tale fine dovranno essere emanate dallo Stato medesimo entro tre mesi dall'entrata in vigore del presente Trattato. Essi perderanno la loro cittadinanza italiana al momento in cui diverranno cittadini dello Stato subentrante.
+ 2. Il governo dello Stato al quale il territorio e' trasferito, dovra' disporre, mediante appropriata legislazione entro tre mesi dalla entrata in vigore del presente Trattato, perche' tutte le persone di cui al par. 1, di eta' superiore ai diciotto anni (e tutte le persone coniugate, siano esse al disotto od al disopra di tale eta') la cui lingua usuale e' l'italiano, abbiano facolta' di optare per la cittadinanza italiana entro il termine di un anno dall'entrata in vigore del presente Trattato.
+ Qualunque persona che opti in tal senso conservera' la cittadinanza italiana e non si considerera' aver acquistato la cittadinanza dello Stato al quale il territorio viene trasferito. L'opzione esercitata dal marito non verra' considerata opzione da parte della moglie. L'opzione esercitata dal padre, o se il padre non e' vivente, dalla madre, si estendera' tuttavia automaticamente a tutti i figli non coniugati, di eta' inferiore ai diciotto anni.
+ 3. Lo Stato al quale il territorio e' ceduto potra' esigere che coloro che si avvalgono dell'opzione si trasferiscano in Italia entro un anno dalla data in cui l'opzione venne esercitata.
+ 4. Lo Stato al quale il territorio e' ceduto dovra' assicurare, conformemente alle sue leggi fondamentali, a tutte le persone che si trovano nel territorio stesso, senza distinzione di razza, lingua o religione, il godimento dei diritti dell'uomo e delle liberta' fondamentali, ivi comprese la liberta' di espressione, di stampa e di diffusione, di culto, di opinione politica, e di pubblica riunione".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_20">
+                <num>Art. 20.</num>
+                <heading/>
+                <paragraph eId="art_20__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Salvo che sia espressamente previsto, lo stato di cittadinanza acquisito anteriormente alla presente legge non si modifica se non per fatti posteriori alla data di entrata in vigore della stessa. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_21">
+                <num>Art. 21.</num>
+                <heading/>
+                <paragraph eId="art_21__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Ai sensi e con le modalita' di cui all'articolo 9, la cittadinanza italiana puo' essere concessa allo straniero che sia stato affiliato da un cittadino italiano prima della data di entrata in vigore della <ref eId="content__ref_55" href="/akn/it/act/legge/stato/1983-05-04/184/!main">legge 4 maggio 1983, n. 184</ref>, e che risieda legalmente nel territorio della Repubblica da almeno sette anni dopo l'affiliazione. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_4" placement="bottom">
+                                <p> Nota all'<ref eId="content__ref_56" href="/akn/it/act/legge/stato/1983/184/!main#art_21">art. 21:
+ - La legge n. 184/1983</ref> reca: "Disciplina dell'adozione e dell'affidamento dei minori". La citata legge e' entrata in vigore il 1&#155; giugno 1983.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_22">
+                <num>Art. 22.</num>
+                <heading/>
+                <paragraph eId="art_22__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Per coloro i quali, alla data di entrata in vigore della presente legge, abbiano gia' perduto la cittadinanza italiana ai sensi dell'<ref eId="content__ref_57" href="/akn/it/act/legge/stato/1912-06-13/555/!main#art_8">articolo 8 della legge 13 giugno 1912, n. 555</ref>, cessa ogni obbligo militare. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_5" placement="bottom">
+                                <p> Nota all'art. 22:
+ - Per il testo dell'<ref eId="content__ref_58" href="/akn/it/act/legge/stato/1912/555/!main#art_8">art. 8 della legge n. 555/1912</ref> si veda in nota all'art. 17.
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_23">
+                <num>Art. 23.</num>
+                <heading/>
+                <paragraph eId="art_23__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le dichiarazioni per l'acquisto, la conservazione, il riacquisto e la rinunzia alla cittadinanza e la prestazione del giuramento previste dalla presente legge sono rese all'ufficiale dello stato civile del comune dove il dichiarante risiede o intende stabilire la propria residenza, ovvero, in caso di residenza all'estero, davanti all'autorita' diplomatica o consolare del luogo di residenza. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_23__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>Le dichiarazioni di cui al comma 1, nonche' gli atti o i provvedimenti attinenti alla perdita, alla conservazione e al riacquisto della cittadinanza italiana vengono trascritti nei registri di cittadinanza e di essi viene effettuata annotazione a margine dell'atto di nascita. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_24">
+                <num>Art. 24.</num>
+                <heading/>
+                <paragraph>
+                    <content>
+                        <p>
+                            <ins eId="ins_26">(( ARTICOLO ABROGATO DAL D.P.R. 3 NOVEMBRE 2000, N. 396 ))</ins>
+                        </p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_25">
+                <num>Art. 25.</num>
+                <heading/>
+                <paragraph eId="art_25__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Le disposizioni necessarie per l'esecuzione della presente legge sono emanate, entro un anno dalla sua entrata in vigore, con decreto del Presidente della Repubblica, udito il parere del Consiglio di Stato e previa deliberazione del Consiglio dei Ministri, su proposta dei Ministri degli affari esteri e dell'interno, di concerto con il Ministro di grazia e giustizia. 
+</p>
+                    </content>
+                </paragraph>
+            </article>
+            <article eId="art_26">
+                <num>Art. 26.</num>
+                <heading/>
+                <paragraph eId="art_26__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>Sono abrogati la <ref eId="content__ref_59" href="/akn/it/act/legge/stato/1912-06-13/555/!main">legge 13 giugno 1912, n. 555</ref>, la <ref eId="content__ref_60" href="/akn/it/act/legge/stato/1926-01-31/108/!main">legge 31 gennaio 1926, n. 108</ref>, il regio decreto-legge 1&#155; dicembre 1934, n. 1997, convertito dalla <ref eId="content__ref_61" href="/akn/it/act/legge/stato/1935-04-04/517/!main#art_143ter">legge 4 aprile 1935, n. 517, l'articolo 143- ter</ref> del <ref eId="content__ref_62" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main">codice civile</ref>, la <ref eId="content__ref_63" href="/akn/it/act/legge/stato/1983-04-21/123/!main#art_39">legge 21 aprile 1983, n. 123, l'articolo 39</ref> della <ref eId="content__ref_64" href="/akn/it/act/legge/stato/1983-05-04/184/!main">legge 4 maggio 1983, n. 184</ref>, la <ref eId="content__ref_65" href="/akn/it/act/legge/stato/1986-05-15/180/!main">legge 15 maggio 1986, n. 180</ref>, e ogni altra disposizione incompatibile con la presente legge. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_26__para_2">
+                    <num>2.</num>
+                    <content>
+                        <p>E' soppresso l'obbligo dell'opzione di cui all'<ref eId="content__ref_66" href="/akn/it/act/legge/stato/1983-04-21/123/!main#art_5-com2">articolo 5, comma secondo, della legge 21 aprile 1983, n. 123</ref>, e all'<ref eId="content__ref_67" href="/akn/it/act/legge/stato/1986-05-15/180/!main#art_1-com1">articolo 1, comma 1, della legge 15 maggio 1986, n. 180</ref>. 
+</p>
+                    </content>
+                </paragraph>
+                <paragraph eId="art_26__para_3">
+                    <num>3.</num>
+                    <content>
+                        <p>Restano salve le diverse disposizioni previste da accordi internazionali. 
+</p>
+                    </content>
+                </paragraph>
+                <section>
+                    <content>
+                        <p>
+                            <authorialNote eId="authorialNote_6" placement="bottom">
+                                <p> Note all'<ref eId="content__ref_68" href="/akn/it/act/legge/stato/1912/555/!main#art_26">art. 26:
+ - La legge n. 555/1912</ref> recava norme sulla cittadinanza.
+ - La legge n. 108/1z926 recava: "Modificazioni ed aggiunte alla <ref eId="content__ref_69" href="/akn/it/act/legge/stato/1912-06-13/555/!main">legge 13 giugno 1912, n. 555</ref>, sulla cittadinanza".
+ - Il <ref eId="content__ref_70" href="/akn/it/act/regio.decreto.legge/stato/1934/1997/!main">R.D.L. n. 1997/1934</ref> recava: "Modificazioni alla <ref eId="content__ref_71" href="/akn/it/act/legge/stato/1912-06-13/555/!main">legge 13 giugno 1912, n. 555</ref>, sulla cittadinanza".
+ - L'<ref eId="content__ref_72" href="/akn/it/act/codice.civile/stato/1942-03-16/262/!main#art_143ter">art. 143- ter del codice civile</ref>, aggiunto dall'<ref eId="content__ref_73" href="/akn/it/act/legge/stato/1975-05-19/151/!main#art_25">art. 25 della legge 19 maggio 1975, n. 151</ref>, era cosi' formulato:
+ "Art. 143- ter (Cittadinanza della moglie). - La moglie conserva la cittadinanza italiana, salvo sua espressa rinunzia, anche se per effetto del matrimonio o del mutamento di cittadinanza da parte del marito assume una cittadinanza straniera".
+ - La <ref eId="content__ref_74" href="/akn/it/act/legge/stato/1983/123/!main">legge n. 123/1983</ref> recava: "Disposizioni in materia di cittadinanza". L'art. 5, comma secondo, della medesima legge cosi' disponeva: "Nel caso di doppia cittadinanza, il figlio dovra' optare per una sola cittadinanza entro un anno dal raggiungimento della maggiore eta'".
+ - L'<ref eId="content__ref_75" href="/akn/it/act/legge/stato/1983/184/!main#art_39">art. 39 della legge n. 184/1983</ref> (Disciplina della adozione e dell'affidamento dei minori) cosi' recitava:
+ "Art. 39. - Il minore di nazionalita' straniera adottato da coniugi di cittadinanza italiana acquista di diritto tale cittadinanza.
+ La disposizione del precedente comma si applica anche nei confronti degli adottati prima dell'entrata in vigore della presente legge".
+ - L'<ref eId="content__ref_76" href="/akn/it/act/legge/stato/1986/180/!main#art_1-com1">art. 1, comma 1, della legge n. 180/1986</ref> (Modificazioni all'<ref eId="content__ref_77" href="/akn/it/act/legge/stato/1983-04-21/123/!main#art_5">art. 5 della legge 21 aprile 1983, n. 123</ref>, recante disposizioni in materia di cittadinanza) cosi' recitava: "Il termine per l'esercizio dell'opzione di cui all'<ref eId="content__ref_78" href="/akn/it/act/legge/stato/1983-04-21/123/!main#art_5-com2">art. 5, secondo comma, della legge 21 aprile 1983, n. 123</ref>, e' prorogato fino alla data di entrata in vigore della nuova legge organica sulla cittadinanza".
+</p>
+                            </authorialNote>
+                        </p>
+                    </content>
+                </section>
+            </article>
+            <article eId="art_27">
+                <num>Art. 27.</num>
+                <heading/>
+                <paragraph eId="art_27__para_1">
+                    <num>1.</num>
+                    <content>
+                        <p>La presente legge entra in vigore sei mesi dopo la sua pubblicazione nella Gazzetta Ufficiale. 
+ </p>
+                    </content>
+                </paragraph>
+            </article>
+        </body>
+        <conclusions>
+            <formula name="formulaFinaleConclusioni">
+                <p>La presente legge, munita del sigillo dello Stato, sara' inserita nella Raccolta ufficiale degli atti normativi della Repubblica italiana. E' fatto obbligo a chiunque spetti di osservarla e di farla osservare come legge dello Stato. </p>
+            </formula>
+            <p> Data a Roma, addi' 5 febbraio 1992 </p>
+            <p>COSSIGA ANDREOTTI, Presidente del Consiglio dei Ministri DE MICHELIS, Ministro degli affari esteri Visto, il Guardasigilli: MARTELLI</p>
+        </conclusions>
+    </act>
+</akomaNtoso>

@@ -51,6 +51,11 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         del kind
         if not texts:
             return []
+        # Difesa dal limite input del modello (~8k token): tronchiamo a ~24k
+        # caratteri (≈6k token) — l'embedding della prima parte rappresenta
+        # adeguatamente l'articolo; il testo integrale resta in DB/payload.
+        # Input vuoti → " " (l'API rifiuta stringhe vuote).
+        texts = [(t[:24000] or " ") for t in texts]
 
         vectors: list[EmbeddingVector] = []
         for start in range(0, len(texts), self._batch_size):

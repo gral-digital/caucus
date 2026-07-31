@@ -250,6 +250,200 @@ CODICI_CATALOG: dict[str, CodiceInfo] = {
         issued_at=date(2012, 12, 31),
         in_force_from=date(2013, 2, 2),
     ),
+    # ===== Compliance / 231 / anticorruzione =====
+    "dlgs231": CodiceInfo(
+        short_id="dlgs231",
+        urn="urn:nir:stato:decreto.legislativo:2001-06-08;231",
+        title="Responsabilità amministrativa degli enti (D.Lgs. 231/2001)",
+        issued_at=date(2001, 6, 8),
+        in_force_from=date(2001, 7, 4),
+    ),
+    "aml": CodiceInfo(
+        short_id="aml",
+        urn="urn:nir:stato:decreto.legislativo:2007-11-21;231",
+        title="Antiriciclaggio (D.Lgs. 231/2007)",
+        issued_at=date(2007, 11, 21),
+        in_force_from=date(2008, 1, 1),
+    ),
+    "l190": CodiceInfo(
+        short_id="l190",
+        urn="urn:nir:stato:legge:2012-11-06;190",
+        title="Prevenzione e repressione della corruzione (L. 190/2012)",
+        issued_at=date(2012, 11, 6),
+        in_force_from=date(2012, 11, 28),
+    ),
+    "dlgs33": CodiceInfo(
+        short_id="dlgs33",
+        urn="urn:nir:stato:decreto.legislativo:2013-03-14;33",
+        title="Trasparenza della pubblica amministrazione (D.Lgs. 33/2013)",
+        issued_at=date(2013, 3, 14),
+        in_force_from=date(2013, 4, 20),
+    ),
+    "dlgs39": CodiceInfo(
+        short_id="dlgs39",
+        urn="urn:nir:stato:decreto.legislativo:2013-04-08;39",
+        title="Inconferibilità e incompatibilità di incarichi (D.Lgs. 39/2013)",
+        issued_at=date(2013, 4, 8),
+        in_force_from=date(2013, 5, 4),
+    ),
+    "cam": CodiceInfo(
+        short_id="cam",
+        urn="urn:nir:stato:decreto.legislativo:2011-09-06;159",
+        title="Codice delle leggi antimafia (D.Lgs. 159/2011)",
+        issued_at=date(2011, 9, 6),
+        in_force_from=date(2011, 10, 13),
+    ),
+    "wb": CodiceInfo(
+        short_id="wb",
+        urn="urn:nir:stato:decreto.legislativo:2023-03-10;24",
+        title="Whistleblowing (D.Lgs. 24/2023)",
+        issued_at=date(2023, 3, 10),
+        in_force_from=date(2023, 3, 30),
+    ),
+    "ritpag": CodiceInfo(
+        short_id="ritpag",
+        urn="urn:nir:stato:decreto.legislativo:2002-10-09;231",
+        title="Ritardi di pagamento nelle transazioni commerciali (D.Lgs. 231/2002)",
+        issued_at=date(2002, 10, 9),
+        in_force_from=date(2002, 11, 7),
+    ),
+    # ===== Amministrativo / ambiente / enti locali =====
+    "tua": CodiceInfo(
+        short_id="tua",
+        urn="urn:nir:stato:decreto.legislativo:2006-04-03;152",
+        title="Testo Unico Ambiente (D.Lgs. 152/2006)",
+        issued_at=date(2006, 4, 3),
+        in_force_from=date(2006, 4, 29),
+    ),
+    "tupi": CodiceInfo(
+        short_id="tupi",
+        urn="urn:nir:stato:decreto.legislativo:2001-03-30;165",
+        title="Testo Unico Pubblico Impiego (D.Lgs. 165/2001)",
+        issued_at=date(2001, 3, 30),
+        in_force_from=date(2001, 6, 24),
+    ),
+    "cpa": CodiceInfo(
+        short_id="cpa",
+        urn="urn:nir:stato:decreto.legislativo:2010-07-02;104",
+        title="Codice del Processo Amministrativo (D.Lgs. 104/2010)",
+        issued_at=date(2010, 7, 2),
+        in_force_from=date(2010, 9, 16),
+    ),
+    "cpt": CodiceInfo(
+        short_id="cpt",
+        urn="urn:nir:stato:decreto.legislativo:1992-12-31;546",
+        title="Processo Tributario (D.Lgs. 546/1992)",
+        issued_at=date(1992, 12, 31),
+        in_force_from=date(1996, 4, 1),
+    ),
+    "tuel": CodiceInfo(
+        short_id="tuel",
+        urn="urn:nir:stato:decreto.legislativo:2000-08-18;267",
+        title="Testo Unico Enti Locali (D.Lgs. 267/2000)",
+        issued_at=date(2000, 8, 18),
+        in_force_from=date(2000, 10, 13),
+    ),
+    "tudoc": CodiceInfo(
+        short_id="tudoc",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:2000-12-28;445",
+        title="Testo Unico Documentazione Amministrativa (D.P.R. 445/2000)",
+        issued_at=date(2000, 12, 28),
+        in_force_from=date(2001, 1, 7),
+    ),
+    "cbc": CodiceInfo(
+        short_id="cbc",
+        urn="urn:nir:stato:decreto.legislativo:2004-01-22;42",
+        title="Codice dei Beni Culturali e del Paesaggio (D.Lgs. 42/2004)",
+        issued_at=date(2004, 1, 22),
+        in_force_from=date(2004, 5, 1),
+    ),
+    # ===== Assicurazioni / fisco =====
+    "cap": CodiceInfo(
+        short_id="cap",
+        urn="urn:nir:stato:decreto.legislativo:2005-09-07;209",
+        title="Codice delle Assicurazioni Private (D.Lgs. 209/2005)",
+        issued_at=date(2005, 9, 7),
+        in_force_from=date(2006, 1, 1),
+    ),
+    "iva": CodiceInfo(
+        short_id="iva",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1972-10-26;633",
+        title="Disciplina dell'IVA (D.P.R. 633/1972)",
+        issued_at=date(1972, 10, 26),
+        in_force_from=date(1973, 1, 1),
+    ),
+    "dpr600": CodiceInfo(
+        short_id="dpr600",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1973-09-29;600",
+        title="Accertamento delle imposte sui redditi (D.P.R. 600/1973)",
+        issued_at=date(1973, 9, 29),
+        in_force_from=date(1974, 1, 1),
+    ),
+    # ===== Lavoro =====
+    "lav81": CodiceInfo(
+        short_id="lav81",
+        urn="urn:nir:stato:decreto.legislativo:2015-06-15;81",
+        title="Disciplina organica dei contratti di lavoro (D.Lgs. 81/2015)",
+        issued_at=date(2015, 6, 15),
+        in_force_from=date(2015, 6, 25),
+    ),
+    "l604": CodiceInfo(
+        short_id="l604",
+        urn="urn:nir:stato:legge:1966-07-15;604",
+        title="Licenziamenti individuali (L. 604/1966)",
+        issued_at=date(1966, 7, 15),
+        in_force_from=date(1966, 8, 21),
+    ),
+    "dlgs23": CodiceInfo(
+        short_id="dlgs23",
+        urn="urn:nir:stato:decreto.legislativo:2015-03-04;23",
+        title="Contratto a tutele crescenti (D.Lgs. 23/2015)",
+        issued_at=date(2015, 3, 4),
+        in_force_from=date(2015, 3, 7),
+    ),
+    "tumat": CodiceInfo(
+        short_id="tumat",
+        urn="urn:nir:stato:decreto.legislativo:2001-03-26;151",
+        title="Testo Unico Maternità e Paternità (D.Lgs. 151/2001)",
+        issued_at=date(2001, 3, 26),
+        in_force_from=date(2001, 4, 27),
+    ),
+    # ===== Civile / famiglia / locazioni / cittadinanza =====
+    "l392": CodiceInfo(
+        short_id="l392",
+        urn="urn:nir:stato:legge:1978-07-27;392",
+        title="Locazioni di immobili urbani (L. 392/1978)",
+        issued_at=date(1978, 7, 27),
+        in_force_from=date(1978, 7, 30),
+    ),
+    "l898": CodiceInfo(
+        short_id="l898",
+        urn="urn:nir:stato:legge:1970-12-01;898",
+        title="Disciplina dei casi di scioglimento del matrimonio (L. 898/1970)",
+        issued_at=date(1970, 12, 1),
+        in_force_from=date(1970, 12, 18),
+    ),
+    "l76": CodiceInfo(
+        short_id="l76",
+        urn="urn:nir:stato:legge:2016-05-20;76",
+        title="Unioni civili e convivenze (L. 76/2016)",
+        issued_at=date(2016, 5, 20),
+        in_force_from=date(2016, 6, 5),
+    ),
+    "l91": CodiceInfo(
+        short_id="l91",
+        urn="urn:nir:stato:legge:1992-02-05;91",
+        title="Cittadinanza italiana (L. 91/1992)",
+        issued_at=date(1992, 2, 5),
+        in_force_from=date(1992, 8, 16),
+    ),
+    "cnav": CodiceInfo(
+        short_id="cnav",
+        urn="urn:nir:stato:regio.decreto:1942-03-30;327",
+        title="Codice della Navigazione",
+        issued_at=date(1942, 3, 30),
+        in_force_from=date(1942, 4, 21),
+    ),
 }
 
 
@@ -449,12 +643,31 @@ class NormattivaAknParser:
     # Entry points
     # ------------------------------------------------------------------
 
-    def parse_file(self, xml_path: Path, *, short_id: str) -> CanonicalAct:
-        """Parsa un file AKN salvato localmente."""
-        xml_bytes = xml_path.read_bytes()
-        return self.parse_bytes(xml_bytes, short_id=short_id)
+    # Nome fixture: codice_{short_id}_{YYYYMMDD}.akn.xml
+    _FIXTURE_DATE_RE = re.compile(r"_(\d{8})\.akn\.xml$")
 
-    def parse_bytes(self, xml_bytes: bytes, *, short_id: str) -> CanonicalAct:
+    def parse_file(self, xml_path: Path, *, short_id: str) -> CanonicalAct:
+        """Parsa un file AKN salvato localmente.
+
+        La data di vigenza nel nome della fixture è usata come hint per
+        l'expression date (nel formato A i meta AKN portano solo la data
+        storica dell'atto).
+        """
+        xml_bytes = xml_path.read_bytes()
+        hint: date | None = None
+        m = self._FIXTURE_DATE_RE.search(xml_path.name)
+        if m:
+            raw = m.group(1)
+            hint = date(int(raw[:4]), int(raw[4:6]), int(raw[6:8]))
+        return self.parse_bytes(xml_bytes, short_id=short_id, expression_date_hint=hint)
+
+    def parse_bytes(
+        self,
+        xml_bytes: bytes,
+        *,
+        short_id: str,
+        expression_date_hint: date | None = None,
+    ) -> CanonicalAct:
         if short_id not in CODICI_CATALOG:
             raise ValueError(f"Unknown codice short_id: {short_id!r}")
         info = CODICI_CATALOG[short_id]
@@ -462,6 +675,13 @@ class NormattivaAknParser:
         tree = etree.fromstring(xml_bytes)
         articles = list(self._iter_articles(tree))
         expression_date = self._extract_expression_date(tree)
+        # Il consolidato scaricato è vigente alla data richiesta al portale
+        # (dataVigenza / data nel nome fixture): se più recente della FRBRdate
+        # (che nel formato A è la data storica), è lei l'expression date.
+        if expression_date_hint and (
+            expression_date is None or expression_date_hint > expression_date
+        ):
+            expression_date = expression_date_hint
         logger.info(
             "akn.parsed",
             short_id=short_id,
@@ -499,23 +719,23 @@ class NormattivaAknParser:
 
     @staticmethod
     def _extract_expression_date(tree: etree._Element) -> date | None:
-        """Data di consolidamento dal meta AKN dell'atto (FRBRExpression/FRBRdate).
+        """Data di consolidamento dal meta AKN (FRBRExpression/FRBRdate).
 
-        Cerca prima nel meta dell'<act> (non in quelli degli attachment, che
-        possono divergere). Formato atteso: date="YYYY-MM-DD".
+        Nel formato A il meta dell'<act> porta la data STORICA dell'atto
+        (es. CC → 1944), mentre i meta degli attachment portano la data del
+        consolidato scaricato: la data dell'espressione consolidata è la
+        MASSIMA tra tutte le FRBRdate presenti nel documento.
         """
-        for xpath in (
-            ".//a:act/a:meta/a:identification/a:FRBRExpression/a:FRBRdate",
-            ".//a:FRBRExpression/a:FRBRdate",
-        ):
-            el = tree.find(xpath, _NS)
-            if el is not None:
-                raw = el.get("date", "")
-                try:
-                    return date.fromisoformat(raw)
-                except ValueError:
-                    logger.warning("akn.bad_expression_date", raw=raw)
-        return None
+        best: date | None = None
+        for el in tree.findall(".//a:FRBRExpression/a:FRBRdate", _NS):
+            raw = el.get("date", "")
+            try:
+                d = date.fromisoformat(raw)
+            except ValueError:
+                continue
+            if best is None or d > best:
+                best = d
+        return best
 
     # ------------------------------------------------------------------
     # Article extraction
@@ -556,23 +776,33 @@ class NormattivaAknParser:
         # il corpo vero del codice (bug storico: il CCP veniva indicizzato con
         # i soli allegati). Escludiamo dal conteggio i doc il cui nome contiene
         # "allegato".
-        attachment_articles = sum(
-            1
-            for att in attachments
-            if (doc := att.find("a:doc", _NS)) is not None
-            and _ARTICLE_NUM_RE.search(doc.get("name", ""))
-            and "allegato" not in doc.get("name", "").lower()
-        )
+        attachment_articles = 0
+        attachment_articles_incl_allegati = 0
+        for att in attachments:
+            doc = att.find("a:doc", _NS)
+            if doc is None or not _ARTICLE_NUM_RE.search(doc.get("name", "")):
+                continue
+            attachment_articles_incl_allegati += 1
+            if "allegato" not in doc.get("name", "").lower():
+                attachment_articles += 1
 
         # Decisione:
         # - body vuoto → formato A se ci sono attachment-articolo (anche uno solo);
-        # - body con pochi articoli (il regio decreto di approvazione dei codici
-        #   storici ne ha 2-3) → formato A se gli attachment-articolo dominano;
-        # - body con molti articoli canonici → è sempre il corpo autorevole.
+        # - body con pochi articoli (il decreto di approvazione ne ha 2-3) →
+        #   formato A se gli attachment-articolo dominano. Caso speciale: alcuni
+        #   codici vivono INTERAMENTE in un allegato (es. CPA, d.lgs. 104/2010 =
+        #   2 articoli nel body + il codice in "Allegato 1"): se il body è
+        #   minuscolo e gli attachment-articolo (allegati inclusi) sono tanti,
+        #   il corpo autorevole sono gli attachment.
+        # - body con molti articoli canonici → è sempre il corpo autorevole
+        #   (es. CCP: 233 articoli nel body + 324 allegati tecnici da scartare).
         if not articles_b:
-            use_attachments = attachment_articles > 0
+            use_attachments = attachment_articles_incl_allegati > 0
         elif len(articles_b) <= 10:
-            use_attachments = attachment_articles >= max(10, len(articles_b))
+            use_attachments = (
+                attachment_articles >= max(10, len(articles_b))
+                or attachment_articles_incl_allegati >= 50
+            )
         else:
             use_attachments = False
         if use_attachments:
@@ -667,11 +897,20 @@ class NormattivaAknParser:
             refs=_extract_refs(article),
         )
 
+    _ALLEGATO_NUM_RE = re.compile(r"allegato\s*([0-9]+)", re.IGNORECASE)
+
     def _parse_article_doc(self, doc: etree._Element) -> CanonicalPartition | None:
         name = doc.get("name", "")
         num = self._extract_article_number(name)
         if num is None:
             return None
+        # Codici interamente contenuti in allegati (es. CPA): gli allegati
+        # successivi al primo (norme di attuazione/transitorie) ricominciano
+        # la numerazione da 1 — senza prefisso colliderebbero con il codice.
+        # Convenzione citazionale: "art. N" nudo = Allegato 1.
+        alm = self._ALLEGATO_NUM_RE.search(name)
+        if alm and int(alm.group(1)) > 1:
+            num = f"all{alm.group(1)}-{num}"
 
         main_body = doc.find("a:mainBody", _NS)
         if main_body is None:

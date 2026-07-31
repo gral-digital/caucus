@@ -38,7 +38,9 @@ class ChatRequest(BaseModel):
         max_length=40,
         description="Turni precedenti della conversazione corrente (user/assistant alternati). Esclude il turno attuale.",
     )
-    corpora: list[CorpusFilter] = Field(default_factory=lambda: [CorpusFilter.CODICI])
+    corpora: list[CorpusFilter] = Field(
+        default_factory=lambda: [CorpusFilter.CODICI, CorpusFilter.CASSAZIONE]
+    )
     sources: list[str] | None = Field(
         None,
         description="Filtro opzionale short_id fonti, es. ['cc', 'cp']. Default: tutte.",

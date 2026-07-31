@@ -33,7 +33,7 @@ migrate-new:  ## Crea nuova migration (usage: make migrate-new msg="descrizione"
 	cd apps/api && uv run alembic revision --autogenerate -m "$(msg)"
 
 # Tutte le fonti del catalogo (CODICI_CATALOG in parsers/normattiva_akn.py)
-CODICI := cc cp cpc cpp cost cds cdc ccii ccp cad cts tus tui tue tusl tub tuf tuir cpriv l241 stat l689 lpf
+CODICI := cc cp cpc cpp cost cds cdc ccii ccp cad cts tus tui tue tusl tub tuf tuir cpriv l241 stat l689 lpf dlgs231 aml l190 dlgs33 dlgs39 cam wb ritpag tua tupi cpa cpt tuel tudoc cbc cap iva dpr600 lav81 l604 dlgs23 tumat l392 l898 l76 l91 cnav
 
 fetch-codici:  ## Scarica AKN XML di CC + CP e salva come fixture (richiede rete)
 	uv run avvocato-ingest fetch --codice cc

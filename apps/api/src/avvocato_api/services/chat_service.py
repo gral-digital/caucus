@@ -212,7 +212,9 @@ class ChatService:
     def _hit_summary(hit: RetrievalHit) -> dict[str, Any]:
         return {
             "chunk_id": str(hit.chunk_id),
-            "citation_display": hit.citation.to_display() if hit.citation else None,
+            "citation_display": hit.citation.to_display()
+            if hit.citation
+            else (str(hit.metadata.get("display")) if hit.metadata.get("display") else None),
             "citation_anchor": hit.citation.to_anchor() if hit.citation else None,
             "score": hit.score_final,
             "excerpt": hit.text[:240],
@@ -223,6 +225,15 @@ class ChatService:
         blocks: list[str] = []
         for idx, hit in enumerate(hits, start=1):
             if hit.citation is None:
+                # Giurisprudenza (o chunk senza citazione normativa): entra nel
+                # contesto con il display; si cita in prosa, non con <cite/>.
+                display = str(hit.metadata.get("display") or "").strip()
+                if display:
+                    blocks.append(
+                        f"[{idx}] {display}   (giurisprudenza — citala in prosa "
+                        f"con questi estremi, NON con tag <cite/>)\n"
+                        f"    {hit.text.strip()}"
+                    )
                 continue
             cite_tag = (
                 f'<cite source="{hit.citation.source}" part="articolo" num="{hit.citation.num}"'
