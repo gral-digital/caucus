@@ -134,8 +134,16 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    minimale (catalogo fonti in pannello modale); (e) modulo Giurisprudenza
    (mode dedicato, Cassazione primaria nel retrieval — NB: l'ordine di
    `query.corpora` è ora semantico, il primo è il corpus primario).
-   Prossimi: retrieval FTS sui documenti lunghi (oggi cap 30k char nel
-   prompt), Word add-in.
+   Fatto anche: (f) estratti pertinenti per documenti lunghi
+   (document_excerpts.py, testa + finestre rilevanti con omissis marcati);
+   (g) Word add-in v0 (apps/word-addin/ + statici in
+   apps/web/public/word-addin/, endpoint POST /citations/validate) —
+   **NON ancora collaudato dentro Word reale**: manifest validato e pagina
+   verificata nel browser (SSE ok, endpoint ok); il primo sideload in Word
+   (richiede HTTPS: `pnpm dev --experimental-https`) è in checklist
+   pre-release insieme alle icone definitive. La fase prodotto
+   pre-pubblicazione è COMPLETA: prossimo passo test completo (eval +
+   E2E) e poi pubblicazione.
 5. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.

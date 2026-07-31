@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Caucus per Word</title>
+  <!-- Office.js dal CDN Microsoft: obbligatorio per gli add-in, non va servito localmente -->
+  <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
+  <link rel="stylesheet" href="taskpane.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="logo">C</div>
+    <div>
+      <div class="brand">Caucus</div>
+      <div class="tagline">Citazioni verificate, dentro Word</div>
+    </div>
+  </header>
+
+  <div id="outside-office" class="notice" hidden>
+    Questa pagina è il pannello dell'add-in per Microsoft Word: aprila da Word
+    (Inserisci → Componenti aggiuntivi) dopo il sideload del manifest.
+    Le funzioni di inserimento e lettura del documento sono disponibili solo lì.
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button class="tab active" data-tab="ricerca" role="tab">Ricerca</button>
+    <button class="tab" data-tab="verifica" role="tab">Verifica citazioni</button>
+  </nav>
+
+  <section id="panel-ricerca" class="panel" role="tabpanel">
+    <label class="label" for="question">Domanda giuridica</label>
+    <textarea id="question" rows="3"
+      placeholder="Es. Il preliminare di vendita richiede la forma scritta?"></textarea>
+    <button id="ask" class="primary">Cerca</button>
+    <div id="answer-status" class="muted" hidden></div>
+    <article id="answer" class="answer" hidden></article>
+    <button id="insert" class="secondary" hidden>Inserisci nel documento</button>
+  </section>
+
+  <section id="panel-verifica" class="panel" hidden role="tabpanel">
+    <p class="muted">
+      Estrae i riferimenti normativi dal documento aperto (tag e prosa, es.
+      «art. 2043 c.c.») e li verifica contro il corpus: esistenza, vigenza,
+      abrogazione.
+    </p>
+    <button id="verify" class="primary">Verifica il documento</button>
+    <div id="verify-status" class="muted" hidden></div>
+    <div id="verify-results" hidden></div>
+  </section>
+
+  <footer class="foot">
+    Le citazioni sono verificate sul corpus normativo indicizzato.
+    L'assistente non sostituisce il parere di un avvocato.
+  </footer>
+
+  <script src="taskpane.js"></script>
+</body>
+</html>

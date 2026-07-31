@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Manifest dell'add-in Caucus per Microsoft Word (taskpane).
+
+  Dev locale: il taskpane è servito dalla web app Next su
+  https://localhost:3100/word-addin/taskpane.html — Word richiede HTTPS,
+  quindi in sviluppo avviare Next con `next dev - -experimental-https`
+  (vedi README.md in questa cartella) o mettere un proxy TLS davanti.
+  In produzione sostituire gli URL con il dominio pubblico.
+-->
+<OfficeApp
+  xmlns="http://schemas.microsoft.com/office/appforoffice/1.1"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
+  xmlns:ov="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+  xsi:type="TaskPaneApp">
+
+  <Id>7f1c9d84-3a52-4b6e-9c0d-caucus0word01</Id>
+  <Version>0.1.0</Version>
+  <ProviderName>Caucus</ProviderName>
+  <DefaultLocale>it-IT</DefaultLocale>
+  <DisplayName DefaultValue="Caucus" />
+  <Description DefaultValue="Ricerca giuridica con citazioni verificate e verifica delle citazioni del documento contro il corpus normativo italiano." />
+  <IconUrl DefaultValue="https://localhost:3100/word-addin/icon-32.png" />
+  <HighResolutionIconUrl DefaultValue="https://localhost:3100/word-addin/icon-80.png" />
+  <SupportUrl DefaultValue="https://localhost:3100" />
+
+  <Hosts>
+    <Host Name="Document" />
+  </Hosts>
+
+  <DefaultSettings>
+    <SourceLocation DefaultValue="https://localhost:3100/word-addin/taskpane.html" />
+  </DefaultSettings>
+
+  <Permissions>ReadWriteDocument</Permissions>
+
+  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides" xsi:type="VersionOverridesV1_0">
+    <Hosts>
+      <Host xsi:type="Document">
+        <DesktopFormFactor>
+          <ExtensionPoint xsi:type="PrimaryCommandSurface">
+            <OfficeTab id="TabHome">
+              <Group id="Caucus.Group">
+                <Label resid="Caucus.GroupLabel" />
+                <Icon>
+                  <bt:Image size="16" resid="Caucus.Icon16" />
+                  <bt:Image size="32" resid="Caucus.Icon32" />
+                  <bt:Image size="80" resid="Caucus.Icon80" />
+                </Icon>
+                <Control xsi:type="Button" id="Caucus.TaskpaneButton">
+                  <Label resid="Caucus.ButtonLabel" />
+                  <Supertip>
+                    <Title resid="Caucus.ButtonLabel" />
+                    <Description resid="Caucus.ButtonTip" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Caucus.Icon16" />
+                    <bt:Image size="32" resid="Caucus.Icon32" />
+                    <bt:Image size="80" resid="Caucus.Icon80" />
+                  </Icon>
+                  <Action xsi:type="ShowTaskpane">
+                    <TaskpaneId>Caucus.Taskpane</TaskpaneId>
+                    <SourceLocation resid="Caucus.TaskpaneUrl" />
+                  </Action>
+                </Control>
+              </Group>
+            </OfficeTab>
+          </ExtensionPoint>
+        </DesktopFormFactor>
+      </Host>
+    </Hosts>
+    <Resources>
+      <bt:Images>
+        <bt:Image id="Caucus.Icon16" DefaultValue="https://localhost:3100/word-addin/icon-16.png" />
+        <bt:Image id="Caucus.Icon32" DefaultValue="https://localhost:3100/word-addin/icon-32.png" />
+        <bt:Image id="Caucus.Icon80" DefaultValue="https://localhost:3100/word-addin/icon-80.png" />
+      </bt:Images>
+      <bt:Urls>
+        <bt:Url id="Caucus.TaskpaneUrl" DefaultValue="https://localhost:3100/word-addin/taskpane.html" />
+      </bt:Urls>
+      <bt:ShortStrings>
+        <bt:String id="Caucus.GroupLabel" DefaultValue="Caucus" />
+        <bt:String id="Caucus.ButtonLabel" DefaultValue="Apri Caucus" />
+      </bt:ShortStrings>
+      <bt:LongStrings>
+        <bt:String id="Caucus.ButtonTip" DefaultValue="Ricerca giuridica con citazioni verificate e controllo delle citazioni del documento." />
+      </bt:LongStrings>
+    </Resources>
+  </VersionOverrides>
+</OfficeApp>

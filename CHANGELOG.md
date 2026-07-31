@@ -5,6 +5,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Add-in Word (v0, non ancora collaudato in Word reale)**: taskpane
+  Office.js (`apps/word-addin/` + statici in `apps/web/public/word-addin/`)
+  con ricerca giuridica via SSE, inserimento della risposta nel documento
+  (citazioni in forma canonica) e **verifica delle citazioni del documento
+  aperto** contro il corpus via `POST /citations/validate` — esistenza,
+  vigenza, abrogazione, con esiti verde/giallo/rosso. Manifest validato,
+  istruzioni di sideload nel README; fuori da Word la pagina degrada con
+  avviso e ricerca comunque funzionante.
+- **Endpoint `POST /citations/validate`**: il trust layer come servizio —
+  estrae i riferimenti (tag e prosa) da un testo arbitrario e li valida
+  contro il corpus.
 - **Modulo Giurisprudenza**: ricerca negli orientamenti della Cassazione.
   In questa modalità l'ordine dei corpora si inverte (Cassazione primaria
   nel retrieval, normativa di supporto — l'ordine di `query.corpora` è ora

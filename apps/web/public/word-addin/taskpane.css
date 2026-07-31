@@ -1,0 +1,87 @@
+/* Taskpane Caucus per Word — palette coerente con la web app (carta/inchiostro). */
+
+* { box-sizing: border-box; margin: 0; }
+
+body {
+  font: 13.5px/1.5 -apple-system, "Segoe UI", system-ui, sans-serif;
+  color: #26303f;
+  background: #faf9f6;
+  padding: 0 0 8px;
+}
+
+.topbar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 14px 16px 10px;
+  border-bottom: 1px solid #e7e3da;
+  background: #f5f3ee;
+}
+.logo {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: #8d2a1e; color: #faf9f6;
+  display: flex; align-items: center; justify-content: center;
+  font: 600 15px Georgia, serif;
+}
+.brand { font: 600 15px Georgia, serif; color: #1a1a1a; }
+.tagline { font-size: 11px; color: #6b7280; }
+
+.notice {
+  margin: 12px 16px 0; padding: 10px 12px;
+  border: 1px solid #e5c98f; border-radius: 8px;
+  background: #fdf6e7; font-size: 12.5px; color: #7a5a1e;
+}
+
+.tabs { display: flex; gap: 4px; padding: 12px 16px 0; }
+.tab {
+  border: 0; background: transparent; padding: 7px 12px;
+  border-radius: 8px 8px 0 0; font-size: 13px; color: #6b7280; cursor: pointer;
+}
+.tab.active {
+  background: #fff; color: #1a1a1a; font-weight: 600;
+  border: 1px solid #e7e3da; border-bottom-color: #fff;
+}
+
+.panel {
+  margin: 0 16px; padding: 14px;
+  background: #fff; border: 1px solid #e7e3da; border-radius: 0 10px 10px 10px;
+}
+
+.label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+textarea {
+  width: 100%; padding: 9px 10px; margin-bottom: 10px;
+  border: 1px solid #d8d3c8; border-radius: 8px;
+  font: inherit; resize: vertical; background: #faf9f6;
+}
+textarea:focus { outline: none; border-color: #8d2a1e; }
+
+button.primary, button.secondary {
+  width: 100%; padding: 9px 12px; border-radius: 8px;
+  font: 600 13px inherit; cursor: pointer;
+}
+button.primary { border: 0; background: #1a1a1a; color: #faf9f6; }
+button.primary:disabled { opacity: 0.5; cursor: default; }
+button.secondary {
+  margin-top: 10px; border: 1px solid #d8d3c8; background: #faf9f6; color: #26303f;
+}
+
+.muted { font-size: 12px; color: #6b7280; margin-top: 10px; }
+.answer {
+  margin-top: 12px; padding: 10px 12px;
+  background: #faf9f6; border: 1px solid #e7e3da; border-radius: 8px;
+  white-space: pre-wrap; font-size: 13px; max-height: 45vh; overflow-y: auto;
+}
+.answer .cite { color: #8d2a1e; font-weight: 600; }
+
+.check { margin-top: 10px; }
+.check-item {
+  display: flex; gap: 8px; align-items: baseline;
+  padding: 7px 10px; border-radius: 8px; margin-bottom: 6px; font-size: 12.5px;
+}
+.check-item .ref { font-weight: 600; white-space: nowrap; }
+.ok   { background: #eef5ee; border: 1px solid #cfe3cf; color: #2f5e35; }
+.warn { background: #fdf6e7; border: 1px solid #ecd9a8; color: #7a5a1e; }
+.bad  { background: #fbeeea; border: 1px solid #eccdc2; color: #8d2a1e; }
+
+.foot {
+  margin: 14px 16px 0; padding-top: 10px;
+  border-top: 1px solid #e7e3da; font-size: 10.5px; color: #9aa0a6;
+}

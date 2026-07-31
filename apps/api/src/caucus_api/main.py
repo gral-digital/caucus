@@ -13,7 +13,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from caucus_api.logging_config import configure_logging
-from caucus_api.routes import chat, documents, export, health, norma, search
+from caucus_api.routes import chat, citations, documents, export, health, norma, search
 from caucus_rag_core.config import get_settings
 
 logger = structlog.get_logger(__name__)
@@ -70,3 +70,4 @@ app.include_router(chat.router, prefix="/api/v1", tags=["chat"])
 app.include_router(norma.router, prefix="/api/v1", tags=["norma"])
 app.include_router(export.router, prefix="/api/v1", tags=["export"])
 app.include_router(documents.router, prefix="/api/v1", tags=["documents"])
+app.include_router(citations.router, prefix="/api/v1", tags=["citations"])
