@@ -24,6 +24,7 @@ was otherwise idle.
 make up && make migrate && make seed-all      # corpus
 make dev-api                                   # or: make dev
 make eval                                      # writes reports/eval_v2_latest.json
+# report canonici della sessione: reports/eval_{BASELINE,MILESTONE,CURRENT}_*.json
 ```
 
 ## History
