@@ -57,6 +57,7 @@ from avvocato_ingestion.canonical import (
     CanonicalComma,
     CanonicalCommaLetter,
     CanonicalPartition,
+    CanonicalRef,
 )
 from avvocato_rag_core.schemas.norm import NormPartitionKind, NormSourceType
 
@@ -307,6 +308,8 @@ _SUFFIX_ALIASES = {
 def _normalize_article_number(raw: str) -> str:
     """Normalizza un numero articolo: "2043 bis" → "2043-bis", "2-sex-decies" → "2-sexiesdecies"."""
     num = re.sub(r"\s+", "-", raw.strip()).lower()
+    # Forma attaccata senza separatore (es. fragment AKN "art_2929bis").
+    num = re.sub(rf"^([0-9]+(?:/[0-9]+)?)({_LATIN_WORD})", r"\1-\2", num)
     m = re.match(r"^([0-9]+(?:/[0-9]+)?)-(.+?)(\.[0-9]+)?$", num)
     if m:
         base, suffix, sub = m.group(1), m.group(2), m.group(3) or ""
@@ -357,6 +360,72 @@ def _detect_abrogato(text: str | None) -> bool:
     if not text:
         return False
     return _ABROGATO_RE.search(text.strip()) is not None
+
+
+# ---------------------------------------------------------------------------
+# Rinvii normativi (<ref href="/akn/it/act/...">)
+# ---------------------------------------------------------------------------
+
+# URI AKN di un atto: /akn/it/act/<tipo>/<autorità>/<data>/<numero>/...
+_AKN_ACT_HREF_RE = re.compile(r"^/akn/it/act/[^/]+/[^/]+/(\d{4}-\d{2}-\d{2})/([0-9]+)\b")
+# Fragment articolo: "#art_1284", "#art_16-com1", "#art_2929bis"
+_AKN_ART_FRAGMENT_RE = re.compile(
+    r"art_([0-9]+[a-z0-9]*(?:-?(?:bis|ter|quater|quinquies|sexies|septies|octies|novies|decies))?)(?:-com|$|-)"
+)
+
+
+def _build_date_num_index() -> dict[tuple[str, str], str]:
+    """Mappa (data, numero) dell'atto → short_id, derivata dagli URN del catalogo.
+
+    URN NIR: "urn:nir:stato:regio.decreto:1942-03-16;262" → ("1942-03-16", "262").
+    """
+    index: dict[tuple[str, str], str] = {}
+    for short_id, info in CODICI_CATALOG.items():
+        m = re.search(r":(\d{4}-\d{2}-\d{2});(\d+)$", info.urn)
+        if m:
+            index[(m.group(1), m.group(2))] = short_id
+    return index
+
+
+_DATE_NUM_TO_SHORT_ID = _build_date_num_index()
+
+
+def _extract_refs(element: etree._Element) -> list[CanonicalRef]:
+    """Estrae i rinvii ``<ref>`` risolvibili contro il catalogo fonti.
+
+    Conserviamo solo i ref il cui atto target è nel catalogo (linkabili nel
+    grafo): i rinvii a atti non indicizzati aggiungerebbero solo rumore in
+    questa fase. Dedup per (target_short_id, target_article).
+    """
+    refs: list[CanonicalRef] = []
+    seen: set[tuple[str, str | None]] = set()
+    for ref in element.findall(".//a:ref", _NS):
+        href = ref.get("href", "")
+        m = _AKN_ACT_HREF_RE.match(href)
+        if not m:
+            continue
+        short_id = _DATE_NUM_TO_SHORT_ID.get((m.group(1), m.group(2)))
+        if short_id is None:
+            continue
+        article: str | None = None
+        if "#" in href:
+            fm = _AKN_ART_FRAGMENT_RE.search(href.split("#", 1)[1])
+            if fm:
+                article = _normalize_article_number(fm.group(1))
+        key = (short_id, article)
+        if key in seen:
+            continue
+        seen.add(key)
+        raw = re.sub(r"\s+", " ", "".join(ref.itertext())).strip()[:256]
+        refs.append(
+            CanonicalRef(
+                raw_text=raw,
+                href=href,
+                target_short_id=short_id,
+                target_article=article,
+            )
+        )
+    return refs
 
 
 # ---------------------------------------------------------------------------
@@ -595,6 +664,7 @@ class NormattivaAknParser:
             full_text=full_text,
             abrogato=_detect_abrogato(full_text),
             commi=commi,
+            refs=_extract_refs(article),
         )
 
     def _parse_article_doc(self, doc: etree._Element) -> CanonicalPartition | None:
@@ -631,6 +701,7 @@ class NormattivaAknParser:
             full_text=full_text,
             abrogato=_detect_abrogato(full_text),
             commi=commi,
+            refs=_extract_refs(main_body),
         )
 
     @staticmethod

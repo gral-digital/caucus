@@ -24,14 +24,25 @@ def reciprocal_rank_fusion(
     k: int = 60,
     top_k: int,
     pin_first: Sequence[UUID] | None = None,
+    weights: Sequence[float] | None = None,
 ) -> list[RetrievalHit]:
-    """Fonde liste già ordinate per rank. ``pin_first`` forza chunk in cima."""
+    """Fonde liste già ordinate per rank.
+
+    ``weights`` (uno per lista, default 1.0) permette di pesare i rami: in
+    dominio legale il lookup deterministico per numero di articolo è più
+    autorevole del retrieval probabilistico e non deve pareggiare con esso.
+    ``pin_first`` forza chunk in cima a valle della fusione.
+    """
+    if weights is not None and len(weights) != len(ranked_lists):
+        raise ValueError("weights deve avere la stessa lunghezza di ranked_lists")
+
     scores: dict[UUID, float] = {}
     hits_by_id: dict[UUID, RetrievalHit] = {}
 
-    for ranked in ranked_lists:
+    for i, ranked in enumerate(ranked_lists):
+        w = weights[i] if weights is not None else 1.0
         for rank, hit in enumerate(ranked, start=1):
-            scores[hit.chunk_id] = scores.get(hit.chunk_id, 0.0) + 1.0 / (k + rank)
+            scores[hit.chunk_id] = scores.get(hit.chunk_id, 0.0) + w / (k + rank)
             existing = hits_by_id.get(hit.chunk_id)
             if existing is None or _lookup_priority(hit) > _lookup_priority(existing):
                 hits_by_id[hit.chunk_id] = hit

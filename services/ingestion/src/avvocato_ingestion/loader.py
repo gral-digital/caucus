@@ -22,12 +22,13 @@ from datetime import date
 from uuid import uuid4
 
 import structlog
-from sqlalchemy import delete
+from sqlalchemy import delete, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from avvocato_api.db.models import (
     NormChunk,
+    NormCitation,
     NormComma,
     NormPartition,
     NormSource,
@@ -35,6 +36,7 @@ from avvocato_api.db.models import (
 from avvocato_ingestion.canonical import (
     CanonicalAct,
     CanonicalPartition,
+    CanonicalRef,
 )
 from avvocato_ingestion.chunker import BuiltChunk, build_chunks
 from avvocato_rag_core.embeddings.base import EmbeddingProvider
@@ -75,6 +77,7 @@ class Loader:
         source = await self._upsert_source(act)
         await self._delete_existing(source_id=source.id, short_id=act.short_id)
         all_chunks: list[BuiltChunk] = []
+        ref_sink: list[tuple[uuid.UUID, CanonicalRef]] = []
 
         # effective_from = data del consolidato (FRBRdate), NON la data storica
         # di entrata in vigore dell'atto: il testo parsato è quello vigente
@@ -95,12 +98,16 @@ class Loader:
                 parent_id=None,
                 parent_path=act.short_id,
                 source_short_id=act.short_id,
+                source_title=act.title,
                 effective_from_iso=effective_from.isoformat(),
                 effective_to_iso=act.in_force_to.isoformat() if act.in_force_to else None,
                 chunk_sink=all_chunks,
+                ref_sink=ref_sink,
             )
 
         await self._s.flush()
+        n_refs = await self._persist_citations(ref_sink)
+        await self._reresolve_incoming_citations(source_id=source.id, short_id=act.short_id)
 
         if all_chunks and not self._skip_embeddings:
             await self._embed_and_index_chunks(all_chunks)
@@ -113,6 +120,7 @@ class Loader:
             "loader.done",
             urn=act.urn,
             chunks=len(all_chunks),
+            citations=n_refs,
             indexed_qdrant=not self._skip_embeddings,
         )
 
@@ -151,6 +159,108 @@ class Loader:
                 collection=self._collection, field="source", value=short_id
             )
 
+    async def _persist_citations(self, refs: list[tuple[uuid.UUID, CanonicalRef]]) -> int:
+        """Popola norm_citation dai rinvii estratti dal parser.
+
+        ``to_partition_id`` è risolto quando l'articolo target esiste già in DB
+        (stessa fonte appena caricata o fonte già ingerita); altrimenti resta
+        NULL con il target denormalizzato in (to_source_short_id,
+        to_article_number), ri-risolvibile al load della fonte target.
+        """
+        if not refs:
+            return 0
+
+        # Risoluzione batch dei target vigenti: (short_id, number) → partition_id.
+        targets = {
+            (r.target_short_id, r.target_article)
+            for _, r in refs
+            if r.target_short_id and r.target_article
+        }
+        target_map: dict[tuple[str, str], uuid.UUID] = {}
+        source_ids: dict[str, uuid.UUID] = {}
+        if targets:
+            short_ids = {sid for sid, _ in targets}
+            rows = await self._s.execute(
+                select(NormSource.short_id, NormSource.id).where(
+                    NormSource.short_id.in_(list(short_ids))
+                )
+            )
+            source_ids = {r.short_id: r.id for r in rows}
+            for sid, src_id in source_ids.items():
+                nums = [num for s, num in targets if s == sid]
+                part_rows = await self._s.execute(
+                    select(NormPartition.number, NormPartition.id)
+                    .where(NormPartition.source_id == src_id)
+                    .where(NormPartition.kind == NormPartitionKind.ARTICOLO.value)
+                    .where(NormPartition.number.in_(nums))
+                    .where(NormPartition.effective_to.is_(None))
+                )
+                for num, pid in part_rows:
+                    target_map[(sid, num)] = pid
+
+        resolved = 0
+        for from_id, ref in refs:
+            to_pid = None
+            if ref.target_short_id and ref.target_article:
+                to_pid = target_map.get((ref.target_short_id, ref.target_article))
+            if to_pid is not None:
+                resolved += 1
+            self._s.add(
+                NormCitation(
+                    id=uuid4(),
+                    from_partition_id=from_id,
+                    from_comma_id=None,
+                    to_partition_id=to_pid,
+                    to_source_id=source_ids.get(ref.target_short_id or ""),
+                    raw_text=ref.raw_text or ref.href,
+                    citation_kind="rinvio",
+                    confidence=1.0 if to_pid is not None else 0.7,
+                    to_source_short_id=ref.target_short_id,
+                    to_article_number=ref.target_article,
+                )
+            )
+        await self._s.flush()
+        logger.info("loader.citations", total=len(refs), resolved=resolved)
+        return len(refs)
+
+    async def _reresolve_incoming_citations(self, *, source_id: uuid.UUID, short_id: str) -> None:
+        """Ri-risolve i rinvii di ALTRE fonti che puntano a questa fonte.
+
+        Il delete-and-replace azzera i ``to_partition_id`` entranti (FK SET
+        NULL): grazie al target denormalizzato possiamo ricollegarli alle
+        nuove partizioni appena caricate.
+        """
+        rows = await self._s.execute(
+            select(NormCitation.id, NormCitation.to_article_number)
+            .where(NormCitation.to_source_short_id == short_id)
+            .where(NormCitation.to_partition_id.is_(None))
+            .where(NormCitation.to_article_number.is_not(None))
+        )
+        pending = list(rows)
+        if not pending:
+            return
+        nums = {num for _, num in pending}
+        part_rows = await self._s.execute(
+            select(NormPartition.number, NormPartition.id)
+            .where(NormPartition.source_id == source_id)
+            .where(NormPartition.kind == NormPartitionKind.ARTICOLO.value)
+            .where(NormPartition.number.in_(list(nums)))
+            .where(NormPartition.effective_to.is_(None))
+        )
+        by_num: dict[str, uuid.UUID] = {num: pid for num, pid in part_rows}  # noqa: C416
+        fixed = 0
+        for cit_id, num in pending:
+            pid = by_num.get(num)
+            if pid is not None:
+                await self._s.execute(
+                    update(NormCitation)
+                    .where(NormCitation.id == cit_id)
+                    .values(to_partition_id=pid, to_source_id=source_id, confidence=1.0)
+                )
+                fixed += 1
+        if fixed:
+            logger.info("loader.citations_reresolved", short_id=short_id, fixed=fixed)
+
     async def _upsert_source(self, act: CanonicalAct) -> NormSource:
         stmt = (
             insert(NormSource)
@@ -186,9 +296,11 @@ class Loader:
         parent_id: uuid.UUID | None,
         parent_path: str,
         source_short_id: str,
+        source_title: str,
         effective_from_iso: str,
         effective_to_iso: str | None,
         chunk_sink: list[BuiltChunk],
+        ref_sink: list[tuple[uuid.UUID, CanonicalRef]],
     ) -> None:
         path = _build_ltree_path(parent_path, node)
         citation = _build_citation(node, source_short_id)
@@ -214,6 +326,9 @@ class Loader:
         # partizioni costava un round-trip ciascuno.
         self._s.add(partition)
 
+        if node.kind == NormPartitionKind.ARTICOLO and node.refs:
+            ref_sink.extend((partition.id, r) for r in node.refs)
+
         # Commi solo per articoli
         commi_rows: list[tuple[uuid.UUID, str, str]] = []
         if node.kind == NormPartitionKind.ARTICOLO and node.commi:
@@ -238,6 +353,7 @@ class Loader:
                     partition_id=partition.id,
                     articolo_num=node.number,
                     source_short_id=source_short_id,
+                    source_title=source_title,
                     path=path,
                     rubrica=node.rubrica,
                     commi=commi_rows,
@@ -254,9 +370,11 @@ class Loader:
                 parent_id=partition.id,
                 parent_path=path,
                 source_short_id=source_short_id,
+                source_title=source_title,
                 effective_from_iso=effective_from_iso,
                 effective_to_iso=effective_to_iso,
                 chunk_sink=chunk_sink,
+                ref_sink=ref_sink,
             )
 
     async def _embed_and_index_chunks(self, chunks: list[BuiltChunk]) -> None:

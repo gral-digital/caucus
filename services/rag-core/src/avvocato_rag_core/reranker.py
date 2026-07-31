@@ -207,6 +207,10 @@ def _tokenize(text: str) -> list[str]:
 
 
 def _extract_rubrica(text: str) -> str | None:
-    # Il chunker scrive "[Rubrica] <testo>" (parentesi QUADRE — chunker.py).
+    # Il chunker scrive "[Rubrica] <testo>" negli articolo-full e
+    # "[Fonte] Titolo — art. N (<rubrica>), comma M" nei chunk comma.
     m = re.search(r"\[Rubrica\]\s*([^\n]+)", text, re.I)
+    if m:
+        return m.group(1).strip()
+    m = re.search(r"\[Fonte\][^\n(]*\(([^)]+)\)", text, re.I)
     return m.group(1).strip() if m else None

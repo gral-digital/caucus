@@ -89,8 +89,11 @@ test:
 	uv run pytest
 	pnpm turbo run test
 
-eval-lexroom:  ## Benchmark E2E vs standard Lexroom (richiede API up + corpus indicizzato)
-	uv run python scripts/eval_lexroom_benchmark.py --json-out reports/eval_lexroom_latest.json
+eval:  ## Eval E2E sul gold set v2 (richiede API up + corpus indicizzato)
+	uv run python scripts/eval_v2.py --json-out reports/eval_v2_latest.json
+
+eval-gate:  ## Eval con soglie bloccanti (per CI notturna)
+	uv run python scripts/eval_v2.py --gate --json-out reports/eval_v2_gate.json
 
 clean:
 	docker compose down -v

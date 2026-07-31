@@ -20,6 +20,22 @@ class CanonicalCommaLetter(BaseModel):
     text: str
 
 
+class CanonicalRef(BaseModel):
+    """Rinvio normativo estratto da un ``<ref href>`` AKN.
+
+    ``target_short_id``/``target_article`` sono valorizzati solo quando l'atto
+    target è nel catalogo fonti (CODICI_CATALOG): sono la parte linkabile del
+    grafo dei rinvii. Il ``href`` grezzo è conservato per risoluzioni future.
+    """
+
+    model_config = ConfigDict(frozen=True)
+
+    raw_text: str
+    href: str
+    target_short_id: str | None = None
+    target_article: str | None = None
+
+
 class CanonicalComma(BaseModel):
     model_config = ConfigDict(frozen=True)
     number: str
@@ -45,6 +61,8 @@ class CanonicalPartition(BaseModel):
     # retrieval può filtrarlo/penalizzarlo.
     abrogato: bool = False
     commi: list[CanonicalComma] = Field(default_factory=list)
+    # Rinvii normativi dell'articolo (dedup per (target_short_id, target_article)).
+    refs: list[CanonicalRef] = Field(default_factory=list)
     children: list[CanonicalPartition] = Field(default_factory=list)
 
     def walk(self) -> list[CanonicalPartition]:

@@ -112,6 +112,10 @@ class SearchService:
             [direct_hits, fts_hits, vector_result.hits],
             top_k=effective_query.top_k_retrieve,
             pin_first=pin_ids or None,
+            # Il lookup per numero di articolo è deterministico: pesa il triplo
+            # dei rami probabilistici, così la citazione esatta dell'utente
+            # domina il ranking senza dipendere solo dai workaround di pinning.
+            weights=[3.0, 1.0, 1.0],
         )
 
         reranked = await self._reranker.rerank(
@@ -123,6 +127,14 @@ class SearchService:
         reranked = ensure_direct_articles_first(
             reranked, direct=direct_keys, top_k=effective_query.top_k_rerank
         )
+
+        # One-hop expansion sul grafo dei rinvii: gli articoli citati dai top
+        # hit entrano nel contesto come materiale ausiliario (in coda).
+        ref_hits = await self._fts.expand_citations(
+            reranked[:3], max_extra=3, effective_at=effective_query.effective_at
+        )
+        if ref_hits:
+            reranked = reranked + ref_hits
 
         latency_ms = int((perf_counter() - t0) * 1000)
         logger.info(

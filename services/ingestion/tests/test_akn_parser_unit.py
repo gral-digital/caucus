@@ -224,3 +224,45 @@ def test_abrogato_flag_not_set_on_vigente():
     )
     act = NormattivaAknParser().parse_bytes(xml, short_id="cc")
     assert act.root[0].children[0].abrogato is False
+
+
+def test_ref_extraction_resolves_catalog_targets():
+    """I <ref href> AKN verso fonti del catalogo diventano CanonicalRef risolti."""
+    import textwrap
+
+    xml = (
+        textwrap.dedent("""\
+    <?xml version="1.0" encoding="UTF-8"?>
+    <akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+      <act>
+        <meta/>
+        <body>
+          <article>
+            <num>Art. 186.</num>
+            <heading> Guida sotto l'influenza dell'alcool</heading>
+            <paragraph>
+              <num>1.</num>
+              <content><p>Si applica l'<ref href="/akn/it/act/regioDecreto/stato/1930-10-19/1398/!main#art_240">articolo 240 del codice penale</ref>
+              e l'<ref href="/akn/it/act/decretoLegislativo/stato/2050-01-01/999/!main#art_1">atto ignoto</ref>.</p></content>
+            </paragraph>
+          </article>
+        </body>
+        <attachments/>
+      </act>
+    </akomaNtoso>
+    """)
+        .strip()
+        .encode()
+    )
+    act = NormattivaAknParser().parse_bytes(xml, short_id="cds")
+    art = act.root[0].children[0]
+    targets = [(r.target_short_id, r.target_article) for r in art.refs]
+    # Il rinvio al CP è risolto; l'atto fuori catalogo è scartato
+    assert targets == [("cp", "240")]
+
+
+def test_ref_fragment_attached_suffix_normalized():
+    from avvocato_ingestion.parsers.normattiva_akn import _normalize_article_number
+
+    assert _normalize_article_number("2929bis") == "2929-bis"
+    assert _normalize_article_number("416-bis") == "416-bis"

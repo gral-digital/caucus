@@ -18,6 +18,7 @@ from sqlalchemy import or_, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from avvocato_api.db.models import NormChunk, NormPartition, NormSource
+from avvocato_api.db.models import NormCitation as NormCitationRow
 from avvocato_rag_core.query_router import ArticleRef, RoutedQuery
 from avvocato_rag_core.schemas.citation import NormCitation
 from avvocato_rag_core.schemas.retrieval import RetrievalHit
@@ -141,6 +142,99 @@ class FtsRetriever:
             effective_at=str(eff),
         )
         return hits
+
+    async def expand_citations(
+        self,
+        hits: list[RetrievalHit],
+        *,
+        max_extra: int = 3,
+        effective_at: date | None = None,
+    ) -> list[RetrievalHit]:
+        """One-hop expansion sul grafo dei rinvii (norm_citation).
+
+        Il testo di legge è denso di rinvii ("salvo quanto previsto
+        dall'art. …"): l'articolo citato serve spesso a rispondere quanto
+        quello recuperato. Per i top hit, recupera gli articoli che essi
+        rinviano e li aggiunge al contesto (marcati ``lookup="ref"``).
+        """
+        if not hits or max_extra <= 0:
+            return []
+
+        eff = effective_at or date.today()
+        from_ids = [h.partition_id for h in hits]
+        already = {h.partition_id for h in hits}
+
+        rows = (
+            await self._session.execute(
+                select(
+                    NormChunk.id,
+                    NormChunk.partition_id,
+                    NormChunk.comma_id,
+                    NormChunk.text,
+                    NormChunk.chunk_kind,
+                    NormPartition.number,
+                    NormPartition.metadata_,
+                    NormSource.short_id,
+                    NormCitationRow.raw_text,
+                )
+                .join(
+                    NormCitationRow,
+                    NormCitationRow.to_partition_id == NormChunk.partition_id,
+                )
+                .join(NormPartition, NormPartition.id == NormChunk.partition_id)
+                .join(NormSource, NormSource.id == NormPartition.source_id)
+                .where(NormCitationRow.from_partition_id.in_(from_ids))
+                .where(NormPartition.effective_from <= eff)
+                .where(
+                    or_(
+                        NormPartition.effective_to.is_(None),
+                        NormPartition.effective_to > eff,
+                    )
+                )
+                # Un solo chunk rappresentativo per articolo: preferiamo
+                # articolo-full, poi comma (ordinamento sotto + dedup in Python).
+                .order_by(NormChunk.partition_id, NormChunk.chunk_kind)
+                .limit(max_extra * 8)
+            )
+        ).all()
+
+        extra: list[RetrievalHit] = []
+        seen_partitions: set[UUID] = set()
+        for chunk_id, part_id, comma_id, txt, chunk_kind, num, part_meta, src, raw in rows:
+            if part_id in already or part_id in seen_partitions:
+                continue
+            # "articolo-full" < "comma" < "window" alfabeticamente: il primo
+            # chunk per partizione è quello preferito grazie all'order_by.
+            del chunk_kind
+            seen_partitions.add(part_id)
+            metadata: dict[str, Any] = {
+                "source": src,
+                "articolo": num,
+                "lookup": "ref",
+                "ref_raw": raw[:120],
+            }
+            if (part_meta or {}).get("abrogato"):
+                metadata["abrogato"] = True
+            extra.append(
+                RetrievalHit(
+                    chunk_id=chunk_id,
+                    partition_id=part_id,
+                    comma_id=comma_id,
+                    citation=NormCitation(source=src, part="articolo", num=num),
+                    text=txt,
+                    score_final=0.01,  # in coda: contesto ausiliario, non risultato primario
+                    metadata=metadata,
+                )
+            )
+            if len(extra) >= max_extra:
+                break
+        if extra:
+            logger.info(
+                "ref_expansion.done",
+                n=len(extra),
+                targets=[(h.citation.source, h.citation.num) for h in extra if h.citation],
+            )
+        return extra
 
     @staticmethod
     def _row_to_hit(row: Any, *, score: float) -> RetrievalHit:

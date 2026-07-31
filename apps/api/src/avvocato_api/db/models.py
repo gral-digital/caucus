@@ -142,6 +142,7 @@ class NormCitation(Base):
     __table_args__ = (
         Index("ix_norm_citation_from", "from_partition_id"),
         Index("ix_norm_citation_to", "to_partition_id"),
+        Index("ix_norm_citation_target_ref", "to_source_short_id", "to_article_number"),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -168,6 +169,11 @@ class NormCitation(Base):
     raw_text: Mapped[str] = mapped_column(Text, nullable=False)
     citation_kind: Mapped[str] = mapped_column(String(32), nullable=False)
     confidence: Mapped[float] = mapped_column(nullable=False, default=1.0)
+    # Target denormalizzato: sopravvive al delete-and-replace della fonte
+    # target (che azzera to_partition_id via FK SET NULL) e permette la
+    # ri-risoluzione del link a ogni load.
+    to_source_short_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    to_article_number: Mapped[str | None] = mapped_column(String(32), nullable=True)
 
 
 class NormChunk(Base):

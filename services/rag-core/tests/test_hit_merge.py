@@ -64,3 +64,21 @@ def test_ensure_direct_articles_first_reorders():
     b = _hit(uuid4(), lookup="direct", source="cp", num="575")
     out = ensure_direct_articles_first([a, b], direct=[("cp", "575")], top_k=5)
     assert out[0].citation is not None and out[0].citation.num == "575"
+
+
+def test_rrf_weights_favor_direct_list():
+    """Con weights, un hit in cima alla lista pesata batte un hit in cima a una lista non pesata."""
+    direct_id = uuid4()
+    vector_id = uuid4()
+    direct = [_hit(direct_id, lookup="direct", num="575")]
+    vector = [_hit(vector_id, num="589"), _hit(direct_id, lookup=None, num="575")]
+
+    merged = reciprocal_rank_fusion([direct, vector], top_k=5, weights=[3.0, 1.0])
+    assert merged[0].chunk_id == direct_id
+
+
+def test_rrf_weights_length_mismatch_raises():
+    import pytest
+
+    with pytest.raises(ValueError):
+        reciprocal_rank_fusion([[_hit(uuid4())]], top_k=5, weights=[1.0, 2.0])
