@@ -54,7 +54,7 @@ class LLMQueryExpander:
                         LLMMessage(role="user", content=question),
                     ],
                     model=self._model,
-                    max_tokens=120,
+                    max_tokens=80,
                     temperature=0.0,
                 ),
                 timeout=self._timeout,

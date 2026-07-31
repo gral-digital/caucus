@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
+from avvocato_rag_core.act_registry import resolve_act_ref
 from avvocato_rag_core.schemas.retrieval import RetrievalQuery
 
 # art. 575 c.p. / articolo 2043 c.c. / art 186 cds
@@ -30,7 +31,11 @@ _ARTICLE_RE = re.compile(
     r"(?:del\s+)?gdpr|(?:dello\s+)?statuto\s+dei\s+lavoratori|"
     r"(?:del\s+)?d\.?\s*lgs\.?\s*(?:n\.?\s*)?231\s*/\s*2001|"
     r"(?:del\s+)?testo\s+unico\s+(?:sull[ae]\s+|dell[ae]\s+)?"
-    r"(?:immigrazione|edilizia|bancario|finanza|ambiente|sicurezza\s+sul\s+lavoro))",
+    r"(?:immigrazione|edilizia|bancario|finanza|ambiente|sicurezza\s+sul\s+lavoro)|"
+    # Estremi ufficiali: "D.Lgs. 81/2008", "L. 300/1970", "D.P.R. 917/1986"
+    r"(?:del\s+|della\s+)?(?:d\.?\s*lgs\.?|decreto\s+legislativo|d\.?\s*p\.?\s*r\.?|"
+    r"decreto\s+del\s+presidente\s+della\s+repubblica|legge|l\.)\s*"
+    r"(?:n\.?\s*)?\d+\s*(?:/|\s+del\s+)\s*\d{2,4})",
     re.IGNORECASE,
 )
 
@@ -96,12 +101,38 @@ _SUFFIX_TO_SHORT: dict[str, str] = {
 }
 
 
+_ACT_REF_RE = re.compile(
+    r"(?:del\s+|della\s+)?"
+    r"(d\.?\s*lgs\.?|decreto\s+legislativo|d\.?\s*p\.?\s*r\.?|"
+    r"decreto\s+del\s+presidente\s+della\s+repubblica|legge|l\.)\s*"
+    r"(?:n\.?\s*)?(\d+)\s*(?:/|\s+del\s+)\s*(\d{2,4})",
+    re.IGNORECASE,
+)
+
+_ACT_TYPE_NORM = {
+    "decretolegislativo": "dlgs",
+    "dlgs": "dlgs",
+    "dpr": "dpr",
+    "decretodelpresidentedellarepubblica": "dpr",
+    "legge": "l",
+    "l": "l",
+}
+
+
 def _normalize_suffix(raw: str) -> str | None:
     s = re.sub(r"\s+", " ", raw.lower().strip())
     compact = s.replace(".", "").replace(" ", "")
     if compact in _SUFFIX_TO_SHORT:
         return _SUFFIX_TO_SHORT[compact]
-    return _SUFFIX_TO_SHORT.get(s)
+    if s in _SUFFIX_TO_SHORT:
+        return _SUFFIX_TO_SHORT[s]
+    # Estremi ufficiali: "d.lgs. 81/2008" → tusl (via act_registry)
+    m = _ACT_REF_RE.fullmatch(s)
+    if m:
+        tipo = _ACT_TYPE_NORM.get(m.group(1).replace(".", "").replace(" ", ""))
+        if tipo:
+            return resolve_act_ref(tipo, m.group(2), m.group(3))
+    return None
 
 
 def _normalize_art_num(raw: str) -> str:

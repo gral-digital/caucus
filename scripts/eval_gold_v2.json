@@ -1,5 +1,5 @@
 {
-  "version": "2.1",
+  "version": "2.2",
   "description": "Gold set v2 — copertura 23 fonti, casi hard (abrogati, bis/ter/oltre-decies, multi-hop, out-of-scope, adversarial). Versionato in git: OGNI modifica va motivata nel commit e mai adattata a posteriori all'output del sistema. v2.1: aggiunti casi per corpus esteso (UE, compliance, giurisprudenza); gap-gdpr convertito in caso positivo perché il GDPR ora È indicizzato.",
   "scoring_notes": "Nessun punteggio per assenza di citazioni: una risposta senza citazioni con should_cite atteso ha citation_recall=0. keywords_groups: ogni gruppo è soddisfatto da almeno una variante (substring case-insensitive).",
   "cases": [
@@ -3288,8 +3288,15 @@
       "category": "gap",
       "question": "Qual è l'orientamento più recente della Cassazione sul danno da perdita di chance?",
       "hard": true,
-      "expect_gap_admission": true,
-      "notes": "Giurisprudenza non indicizzata: ammissione attesa"
+      "notes": "v2.2: dal corpus esteso il sistema HA sentenze di Cassazione indicizzate — la risposta può citarne in prosa dal contesto oppure ammettere che l'orientamento specifico non è nel corpus. Prima era un puro caso gap.",
+      "keywords_groups": [
+        [
+          "cass",
+          "corpus",
+          "non trovo",
+          "non dispongo"
+        ]
+      ]
     },
     {
       "id": "gap-ccnl",

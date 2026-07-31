@@ -99,3 +99,7 @@ clean:
 	docker compose down -v
 	rm -rf .venv node_modules .turbo apps/*/.next
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+
+harvest-cassazione:  ## Harvest massivo Cassazione (resumabile; default 100k per tipo ≈ 14 EUR embeddings)
+	nohup scripts/harvest_cassazione_full.sh > /tmp/harvest_cassazione.log 2>&1 &
+	@echo "Harvest avviato in background. Log: /tmp/harvest_cassazione.log"

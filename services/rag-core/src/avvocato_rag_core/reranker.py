@@ -207,9 +207,13 @@ class CrossEncoderReranker(Reranker):
             # Il cross-encoder giudica solo il testo: i segnali deterministici
             # (lookup diretto per numero, abrogazione) restano dei correttivi.
             adj = score
-            if h.metadata.get("lookup") == "direct":
+            lookup = h.metadata.get("lookup")
+            if lookup == "direct":
                 adj += 1.0
-            if h.metadata.get("abrogato"):
+            # Malus abrogato SOLO sui rami probabilistici: se l'articolo è
+            # stato chiesto per numero (utente o espansione), la domanda È
+            # probabilmente sull'abrogazione — non seppellire la risposta.
+            if h.metadata.get("abrogato") and lookup not in ("direct", "expansion"):
                 adj -= 0.5
             reranked.append(h.model_copy(update={"score_rerank": score, "score_final": adj}))
         reranked.sort(key=lambda h: h.score_final, reverse=True)

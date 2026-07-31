@@ -109,7 +109,9 @@ class SearchService:
         # usano la AsyncSession (direct, fts, exp_lookup) devono restare
         # SEQUENZIALI tra loro — la sessione SQLAlchemy non ammette operazioni
         # concorrenti ("This session is provisioning a new connection...").
-        expander = _get_expander()
+        # Se l'utente ha già citato un articolo per numero, il lookup diretto
+        # è la chiave di retrieval: l'espansione aggiungerebbe solo latenza.
+        expander = _get_expander() if not routed.direct_articles else None
         expansion_task = (
             asyncio.create_task(expander.expand(routed.original_text))
             if expander is not None
