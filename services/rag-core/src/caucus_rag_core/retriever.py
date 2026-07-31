@@ -55,7 +55,7 @@ class HybridRetriever:
         per_corpus: list[list[qm.ScoredPoint]] = []
         total_points = 0
 
-        for corpus in query.corpora:
+        for i, corpus in enumerate(query.corpora):
             collection = self._corpus_map.get(corpus)
             if collection is None:
                 logger.warning("corpus_not_configured", corpus=corpus)
@@ -65,13 +65,15 @@ class HybridRetriever:
             # ogni volta che il router pinna una fonte normativa.
             skip_sources = corpus == CorpusFilter.CASSAZIONE
             filters = list(self._build_filters(query, skip_sources=skip_sources))
-            # Quota per corpus: la normativa è la fonte primaria, la
-            # giurisprudenza è interpretativa e riceve una frazione del budget.
-            # Senza quota il corpus più grande (oggi Cassazione: 285k chunk vs
-            # 64k di norme) si mangia gli slot e le norme rilevanti non
-            # arrivano nemmeno al reranker.
+            # Quota per corpus: il PRIMO corpus in query.corpora è la fonte
+            # primaria, gli altri sono di supporto e ricevono una frazione del
+            # budget. Senza quota il corpus più grande (oggi Cassazione: 285k
+            # chunk vs 64k di norme) si mangia gli slot e i risultati primari
+            # non arrivano nemmeno al reranker. L'ordine di query.corpora è
+            # quindi semantico: [codici, cassazione] per la ricerca normativa,
+            # [cassazione, codici] per la ricerca giurisprudenziale.
             limit = query.top_k_retrieve
-            if corpus == CorpusFilter.CASSAZIONE:
+            if i > 0:
                 limit = max(4, int(query.top_k_retrieve * self._case_law_ratio))
             points = await self._store.hybrid_search(
                 collection,

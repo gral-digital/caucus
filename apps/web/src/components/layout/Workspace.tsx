@@ -6,7 +6,7 @@ import { Sidebar } from "@/components/layout/Sidebar";
 import { cn } from "@/lib/cn";
 import type { ChatMode } from "@/lib/chatStream";
 
-const MODES: ChatMode[] = ["ricerca", "analisi", "redazione"];
+const MODES: ChatMode[] = ["ricerca", "analisi", "redazione", "giurisprudenza"];
 
 /**
  * Workspace a moduli: Ricerca / Analisi / Redazione.

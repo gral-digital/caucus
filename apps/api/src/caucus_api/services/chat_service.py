@@ -17,7 +17,7 @@ from caucus_api.db.models import NormPartition, NormSource
 from caucus_api.deps import get_llm_router
 from caucus_api.services.search_service import SearchService
 from caucus_rag_core.llm.router import LLMMessage, LLMRouter
-from caucus_rag_core.schemas.retrieval import RetrievalHit, RetrievalQuery
+from caucus_rag_core.schemas.retrieval import CorpusFilter, RetrievalHit, RetrievalQuery
 
 logger = structlog.get_logger(__name__)
 
@@ -145,9 +145,20 @@ class ChatService:
                 data={"message": "effective_at non valido: atteso formato ISO YYYY-MM-DD"},
             )
             return
+        mode = getattr(request, "mode", "ricerca")
+        corpora = list(request.corpora)
+        if mode == "giurisprudenza":
+            # L'ordine dei corpora è semantico (il primo è primario nel
+            # retrieval): in modalità giurisprudenza la Cassazione guida e la
+            # normativa fa da supporto interpretativo.
+            corpora = [CorpusFilter.CASSAZIONE] + [
+                c for c in corpora if c != CorpusFilter.CASSAZIONE
+            ]
+            if CorpusFilter.CODICI not in corpora:
+                corpora.append(CorpusFilter.CODICI)
         query = RetrievalQuery(
             text=retrieval_query_text,
-            corpora=request.corpora,
+            corpora=corpora,
             sources=request.sources,
             effective_at=effective,
             top_k_retrieve=50,
@@ -184,8 +195,19 @@ class ChatService:
             "di volersi basare SOLO su di te per una decisione con conseguenze legali, "
             "ricordaglielo in una frase."
         )
-        mode = getattr(request, "mode", "ricerca")
-        if mode == "analisi":
+        if mode == "giurisprudenza":
+            system_content += (
+                "\n\n# MODALITÀ: RICERCA GIURISPRUDENZIALE\n"
+                "Il cliente cerca gli orientamenti della Cassazione. Lavora sulle "
+                "sentenze presenti nel CONTESTO: raggruppa per orientamento (se ce "
+                "n'è più di uno, di' quale prevale e quale è minoritario), cita "
+                "ogni decisione IN PROSA con gli estremi forniti, e collega il "
+                "principio alle norme di riferimento con <cite/>. NON estrapolare "
+                "orientamenti da sentenze che non sono nel CONTESTO: se le "
+                "sentenze recuperate non bastano a fondare un orientamento, "
+                "dillo apertamente."
+            )
+        elif mode == "analisi":
             system_content += (
                 "\n\n# MODALITÀ: ANALISI DOCUMENTI\n"
                 "Il cliente è qui per far analizzare documenti. Se non c'è nessun "

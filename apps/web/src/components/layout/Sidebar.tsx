@@ -74,7 +74,12 @@ export function Sidebar({
           label="Redazione"
           onClick={() => onSelectMode("redazione")}
         />
-        <SidebarLink icon={<Scale size={14} />} label="Giurisprudenza" soon />
+        <SidebarLink
+          active={mode === "giurisprudenza"}
+          icon={<Scale size={14} />}
+          label="Giurisprudenza"
+          onClick={() => onSelectMode("giurisprudenza")}
+        />
       </nav>
 
       <div className="flex-1" />

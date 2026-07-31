@@ -52,6 +52,17 @@ const MODE_COPY: Record<
       "La clausola di recesso è conforme alla disciplina legale?",
     ],
   },
+  giurisprudenza: {
+    title: "Giurisprudenza",
+    subtitle:
+      "Ricerca negli orientamenti della Cassazione (civile e penale, testo integrale): la risposta cita le decisioni con gli estremi e le norme di riferimento.",
+    examples: [
+      "Qual è l'orientamento della Cassazione sul licenziamento ritorsivo?",
+      "Come valuta la Cassazione la guida in stato di ebbrezza con tasso vicino alla soglia?",
+      "Ci sono decisioni recenti sulla responsabilità della banca per operazioni non autorizzate?",
+      "Orientamenti sul risarcimento del danno da perdita di chance",
+    ],
+  },
   redazione: {
     title: "Redazione",
     subtitle:

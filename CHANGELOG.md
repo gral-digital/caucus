@@ -5,8 +5,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
-- **Workspace a tre moduli** (Ricerca giuridica / Analisi documenti /
-  Redazione): sidebar navigabile, welcome ed esempi dedicati per modulo,
+- **Modulo Giurisprudenza**: ricerca negli orientamenti della Cassazione.
+  In questa modalità l'ordine dei corpora si inverte (Cassazione primaria
+  nel retrieval, normativa di supporto — l'ordine di `query.corpora` è ora
+  semantico nel retriever) e il prompt raggruppa per orientamento
+  (prevalente/minoritario), cita le decisioni in prosa con gli estremi e
+  collega i principî alle norme con `<cite/>`; vietato estrapolare
+  orientamenti da sentenze non recuperate.
+- **Workspace a quattro moduli** (Ricerca giuridica / Analisi documenti /
+  Redazione / Giurisprudenza): sidebar navigabile, welcome ed esempi dedicati per modulo,
   conversazioni indipendenti che sopravvivono al cambio modulo.
   `ChatRequest.mode` orienta il comportamento: in analisi l'assistente
   richiede il documento e struttura i rilievi per rischio con norme citate;

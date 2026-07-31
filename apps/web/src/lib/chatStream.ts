@@ -11,7 +11,7 @@ export interface ChatMessage {
   content: string;
 }
 
-export type ChatMode = "ricerca" | "analisi" | "redazione";
+export type ChatMode = "ricerca" | "analisi" | "redazione" | "giurisprudenza";
 
 export interface ChatRequest {
   question: string;
