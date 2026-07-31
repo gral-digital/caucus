@@ -14,6 +14,8 @@ type Turn = {
   id: string;
   question: string;
   answer: string;
+  /** Testo finale del server: citazioni in prosa promosse a tag <cite/>. */
+  finalText?: string;
   hits: RetrievalHitSummary[];
   status: "retrieving" | "streaming" | "done" | "error";
   error?: string;
@@ -67,7 +69,7 @@ export function ChatView() {
               case "citation_warnings":
                 return { ...turn, citationWarnings: ev.warnings };
               case "done":
-                return { ...turn, status: "done" };
+                return { ...turn, status: "done", finalText: ev.final_text };
               case "error":
                 return { ...turn, status: "error", error: ev.message };
               default:
@@ -119,6 +121,9 @@ export function ChatView() {
               turn.citationWarnings.invalid.length > 0 ? (
                 <HallucinationBanner warnings={turn.citationWarnings} />
               ) : null}
+              {turn.status === "done" && turn.answer ? (
+                <ExportDocxButton turn={turn} />
+              ) : null}
               {turn.hits.length > 0 ? <CitationsPanel hits={turn.hits} /> : null}
             </div>
           ))}
@@ -130,6 +135,57 @@ export function ChatView() {
           <QuestionInput onAsk={ask} disabled={isBusy} />
         </div>
       </div>
+    </div>
+  );
+}
+
+function ExportDocxButton({ turn }: { turn: Turn }) {
+  const [state, setState] = useState<"idle" | "busy" | "error">("idle");
+
+  const exportDocx = useCallback(async () => {
+    setState("busy");
+    try {
+      const res = await fetch("/api/v1/export/docx", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: turn.question,
+          // finalText ha le citazioni in prosa promosse a tag <cite/> ed è
+          // passato dal trust layer; il testo streamato è il fallback.
+          answer: turn.finalText ?? turn.answer,
+        }),
+      });
+      if (!res.ok) throw new Error(`export failed: ${res.status}`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download =
+        res.headers.get("Content-Disposition")?.match(/filename="([^"]+)"/)?.[1] ??
+        "parere_caucus.docx";
+      a.click();
+      URL.revokeObjectURL(url);
+      setState("idle");
+    } catch {
+      setState("error");
+    }
+  }, [turn]);
+
+  return (
+    <div className="flex items-center gap-2 self-start">
+      <button
+        type="button"
+        onClick={exportDocx}
+        disabled={state === "busy"}
+        className="rounded-md border border-paper-border bg-paper px-3 py-1.5 text-[13px] text-ink-muted transition hover:bg-paper-hover hover:text-ink disabled:opacity-50"
+      >
+        {state === "busy" ? "Preparo il documento…" : "Esporta in Word (.docx)"}
+      </button>
+      {state === "error" ? (
+        <span className="text-[12.5px] text-red-700">
+          Export non riuscito, riprova.
+        </span>
+      ) : null}
     </div>
   );
 }

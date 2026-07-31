@@ -44,7 +44,7 @@ export type ChatStreamEvent =
   | { kind: "retrieval"; hits: RetrievalHitSummary[]; latency_ms: number }
   | { kind: "token"; text: string }
   | { kind: "citation_warnings"; warnings: CitationWarnings }
-  | { kind: "done"; finish_reason: string }
+  | { kind: "done"; finish_reason: string; final_text?: string }
   | { kind: "error"; message: string };
 
 export async function streamChat(
@@ -77,7 +77,13 @@ export async function streamChat(
           onEvent({ kind: "citation_warnings", warnings: payload });
           break;
         case "done":
-          onEvent({ kind: "done", finish_reason: payload.finish_reason });
+          onEvent({
+            kind: "done",
+            finish_reason: payload.finish_reason,
+            // Testo con le citazioni in prosa promosse a tag <cite/> (e
+            // riparate dal trust layer): è la forma giusta per l'export.
+            final_text: payload.final_text,
+          });
           break;
         case "error":
           onEvent({ kind: "error", message: payload.message });

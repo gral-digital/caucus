@@ -120,10 +120,17 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    ~50k fatte). Resumabile e idempotente. Il completo (~430k) sfora il budget
    (~12€ oltre) → decisione dell'owner. **Attenzione**: più cresce, più può
    ri-abbassare il recall normativo → ri-valutare la `case_law_candidate_ratio`.
-4. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
+4. **Prodotto (fase avviata 2026-07-31, decisione owner: prodotto prima
+   delle metriche; si pubblica tutto insieme)**. Fatto: export .docx del
+   parere con citazioni ri-verificate server-side (`routes/export.py` +
+   `services/docx_export.py` + bottone in ChatView; python-docx). Prossimi,
+   in ordine: analisi documentale (upload docx/pdf + chat ancorata a
+   documento e corpus — riusare pattern da Mike, AGPL compatibile), UI a tre
+   moduli (Ricerca/Analisi/Redazione), Word add-in per ultimo.
+5. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.
-5. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
+6. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
    self-hosted BGE-M3 (azzera costi/dipendenza US, il codice c'è già),
    structured output per le citazioni, conversazioni server-side + audit log.
 

@@ -5,6 +5,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Export del parere in Word** (`POST /export/docx` + bottone in chat): il
+  server ri-verifica le citazioni contro il corpus al momento dell'export e
+  produce un .docx con formattazione da studio (Times New Roman, corpo
+  giustificato, numeri di pagina), riferimenti in forma citazionale canonica
+  e allegato «Riferimenti normativi» con rubrica, testo e stato di vigenza —
+  con avvertenza esplicita su disposizioni abrogate o non trovate. Nota di
+  trasparenza AI in coda al documento.
 - **Guardrail bidirezionale**: policy che distingue analisi giuridica (sempre
   ammessa, anche su reati e clienti colpevoli) da assistenza operativa a un
   illecito (rifiutata per chiunque, avvocati inclusi: artt. 377-378 c.p.), e
