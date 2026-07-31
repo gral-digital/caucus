@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use Caucus or Caucus Bench in your research, please cite it as below."
+title: "Caucus — Open-source legal & compliance AI for Italian law"
+type: software
+license: AGPL-3.0
+abstract: >-
+  Retrieval-augmented legal assistant for Italian law with a post-generation
+  citation trust layer, and Caucus Bench: the first open, versioned benchmark
+  for legal AI on Italian law (162 cases, anti-gaming methodology, MIT).
+keywords:
+  - legal AI
+  - Italian law
+  - RAG
+  - benchmark
+  - hallucination detection
+# repository-code e versione: da compilare alla prima release pubblica

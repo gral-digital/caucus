@@ -69,3 +69,6 @@ logs/
 
 # Output eval locali (i gold set sono tracciati in scripts/, i report no)
 reports/
+
+# Config locale dell'assistente di sviluppo
+.claude/

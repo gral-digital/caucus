@@ -15,7 +15,7 @@ const lora = Lora({
 });
 
 export const metadata: Metadata = {
-  title: "Avvocato — AI per il diritto italiano",
+  title: "Caucus — AI per il diritto italiano",
   description:
     "Assistente legale italiano con citazioni precise al Codice Civile e Penale.",
 };

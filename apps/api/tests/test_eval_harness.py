@@ -8,7 +8,9 @@ import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
-_spec = importlib.util.spec_from_file_location("eval_v2", REPO_ROOT / "scripts" / "eval_v2.py")
+_spec = importlib.util.spec_from_file_location(
+    "eval_v2", REPO_ROOT / "benchmark" / "run_benchmark.py"
+)
 assert _spec is not None and _spec.loader is not None
 eval_v2 = importlib.util.module_from_spec(_spec)
 # I dataclass con `from __future__ import annotations` richiedono il modulo
@@ -18,7 +20,7 @@ _spec.loader.exec_module(eval_v2)
 
 
 def test_gold_set_is_valid_and_large_enough():
-    gold = json.loads((REPO_ROOT / "scripts" / "eval_gold_v2.json").read_text())
+    gold = json.loads((REPO_ROOT / "benchmark" / "gold_cases.json").read_text())
     cases = gold["cases"]
     assert len(cases) >= 100
     ids = [c["id"] for c in cases]

@@ -90,10 +90,10 @@ test:
 	pnpm turbo run test
 
 eval:  ## Eval E2E sul gold set v2 (richiede API up + corpus indicizzato)
-	uv run python scripts/eval_v2.py --json-out reports/eval_v2_latest.json
+	uv run python benchmark/run_benchmark.py --json-out reports/eval_v2_latest.json
 
 eval-gate:  ## Eval con soglie bloccanti (per CI notturna)
-	uv run python scripts/eval_v2.py --gate --json-out reports/eval_v2_gate.json
+	uv run python benchmark/run_benchmark.py --gate --json-out reports/eval_v2_gate.json
 
 clean:
 	docker compose down -v

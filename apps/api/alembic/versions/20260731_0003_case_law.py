@@ -72,9 +72,7 @@ def upgrade() -> None:
         sa.Column("metadata", JSONB, nullable=False, server_default="{}"),
     )
     op.create_index("ix_case_law_chunk_case", "case_law_chunk", ["case_id"])
-    op.create_index(
-        "ix_case_law_chunk_tsv", "case_law_chunk", ["text_tsv"], postgresql_using="gin"
-    )
+    op.create_index("ix_case_law_chunk_tsv", "case_law_chunk", ["text_tsv"], postgresql_using="gin")
 
 
 def downgrade() -> None:

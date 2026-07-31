@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Eval v2 — harness end-to-end contro il gold set versionato.
+"""Caucus Bench — harness end-to-end del benchmark legale italiano.
 
 Differenze metodologiche rispetto alla v1 (eval_lexroom_benchmark.py, rimossa):
 
@@ -43,7 +43,7 @@ from typing import Any
 
 import httpx
 
-GOLD_PATH = Path(__file__).parent / "eval_gold_v2.json"
+GOLD_PATH = Path(__file__).parent / "gold_cases.json"
 API_URL = os.environ.get("EVAL_API_URL", "http://localhost:8000")
 API_TOKEN = os.environ.get("API_AUTH_TOKEN", "")
 

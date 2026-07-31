@@ -32,7 +32,7 @@ export function Sidebar() {
         <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-paper">
           <ScrollText size={15} strokeWidth={2.2} />
         </div>
-        <span className="font-serif text-[17px] tracking-tight text-ink">Avvocato</span>
+        <span className="font-serif text-[17px] tracking-tight text-ink">Caucus</span>
       </div>
 
       <div className="px-3 pb-3 pt-1">

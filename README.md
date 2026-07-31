@@ -1,88 +1,126 @@
-# Avvocato
+# Caucus
 
-Piattaforma AI enterprise per il settore legale italiano — RAG su Codice Civile, Codice Penale e giurisprudenza, drafting e analisi documenti.
+**Open-source legal & compliance AI for Italian law — with a verifiable trust
+layer and the first open Italian legal benchmark.**
 
-## Stato
+*[Versione italiana → README.it.md](README.it.md)*
 
-Fase 0 — scaffolding architettura. Il primo modulo in consegna è **"Chiedi al Codice"** (Q&A su Codice Civile e Penale con citazioni precise articolo:comma).
+Caucus is a retrieval-augmented legal assistant over the Italian legal system:
+50 consolidated statutes from Normattiva (civil, criminal and procedure codes,
+consolidated acts, compliance legislation), 14 EU acts in Italian (GDPR,
+AI Act, NIS2, DORA, MiCA…), and the full-text, anonymized decisions of the
+Corte di Cassazione. Every normative citation in every answer is validated
+post-generation against the corpus — existence, source and temporal validity —
+and flagged to the user when it isn't verifiable.
 
-## Architettura (riassunto)
+> ⚠️ **Caucus is not a lawyer and its output is not legal advice.** It is a
+> research and drafting aid. No professional relationship is created by using
+> it. For decisions with legal consequences, consult a licensed professional.
 
-- **Backend**: Python 3.12, FastAPI async
-- **Frontend**: Next.js 15, React 19, TypeScript, shadcn/ui
-- **Monorepo**: pnpm workspaces + Turborepo per Node, uv workspace per Python
-- **Vector DB**: Qdrant (EU-self-hosted)
-- **Relational DB**: Postgres 16 + pgvector + FTS italiano (Cloud SQL)
-- **Cache / queues**: Redis (Memorystore)
-- **LLM routing**: LiteLLM con Llama 3.3 70B (Vertex AI) primario + Claude Sonnet fallback
-- **Embeddings**: BAAI/bge-m3 (multilingual, dense+sparse)
-- **Reranker**: bge-reranker-v2-m3 + Italian-LegalBERT fine-tune (fase 2)
-- **Parsing giuridico**: Docling (IBM)
-- **Agent orchestration**: LangGraph
-- **Observability**: Langfuse self-hosted + OpenTelemetry
-- **Hosting**: GCP `europe-west1` (sovranità dati EU + GDPR + segreto professionale art. 622 c.p.)
+## Why it exists
 
-Vedi [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) per i dettagli.
+Legal AI vendors claim accuracy figures that cannot be reproduced. Caucus takes
+the opposite bet: **open code (AGPL-3.0), open benchmark (MIT), honest
+numbers**. On [Caucus Bench](benchmark/README.md) — 162 cases across all major
+areas of Italian law, including repealed articles, adversarial requests and
+out-of-corpus questions — the reference stack currently measures:
 
-## Quick start (dev locale)
+| | |
+|---|---|
+| Pass rate | **91%** (92.9% on hard cases) |
+| Source-aware recall@8 / MRR | **92% / 0.79** |
+| Citation recall | **94%** |
+| **Hallucinated citations** (over citing answers) | **0.0%** |
+| Refusal on adversarial requests | **100%** |
 
-Prerequisiti: Docker, `uv`, `pnpm`, `node >= 20`.
+Numbers, methodology and anti-gaming rules: [benchmark/](benchmark/README.md).
+
+## What's inside
+
+- **Corpus** — 50 Normattiva sources parsed from official Akoma Ntoso XML
+  (with repeal detection and consolidation dating), 14 EUR-Lex acts in
+  Italian, incremental idempotent harvest of Cassazione decisions
+  (~430k available, resumable).
+- **Retrieval** — four fused branches (weighted RRF): deterministic
+  article lookup, LLM query expansion with official-reference resolution
+  ("art. 17 D.Lgs. 81/2008" → TU Sicurezza), Postgres FTS (Italian config),
+  dense vectors (Qdrant). Cross-encoder reranking (bge-reranker-v2-m3,
+  local, MPS/CUDA/CPU). One-hop expansion over the **norm citation graph**
+  extracted from the XML cross-references.
+- **Trust layer** — every `<cite/>` in the answer is validated against the
+  database: non-existent articles, articles outside their temporal validity
+  and repealed articles are flagged; citations of real articles that were
+  *not* in the retrieved context (the most insidious hallucination) are
+  reported as weak grounding. Case law is cited in prose with its real
+  docket data, never invented.
+- **Temporal validity** — every partition and chunk carries
+  `effective_from`/`effective_to`; retrieval filters by validity date on all
+  branches (default: today).
+- **API & UI** — FastAPI with SSE streaming, token auth, rate limiting;
+  Next.js chat with retrieved-sources panel and unverified-citation warnings.
+
+## Quick start
+
+Prerequisites: Docker, [`uv`](https://docs.astral.sh/uv/), `pnpm`, Node ≥ 20,
+an OpenAI API key (default backend; local backends supported).
 
 ```bash
-# 1. Dipendenze
-make install
-
-# 2. Infra locale (Postgres, Qdrant, Redis, Langfuse)
-make up
-
-# 3. Migration + seed iniziale
-make migrate
-make seed-codice-civile   # scarica da Normattiva, parse, indicizza
-
-# 4. Avvia API + web in dev
-make dev
+git clone <repo-url> caucus && cd caucus
+cp .env.example .env          # then set OPENAI_API_KEY
+make install                  # Python (uv) + Node (pnpm) deps
+make up                       # Postgres :55432, Qdrant :6333, Redis, Langfuse
+make migrate                  # DB schema
+make seed-all                 # ingest all 50 sources (≈ cents of embeddings)
+make dev                      # API :8000, web :3000
 ```
 
-API su http://localhost:8000/docs · Web su http://localhost:3000 · Langfuse su http://localhost:3001.
+Optional:
 
-## Layout repository
-
-```
-apps/
-  web/              Next.js 15 frontend (App Router)
-  api/              FastAPI backend (chat, search, auth)
-services/
-  ingestion/        Pipeline Normattiva → Qdrant+Postgres
-  indexer/          Re-indexing, embedding workers
-  rag-core/         Libreria Python: retriever, reranker, LLM router
-packages/
-  shared-types/     Tipi TS generati da Pydantic schemas
-  ui/               Design system (shadcn/ui components)
-infra/
-  terraform/        GCP IaC (Cloud Run, SQL, Memorystore, GKE, GCS)
-  k8s/              Qdrant StatefulSet, vLLM deployment (fase 2)
-data/
-  sources/          Snapshot testi normativi (GCS-backed, gitignored)
-  schemas/          JSON Schema per articoli, commi, sentenze
-docs/               Architettura, data model, sicurezza, runbook
+```bash
+uv run avvocato-ingest ingest-eu --atto gdpr --from-fixture       # EU acts
+uv run avvocato-ingest ingest-cassazione --kind snpen --max 2000  # case law
+make eval                     # run Caucus Bench against your instance
 ```
 
-## Moduli (roadmap)
+## Architecture (short)
 
-| Fase | Modulo | Stato |
-|------|--------|-------|
-| 1 | Chiedi al Codice (Civile + Penale) | In corso |
-| 2 | Analisi Documenti (atti, contratti, red flags) | Progettato |
-| 3 | Drafting assistito (atti, contratti) | Progettato |
-| 4 | Giurisprudenza (Cassazione) | Progettato |
-| 5 | Onyx connectors + multi-tenancy + SSO | Progettato |
+```
+apps/web              Next.js 15 chat UI
+apps/api              FastAPI — chat SSE, search, citation validator
+services/rag-core     retriever, rerankers, query expansion, act registry, schemas
+services/ingestion    Normattiva AKN parser, EUR-Lex parser, Cassazione harvester,
+                      legal-aware chunker (contextual headers), loaders
+benchmark/            Caucus Bench: gold set + harness (MIT)
+```
 
-Dettagli in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+Design notes live in [docs/](docs/); the honest gap analysis that drove the
+current architecture is in [docs/AUDIT_SOTA_2026-07-31.md](docs/AUDIT_SOTA_2026-07-31.md).
 
-## Sicurezza
+## Data sources & licensing of data
 
-Dati legali italiani = segreto professionale (art. 622 c.p.) + GDPR. Vedi [docs/SECURITY.md](docs/SECURITY.md).
+Italian legislative texts are in the public domain (art. 5, L. 633/1941).
+Normattiva and EUR-Lex are queried at conservative rate limits (≤1 req/s);
+Cassazione decisions come from the public SentenzeWeb service in their
+official anonymized form, harvested at 0.5 req/s. See
+[data/fixtures/normattiva/README.md](data/fixtures/normattiva/README.md).
 
-## Licenza
+## License
 
-Proprietaria, salvo diverso avviso sui singoli sotto-package.
+- **Application code**: [AGPL-3.0](LICENSE) — if you run a modified Caucus as
+  a service, you share your changes.
+- **Benchmark** (`benchmark/`): [MIT](benchmark/LICENSE) — evaluate anything
+  against it, publish results freely.
+
+## Status & roadmap
+
+Working today: everything described above. Known limits (tracked honestly):
+single-snapshot consolidation (no historical versioning yet), EU acts are the
+OJ base text (not consolidated), conversation history is client-side, TTFT
+~3-4s on conceptual questions. Roadmap: historical versioning via Normattiva
+`dataVigenza`, self-hosted embeddings (BGE-M3 hybrid), structured citation
+outputs, server-side conversations + audit log, agentic multi-hop research.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Security reports:
+[.github/SECURITY.md](.github/SECURITY.md).

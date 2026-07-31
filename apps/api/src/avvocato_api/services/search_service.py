@@ -41,9 +41,7 @@ def _get_reranker() -> Reranker:
 def _get_expander() -> LLMQueryExpander | None:
     if not get_settings().query_expansion_enabled:
         return None
-    return LLMQueryExpander(
-        get_llm_router(), model=get_settings().query_expansion_model
-    )
+    return LLMQueryExpander(get_llm_router(), model=get_settings().query_expansion_model)
 
 
 class SearchService:
@@ -140,9 +138,7 @@ class SearchService:
                 exp_routed = route_query(expansion)
                 user_refs = {(a.source, a.num) for a in routed.direct_articles}
                 expansion_refs = tuple(
-                    a
-                    for a in exp_routed.direct_articles
-                    if (a.source, a.num) not in user_refs
+                    a for a in exp_routed.direct_articles if (a.source, a.num) not in user_refs
                 )[:4]
 
         # Il ramo vettoriale (embedder+Qdrant, niente sessione DB) gira in
