@@ -20,12 +20,18 @@ documentare aspirazioni come feature, sempre misurare sul benchmark.**
 
 ## 2. Stato in una riga
 
-Funzionante e verificato. Eval 171 casi (gold v2.3): **pass 96%, pass(hard)
-100%, recall@8 97%, MRR 0.85, citation recall 94%, hallucination 0%,
-over-refusal 0%, refusal adversarial 100%, gap admission 100%, TTFT p50 4.6s
-(harvest attivo; probe idle ~4s)**. Varianza tra run della stessa config:
-pass 95.3–95.9%. 93 test Python + 9 TS verdi, ruff+mypy strict+tsc+eslint
-puliti, CI bloccante.
+Funzionante e verificato. Ultimo eval 171 casi (gold v2.3, stack idle):
+**pass 97.7%, pass(hard) 100%, recall@8 99.4%, MRR 0.86, citation recall
+98.5%, hallucination 0%, over-refusal 0%, refusal adversarial 100%, gap
+admission 100%, TTFT p50 4.7s**. Varianza tra run della stessa config: pass
+95.3–97.7%, recall 96.2–99.4 — il numero onesto è l'intervallo, non il
+picco. 106 test Python + 9 TS verdi, build di produzione Next ok, ruff+mypy
+strict+tsc+eslint puliti, CI bloccante. Test E2E completo dei flussi
+prodotto eseguito il 2026-07-31 sera (ricerca+link /norma, export, upload+
+analisi, redazione, giurisprudenza, validate, taskpane): tutto verde;
+UNICA cosa non collaudata: l'add-in dentro Word reale (serve sideload
+dell'owner). NB: non lanciare `next build` mentre `next dev` gira (corrompe
+la cache .next del dev server — successo e risolto).
 
 ## 3. Architettura (dove sta cosa)
 

@@ -8,7 +8,7 @@ was otherwise idle.
 
 | System | Date | Gold set | Pass | Pass (hard) | Recall@8 | MRR | Cite recall | Halluc. | Refusal | Over-refusal | Gap adm. | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Caucus reference** (gpt-4o + gpt-4.1-mini structured expansion + text-embedding-3-small + bge-reranker-v2-m3 local, max_length 384) | 2026-07-31 | v2.3 | **96%** | **100%** | **97%** | 0.85 | 94% | **0.0%** | 100% | **0%** | 100% | corpus: 50 Normattiva + 14 EU + 56k Cassazione; Apple M-series (MPS, **not idle**: harvest attivo); TTFT p50 4.6s / p95 10.1s (probe idle ~4s); 0 errors / 171 |
+| **Caucus reference** (gpt-4o + gpt-4.1-mini structured expansion + text-embedding-3-small + bge-reranker-v2-m3 local, max_length 384) | 2026-07-31 | v2.3 | **98%** | **100%** | **99%** | 0.86 | 99% | **0.0%** | 100% | **0%** | 100% | corpus: 50 Normattiva + 14 EU + 60k Cassazione; Apple M-series (MPS, idle); TTFT p50 4.7s / p95 15.3s; 0 errors / 171. **Run-to-run variance of this config: pass 95.3–97.7%, recall@8 96.2–99.4%** — we report the last run; treat the range, not the peak, as the honest number |
 | Caucus (previous, keyword-reranker fallback) | 2026-07-31 | v2.3 | 85% | 78% | 85% | 0.74 | 90% | 0.0% | 100% | 0% | 100% | superseded — vedi correzione sotto |
 
 > **Reading the numbers honestly.**
