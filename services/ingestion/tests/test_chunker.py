@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from avvocato_ingestion.chunker import build_chunks
-from avvocato_rag_core.schemas.norm import NormChunkKind
+from caucus_ingestion.chunker import build_chunks
+from caucus_rag_core.schemas.norm import NormChunkKind
 
 
 def _build(commi_texts: list[str], *, rubrica: str | None = "Risarcimento per fatto illecito"):

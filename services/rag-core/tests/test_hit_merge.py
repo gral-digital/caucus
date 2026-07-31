@@ -4,9 +4,9 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from avvocato_rag_core.hit_merge import ensure_direct_articles_first, reciprocal_rank_fusion
-from avvocato_rag_core.schemas.citation import NormCitation
-from avvocato_rag_core.schemas.retrieval import RetrievalHit
+from caucus_rag_core.hit_merge import ensure_direct_articles_first, reciprocal_rank_fusion
+from caucus_rag_core.schemas.citation import NormCitation
+from caucus_rag_core.schemas.retrieval import RetrievalHit
 
 
 def _hit(

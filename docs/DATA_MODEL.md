@@ -1,5 +1,12 @@
 # Data Model
 
+> ⚠️ **STATO (2026-07-31)**: lo schema reale è la somma delle migration
+> Alembic (`apps/api/alembic/versions/`) — oggi: norm_source, norm_partition,
+> norm_comma, norm_citation (con target denormalizzato), norm_chunk,
+> case_law, case_law_chunk. Non ancora implementati rispetto a quanto sotto:
+> versioning multivigenza con chiusura effective_to, path ltree nativo
+> (oggi VARCHAR+trigram), tabelle applicative (utenti/conversazioni/audit).
+
 Modello dati della gerarchia normativa italiana. Il modello è progettato per preservare la struttura giuridica (gerarchia di partizioni) e per supportare citazioni machine-readable riusabili su tutti i moduli.
 
 ## 1. Fonti e tassonomia

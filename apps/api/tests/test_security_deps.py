@@ -5,8 +5,8 @@ from __future__ import annotations
 import pytest
 from fastapi import HTTPException
 
-from avvocato_api import deps
-from avvocato_rag_core.config import Settings
+from caucus_api import deps
+from caucus_rag_core.config import Settings
 
 
 class _FakeClient:

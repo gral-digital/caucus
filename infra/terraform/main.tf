@@ -199,7 +199,7 @@ resource "google_cloud_run_v2_service" "api" {
 
 resource "google_service_account" "api" {
   account_id   = "${local.name_prefix}-api"
-  display_name = "Avvocato API (${var.env})"
+  display_name = "Caucus API (${var.env})"
 }
 
 resource "google_project_iam_member" "api_roles" {

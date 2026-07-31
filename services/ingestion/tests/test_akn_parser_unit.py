@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import textwrap
 
-from avvocato_ingestion.parsers.normattiva_akn import NormattivaAknParser
+from caucus_ingestion.parsers.normattiva_akn import NormattivaAknParser
 
 
 def _make_minimal_akn(attachments: list[tuple[str, str]]) -> bytes:
@@ -262,7 +262,7 @@ def test_ref_extraction_resolves_catalog_targets():
 
 
 def test_ref_fragment_attached_suffix_normalized():
-    from avvocato_ingestion.parsers.normattiva_akn import _normalize_article_number
+    from caucus_ingestion.parsers.normattiva_akn import _normalize_article_number
 
     assert _normalize_article_number("2929bis") == "2929-bis"
     assert _normalize_article_number("416-bis") == "416-bis"

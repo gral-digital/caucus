@@ -12,8 +12,8 @@ from pathlib import Path
 
 import pytest
 
-from avvocato_ingestion.parsers.normattiva_akn import NormattivaAknParser
-from avvocato_rag_core.schemas.norm import NormPartitionKind
+from caucus_ingestion.parsers.normattiva_akn import NormattivaAknParser
+from caucus_rag_core.schemas.norm import NormPartitionKind
 
 FIXTURE_DIR = Path(__file__).resolve().parents[3] / "data" / "fixtures" / "normattiva"
 

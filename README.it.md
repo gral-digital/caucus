@@ -76,8 +76,8 @@ make dev                      # API :8000, web :3000
 Opzionale:
 
 ```bash
-uv run avvocato-ingest ingest-eu --atto gdpr --from-fixture       # atti UE
-uv run avvocato-ingest ingest-cassazione --kind snpen --max 2000  # sentenze
+uv run caucus-ingest ingest-eu --atto gdpr --from-fixture       # atti UE
+uv run caucus-ingest ingest-cassazione --kind snpen --max 2000  # sentenze
 make eval                     # Caucus Bench sulla tua istanza
 ```
 
@@ -87,6 +87,9 @@ make eval                     # Caucus Bench sulla tua istanza
   modificato come servizio condivide le modifiche.
 - **Benchmark** (`benchmark/`): [MIT](benchmark/LICENSE) — chiunque può
   valutarci sopra qualunque sistema e pubblicare i risultati.
+
+Nota: il repo include ~50 MB di fixture XML ufficiali, così i test del parser
+sono riproducibili offline.
 
 ## Stato e roadmap
 

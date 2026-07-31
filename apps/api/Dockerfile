@@ -34,4 +34,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
   CMD curl -sf http://localhost:8000/api/v1/health/live || exit 1
 # --proxy-headers: dietro Cloud Run/LB serve per client IP e scheme corretti.
-CMD ["uv", "run", "uvicorn", "avvocato_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]
+CMD ["uv", "run", "uvicorn", "caucus_api.main:app", "--host", "0.0.0.0", "--port", "8000", "--proxy-headers"]

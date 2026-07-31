@@ -40,7 +40,7 @@ make test        # pytest (Python), turbo test (Node)
 ## Adding a legal source
 
 - **Normattiva**: add an entry to `CODICI_CATALOG`
-  (`services/ingestion/src/avvocato_ingestion/parsers/normattiva_akn.py`) with
+  (`services/ingestion/src/caucus_ingestion/parsers/normattiva_akn.py`) with
   the correct URN, plus display suffixes in `schemas/citation.py` and
   `loader.py`, and the act registry is regenerated from URNs. Fetch a fixture,
   check article count and rubrica coverage, add a benchmark case.

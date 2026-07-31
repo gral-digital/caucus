@@ -1,5 +1,5 @@
 [project]
-name = "avvocato"
+name = "caucus"
 version = "0.0.1"
 description = "Piattaforma AI enterprise per il settore legale italiano"
 readme = "README.md"
@@ -26,8 +26,8 @@ members = [
 ]
 
 [tool.uv.sources]
-avvocato-rag-core = { workspace = true }
-avvocato-ingestion = { workspace = true }
+caucus-rag-core = { workspace = true }
+caucus-ingestion = { workspace = true }
 
 [tool.ruff]
 line-length = 100
@@ -57,10 +57,10 @@ ignore = ["E501"]  # line too long — handled by formatter
 
 [tool.ruff.lint.isort]
 known-first-party = [
-    "avvocato_api",
-    "avvocato_ingestion",
-    "avvocato_indexer",
-    "avvocato_rag_core",
+    "caucus_api",
+    "caucus_ingestion",
+    "caucus_indexer",
+    "caucus_rag_core",
 ]
 
 [tool.ruff.format]

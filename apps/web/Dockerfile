@@ -3,14 +3,14 @@ FROM node:20-alpine AS deps
 WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json ./
 COPY apps/web/package.json apps/web/
-RUN corepack enable && pnpm install --frozen-lockfile --filter @avvocato/web...
+RUN corepack enable && pnpm install --frozen-lockfile --filter @caucus/web...
 
 FROM node:20-alpine AS build
 WORKDIR /app
 COPY --from=deps /app ./
 COPY apps/web apps/web
 COPY tsconfig.base.json ./
-RUN corepack enable && pnpm --filter @avvocato/web build
+RUN corepack enable && pnpm --filter @caucus/web build
 
 FROM node:20-alpine AS runtime
 WORKDIR /app

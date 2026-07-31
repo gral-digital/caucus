@@ -1,5 +1,8 @@
 # Roadmap
 
+> ⚠️ **STATO (2026-07-31)**: roadmap storica della fase iniziale. La roadmap
+> corrente è nel README (§ Status & roadmap) e in ARCHITECTURE.md §8.
+
 Obiettivo: arrivare a tutti i moduli di Harvey, italianizzati, con sovranità dati EU.
 
 La fondazione comune è **RAG core + gerarchia normativa + citazioni machine-readable**. Una volta solida,

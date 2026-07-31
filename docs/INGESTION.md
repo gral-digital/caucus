@@ -1,5 +1,13 @@
 # Ingestion
 
+> ⚠️ **STATO (2026-07-31)**: documento parzialmente storico (descrive la
+> pipeline della fase CC/CP). La pipeline reale copre oggi 50 fonti
+> Normattiva + 14 atti EUR-Lex + Cassazione (SentenzeWeb) — vedi
+> `docs/ARCHITECTURE.md` §3. Non ancora implementati rispetto a quanto sotto:
+> scheduling automatico del refresh, snapshot su GCS, diff-awareness sul
+> source_hash. I numeri di coverage citati sotto sono precedenti ai fix del
+> parser (2026-07-31) e sono migliorati.
+
 Pipeline di ingestione delle fonti normative italiane. Idempotente, versionata, diff-aware.
 
 ## 1. Fonti primarie
@@ -59,7 +67,7 @@ non funziona senza aver prima visitato il permalink.
    ```
    Risposta: `application/xml` Akoma Ntoso 3.0.
 
-Implementazione: [`services/ingestion/src/avvocato_ingestion/fetchers/normattiva.py`](../services/ingestion/src/avvocato_ingestion/fetchers/normattiva.py).
+Implementazione: [`services/ingestion/src/caucus_ingestion/fetchers/normattiva.py`](../services/ingestion/src/caucus_ingestion/fetchers/normattiva.py).
 
 ### Struttura AKN Normattiva
 
@@ -94,7 +102,7 @@ Le rubriche non riconosciute cadono quasi tutte su articoli abrogati/soppressi
 # Scarica e salva XML AKN sotto data/fixtures/normattiva/
 make fetch-codici
 # oppure singolo:
-uv run avvocato-ingest fetch --codice cc
+uv run caucus-ingest fetch --codice cc
 ```
 
 ### Parse-only (sanity check)
@@ -137,7 +145,7 @@ Tre livelli di chunk per ogni articolo, tutti indicizzati:
 Il retriever fa hybrid search su tutti; il reranker sceglie; l'expander
 Postgres recupera il contesto gerarchico (articoli adiacenti, rubrica).
 
-Dettaglio: `services/ingestion/src/avvocato_ingestion/chunker.py`.
+Dettaglio: `services/ingestion/src/caucus_ingestion/chunker.py`.
 
 ## 6. Versioning
 

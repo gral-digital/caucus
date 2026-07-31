@@ -1,166 +1,129 @@
-# Architettura
+# Architettura di Caucus
 
-> Questo documento è la **fonte di verità** per le decisioni architetturali. Tutte le scelte qui devono essere discusse prima di essere rimesse in discussione nel codice.
+> Questo documento descrive il sistema **come è oggi** (2026-07-31). Le parti
+> future sono marcate esplicitamente come roadmap. La storia delle decisioni è
+> in `docs/ADR/` e nel git log; il gap analysis che ha guidato questa
+> architettura è in `docs/AUDIT_SOTA_2026-07-31.md`.
 
-## 1. Principi guida
+## 1. Principi
 
-1. **Sovranità dei dati EU** — tutto il piano dati risiede in regione `europe-west1`. Nessun provider US può processare dati cliente senza DPA conforme GDPR + compatibile con segreto professionale (art. 622 c.p.).
-2. **Citation-grounded, non hallucination-prone** — ogni risposta deve contenere riferimenti normativi esatti (`codice:libro:titolo:capo:articolo:comma`) linkabili al testo sorgente. Se il retriever non trova base autoritativa, il sistema dice "non ho trovato" — mai generazione libera su domini giuridici.
-3. **Riuso di OSS maturo** — non reimplementare vector DB, parser PDF, orchestratori. Integrare. Contribuire upstream quando serve.
-4. **Separation of concerns rigida** — `rag-core` è l'unica libreria che parla con LLM/vector DB. API e workers la consumano. Sostituire un componente (es. Qdrant → Weaviate) deve toccare un solo modulo.
-5. **Progressive hardening** — Fase 1 gira con managed services (Vertex AI inference, Cloud SQL). Fase 2+ sposta pezzi su GKE dedicato quando il volume lo giustifica. Stessa codebase.
+1. **Trust layer prima di tutto** — ogni citazione normativa generata è
+   validata post-generazione contro il database (esistenza, fonte, vigenza,
+   abrogazione, presenza nel contesto). Il sistema preferisce ammettere un
+   gap che inventare una norma.
+2. **Il benchmark è l'arbitro** — ogni modifica di qualità si misura su
+   Caucus Bench (`benchmark/`), mai su impressioni.
+3. **Determinismo dove possibile** — il lookup per numero di articolo batte
+   sempre il retrieval probabilistico; i segnali deterministici (riferimenti
+   espliciti, abrogazione) correggono i punteggi neurali, non viceversa.
+4. **Separation of concerns** — `rag-core` è l'unica libreria che parla con
+   LLM/vector store; `ingestion` produce un modello canonico unico
+   (`CanonicalAct`) qualunque sia la fonte; l'API li consuma.
 
-## 2. Diagramma logico
+## 2. Componenti
 
 ```
-┌────────────────────────────────────────────────────────────────┐
-│                         Utente (avvocato)                      │
-└──────────────────────────────┬─────────────────────────────────┘
-                               │ HTTPS
-                  ┌────────────▼─────────────┐
-                  │   Next.js 15 (web)       │    Cloud Run (europe-west1)
-                  │   App Router, RSC        │    Edge caching via Cloud CDN
-                  └────────────┬─────────────┘
-                               │ RPC (server actions) / REST
-                  ┌────────────▼─────────────┐
-                  │   FastAPI (api)          │    Cloud Run
-                  │   Auth, routing, SSE     │
-                  └─────┬──────────┬─────────┘
-         ┌──────────────┤          ├──────────────────┐
-         │              │          │                  │
-    ┌────▼────┐   ┌─────▼────┐ ┌───▼──────────┐   ┌──▼────────┐
-    │ rag-core│   │ Postgres │ │ Qdrant       │   │ Redis     │
-    │ library │   │ + pgvec  │ │ (Rust)       │   │ (cache)   │
-    │(in-proc)│   │ Cloud SQL│ │ GKE Autopilot│   │ Memorystore│
-    └────┬────┘   └──────────┘ └──────────────┘   └───────────┘
-         │ LiteLLM
-    ┌────▼─────────────────────────────────────┐
-    │  Vertex AI Model Garden (europe-west*)   │
-    │  - Llama 3.3 70B Instruct (primario)     │
-    │  - Gemma 3 (task leggeri)                │
-    │  - Claude Sonnet (fallback hard reasoning)│
-    │  - text-embedding / bge-m3 via endpoint  │
-    └──────────────────────────────────────────┘
-
-    ┌────────────────────────────────────────┐
-    │ Workers (Dramatiq su Cloud Run Jobs)   │
-    │ - ingestion Normattiva / Cassazione    │
-    │ - re-embedding, re-ranking training    │
-    │ - document analysis async pipelines    │
-    └────────────────────────────────────────┘
-
-    ┌────────────────────────────────────────┐
-    │ Observability                          │
-    │ - Langfuse (self-hosted) → LLM traces  │
-    │ - OpenTelemetry → Cloud Trace/Logging  │
-    │ - Sentry → frontend + API errors       │
-    └────────────────────────────────────────┘
+apps/web        Next.js 15 — chat SSE, pannello fonti, warning citazioni
+apps/api        FastAPI — /chat (SSE), /search, /health; auth token; rate limit
+services/rag-core     retriever ibrido, rerankers, query expansion,
+                      act registry, hit merge (RRF pesato), schemi Pydantic
+services/ingestion    parser Normattiva AKN + EUR-Lex HTML + SentenzeWeb,
+                      chunker contestuale, loader idempotenti
+services/indexer      worker Dramatiq (refresh schedulabile)
+benchmark/            Caucus Bench (MIT): gold set + harness
 ```
 
-## 3. Stack scelto
+Infra locale (docker compose): Postgres 16 + pgvector + FTS `italian_unaccent`
+(:55432), Qdrant (:6333), Redis, Langfuse†, MinIO†.
+† container presenti ma non ancora integrati nel codice (roadmap: observability
+e storage documenti).
 
-| Layer | Tecnologia | Perché |
-|-------|------------|--------|
-| Frontend | Next.js 15 + React 19 + TypeScript 5 | App Router, RSC streaming, server actions — best DX per chat UI complessa con citazioni |
-| UI kit | shadcn/ui + Tailwind CSS v4 | Copy-paste, type-safe, override libero |
-| Backend API | Python 3.12 + FastAPI + Pydantic v2 + Uvicorn | Async-first, ecosistema AI nativo, contract-first con OpenAPI |
-| Monorepo | pnpm workspaces + Turborepo + uv workspace | Caching build, lock riproducibili |
-| Relational DB | Postgres 16 + pgvector + `unaccent` + tsvector italiano | Single-store per metadata + hybrid search rerank |
-| Vector DB | Qdrant (v1.12+) | Filtering avanzato (gerarchie normative), sparse+dense nativo, EU-friendly, Rust |
-| Queue / cache | Redis 7 (Memorystore) + Dramatiq | Più semplice di Celery, prestazioni solide |
-| LLM routing | LiteLLM proxy | Multi-provider, caching, fallback chain, cost tracking |
-| LLM inference | Vertex AI Model Garden | Llama/Gemma hosted in EU, pay-per-token, DPA Google |
-| Embeddings | BAAI/bge-m3 | Multilingual (ottimo italiano), dense+sparse+ColBERT, 8k context |
-| Reranker | BAAI/bge-reranker-v2-m3 (+ fine-tune Italian-LegalBERT in fase 2) | Precisione su cite-exactness |
-| PDF parsing | Docling (IBM) | Leader 2025 su layout PDF complessi (atti, sentenze) |
-| Chunking | LlamaIndex SemanticSplitter + legal-aware splitter custom | Preserva gerarchia articolo/comma/lettera |
-| Agent framework | LangGraph | State machine, durable execution, debuggabile |
-| Connectors enterprise | Onyx (da fase 2) | Maturo per Drive/SharePoint/Confluence, evita reinventare |
-| Observability LLM | Langfuse (self-hosted) | Tracing prompt, eval, cost attribution, EU-friendly |
-| Tracing generale | OpenTelemetry → Google Cloud Trace | Standard aperto |
-| Auth | Clerk o Auth.js v5 (fase 1) → SSO SAML/OIDC via WorkOS (fase 2) | Pragmatico ora, enterprise-ready dopo |
-| IaC | Terraform | Standard GCP, riproducibile |
-| CI/CD | GitHub Actions + Cloud Build | Gratis fino a certe soglie |
+## 3. Pipeline di ingestion
 
-## 4. Moduli (da MVP a prodotto completo)
+Tre fonti, un solo modello canonico (`CanonicalAct` → `Loader`):
 
-### 4.1 Fase 1 — "Chiedi al Codice"
-Input: domanda in linguaggio naturale.
-Output: risposta con citazioni precise (articolo, comma) a Codice Civile o Penale.
+| Fonte | Formato | Note |
+|---|---|---|
+| Normattiva (50 fonti) | Akoma Ntoso XML | due serializzazioni (flat-per-attachment per i codici storici, canonica per i moderni) + caso codici-in-allegato (CPA); rilevamento abrogazioni; data consolidato da FRBRdate/dataVigenza; estrazione `<ref>` per il grafo dei rinvii |
+| EUR-Lex (14 atti) | HTML per CELEX | tre generazioni di markup (oj/eli/pre-2010); testo base GU, consolidato in roadmap |
+| Cassazione (SentenzeWeb) | JSON (proxy Solr pubblico) | testo integrale anonimizzato; harvest incrementale idempotente per external_id; scarto documenti in oscuramento; 0.5 req/s |
 
-Pipeline:
+Proprietà dei loader: **delete-and-replace per fonte** (re-run = stesso
+corpus, mai duplicati) per le norme; **append-only per external_id** per la
+giurisprudenza. Ogni chunk porta un header contestuale
+(`[Fonte] Codice Civile — art. 2043 (Rubrica), comma 1`) così il contesto sta
+nel testo embeddato, e i campi `effective_from`/`effective_to` per il filtro
+di vigenza.
+
+Il grafo dei rinvii (`norm_citation`) è popolato dai `<ref href>` dell'XML,
+con target denormalizzato per sopravvivere ai reload e ri-risoluzione
+automatica dei link entranti a ogni ingest.
+
+## 4. Pipeline di retrieval (per query)
+
 ```
-query → embed (bge-m3) → Qdrant hybrid search (filter: codice)
-      → top-50 retrieval → rerank (bge-reranker) → top-8
-      → Postgres expand (articoli adiacenti, note, modifiche)
-      → LLM (Llama 3.3 70B, prompt con instructions "cita sempre")
-      → streaming response SSE con <citation id="art-2043-cc"/>
-      → frontend render con link cliccabili
-```
-
-Non-goal di fase 1: multi-turn follow-up con memoria lunga, ricerca giurisprudenza, upload documenti.
-
-### 4.2 Fase 2 — Analisi Documenti
-Input: upload PDF/DOCX (atto, contratto).
-Output: analisi strutturata (parti, oggetto, clausole critiche, red flags, riferimenti normativi).
-
-Pipeline:
-```
-upload → GCS → Docling parse → chunking → extraction agent (LangGraph)
-       → per-section analysis (ragionamento su LLM) → red flags detector
-       → output strutturato (JSON schema stabile) + report HTML/PDF
+route_query ──► estremi espliciti? ──sì──► lookup diretto (pinnato)
+     │                                     [espansione LLM skippata]
+     │no
+     ▼
+query expansion LLM (gpt-4o-mini, ~1s, parallela ai rami DB)
+     │  "responsabilità extracontrattuale" → "…art. 2043 codice civile, danno ingiusto…"
+     ▼
+4 rami → RRF pesato [direct 3.0 | expansion-refs 1.5 | FTS 1.0 | dense 1.0]
+     │    • expansion-refs: estremi citati dall'espansione, risolti via act
+     │      registry ("D.Lgs. 81/2008"→tusl), MAI pinnati (l'LLM può sbagliare)
+     │    • FTS: websearch AND, fallback OR senza boost
+     │    • dense: Qdrant, collections codici+cassazione, filtro vigenza
+     ▼
+cross-encoder bge-reranker-v2-m3 (locale, MPS) sui top-30
+     │    riceve la QUERY ESPANSA (misurato: 0.98 vs 0.0002 con la nuda)
+     │    correttivi: +1.0 direct, malus abrogato solo sui rami probabilistici
+     ▼
+dedup per articolo → one-hop expansion sul grafo dei rinvii (max 3)
+     ▼
+contesto → generazione (gpt-4o) → validazione citazioni → SSE
 ```
 
-Riusa `rag-core` per verificare ogni clausola citata contro Codice e giurisprudenza.
+Latenza retrieval misurata: 1.8s (riferimento esplicito) / 2.7s (concettuale).
 
-### 4.3 Fase 3 — Drafting assistito
-Input: template + fatti + vincoli.
-Output: bozza di atto/contratto.
+Vincolo appreso sul campo: le chiamate sulla stessa `AsyncSession` SQLAlchemy
+devono restare sequenziali (mai `gather` sui rami DB).
 
-Pipeline LangGraph multi-step con validazione normativa intermedia. Usa `rag-core` per fact-checking ogni riferimento generato.
+## 5. Trust layer
 
-### 4.4 Fase 4 — Giurisprudenza
-Ingestion Cassazione (sezioni civili e penali) da `italgiure.giustizia.it`. Sentence-level chunking con metadata strutturati (sezione, n. sentenza, data, materia, norme citate). Ricerca semantica con filtri e time-decay.
+Post-generazione, su ogni risposta:
+1. le citazioni in prosa riconosciute (sigle, forme lunghe, estremi ufficiali)
+   vengono promosse a tag `<cite/>` se presenti nel contesto;
+2. ogni tag è verificato su DB: fonte indicizzata? articolo esistente?
+   vigente alla data? abrogato?
+3. le citazioni valide ma assenti dal contesto sono marcate *weak grounding*;
+4. l'evento SSE `citation_warnings` porta tutto alla UI; `done` include il
+   testo finale con i tag promossi.
 
-### 4.5 Fase 5 — Enterprise
-Onyx connectors per knowledge base studio cliente (Drive, SharePoint, OneDrive), multi-tenancy stretto (RLS Postgres + isolation Qdrant per collection), SSO SAML/OIDC, audit log immutabile (Cloud Storage + WORM).
+La giurisprudenza si cita solo in prosa con gli estremi reali del contesto —
+il prompt vieta di inventare estremi e il gold set lo verifica.
 
-## 5. Flusso dati e tenancy
+## 6. Sicurezza (implementata)
 
-- **Dati pubblici** (codici, Gazzetta, Cassazione): indicizzati una volta, shared-read per tutti i tenant.
-- **Dati del tenant** (documenti caricati, conversazioni, note): isolati per `tenant_id` a livello:
-  - Postgres: row-level security (RLS) su `tenant_id`.
-  - Qdrant: collection separata per tenant su dati privati (`tenant_<id>_docs`).
-  - GCS: bucket per-tenant oppure prefix + IAM condition.
-- **Crypto**: in-transit TLS 1.3 ovunque, at-rest default GCP (AES-256), CMEK opzionale per tenant enterprise.
+Token auth (fail-closed fuori da `app_env=local`), rate limit per IP, CORS da
+env, cap su history (40 turni × 8k char), `tenant_id` mai client-supplied,
+errori interni mai esposti, container non-root, sessione DB aperta dentro il
+generatore SSE. Dettagli e roadmap (RLS, multi-tenancy, audit log):
+`docs/SECURITY.md`.
 
-## 6. Environments
+## 7. Configurazione
 
-| Env | Dove | Uso |
-|-----|------|-----|
-| `local` | docker-compose | Dev quotidiano |
-| `dev` | GCP project `avvocato-dev` | Integration, staging |
-| `prod` | GCP project `avvocato-prod` | Clienti |
+Tutto via env (`.env.example` documentato): backend LLM/embedding
+(openai/ollama/local/vertex), modelli, device del reranker (cpu/mps/cuda),
+candidati rerank, query expansion on/off, auth, rate limit. La factory degli
+embedding verifica la coerenza `EMBEDDING_DIM`/backend al boot; il mismatch di
+dimensioni della collection Qdrant è un errore esplicito, mai una
+cancellazione silenziosa.
 
-Separazione forte dei progetti GCP (zero cross-project IAM).
+## 8. Roadmap architetturale
 
-## 7. Decisioni rifiutate (con motivazione)
-
-| Opzione | Rifiutata perché |
-|---------|------------------|
-| LangChain core | Astrazione leaky, breaking changes frequenti. Usiamo LangGraph (più stabile) + SDK nativi dove possibile. |
-| Pinecone | Vendor US, non necessario vista la qualità di Qdrant EU-self-hostable. |
-| MongoDB / Elasticsearch come primario | Postgres + pgvector + Qdrant copre meglio i bisogni con meno moving parts. |
-| Ollama in produzione | Ottimo per dev locale, non enterprise-ready per concurrency/SLA. Usiamo Vertex/vLLM. |
-| NestJS backend | Ecosistema AI Python è 10× più maturo di Node. TypeScript solo al frontend. |
-| Supabase | Buono come prodotto ma non è il fit migliore per un backend Python-heavy con agent orchestration complesso. |
-
-## 8. Open issues
-
-Lista viva — spostare in ADR quando decise.
-
-- [ ] Scelta definitiva auth fase 1: Clerk (rapido, US-hosted con EU residency opz.) vs Auth.js v5 (self-hosted, più lavoro).
-- [ ] Qdrant Cloud EU vs self-host su GKE (costo vs operabilità).
-- [ ] Training set per fine-tune Italian-LegalBERT come reranker di dominio.
-- [ ] Strategia evaluation: dataset gold di domande-risposte verificate da avvocato partner.
-- [ ] Ingestione Cassazione: parsing sentenze PDF vs XML DOGI (se disponibile).
+Multivigenza storica (Normattiva `dataVigenza` per versioni passate);
+embedding self-hosted BGE-M3 (dense+sparse, il codice c'è già — richiede
+re-ingest); citazioni in structured output; conversazioni server-side + audit
+log; observability Langfuse; deploy di riferimento (l'attuale
+`infra/terraform` è parziale e non allineato — vedi RELEASE_CHECKLIST).

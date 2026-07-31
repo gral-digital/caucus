@@ -5,10 +5,10 @@ from __future__ import annotations
 
 from uuid import uuid4
 
-from avvocato_api.routes.chat import ChatMessage, ChatRequest
-from avvocato_api.services.chat_service import ChatService
-from avvocato_rag_core.schemas.citation import NormCitation
-from avvocato_rag_core.schemas.retrieval import RetrievalHit
+from caucus_api.routes.chat import ChatMessage, ChatRequest
+from caucus_api.services.chat_service import ChatService
+from caucus_rag_core.schemas.citation import NormCitation
+from caucus_rag_core.schemas.retrieval import RetrievalHit
 
 
 def _hit(source: str, num: str) -> RetrievalHit:

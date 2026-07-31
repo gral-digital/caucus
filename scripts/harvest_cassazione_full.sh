@@ -18,7 +18,7 @@ for kind in snpen snciv; do
   echo "=== harvest $kind (max $MAX_PER_KIND) ==="
   done_count=0
   while [ "$done_count" -lt "$MAX_PER_KIND" ]; do
-    out=$(uv run avvocato-ingest ingest-cassazione --kind "$kind" --max "$BATCH" --rows 50 2>&1 | tail -3)
+    out=$(uv run caucus-ingest ingest-cassazione --kind "$kind" --max "$BATCH" --rows 50 2>&1 | tail -3)
     echo "$out"
     # "✓ Cassazione snpen: N sentenze indicizzate."
     n=$(echo "$out" | grep -oE '[0-9]+ sentenze' | grep -oE '[0-9]+' || echo 0)

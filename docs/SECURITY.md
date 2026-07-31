@@ -1,5 +1,14 @@
 # Sicurezza & Compliance
 
+> ⚠️ **STATO (2026-07-31)**: questo è un *design document* — descrive la
+> postura di sicurezza target. **Implementato oggi**: token auth fail-closed,
+> rate limiting per IP, CORS da env, cap history, validazione citazioni,
+> container non-root, niente leak di errori interni. **NON ancora
+> implementato**: RLS/multi-tenancy, audit log WORM, cifratura applicativa,
+> PII redaction, SSO. La policy operativa di disclosure è in
+> `.github/SECURITY.md`. Il default LLM corrente è OpenAI (configurabile con
+> backend self-hosted per contenuti coperti da segreto professionale).
+
 Il settore legale italiano ha tre vincoli stringenti che pesano su ogni decisione:
 
 1. **Segreto professionale** — art. 622 c.p. + art. 6 cod. deont. forense. L'avvocato risponde penalmente se comunica fatti del cliente a terzi. Un LLM provider US che processi quei dati *senza* DPA adeguato è un rischio legale per il cliente.
@@ -53,7 +62,7 @@ Il settore legale italiano ha tre vincoli stringenti che pesano su ogni decision
 RBAC a 3 ruoli minimi:
 - `avvocato` — può leggere/scrivere propri casi.
 - `admin-studio` — può gestire utenti del tenant, billing.
-- `superadmin` — solo staff Avvocato, con audit log forte.
+- `superadmin` — solo staff Caucus, con audit log forte.
 
 ABAC su alcune risorse (es. "caso riservato" visibile solo all'avvocato referente anche dentro lo studio).
 

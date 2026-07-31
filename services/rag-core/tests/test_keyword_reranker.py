@@ -5,9 +5,9 @@ from __future__ import annotations
 import asyncio
 from uuid import uuid4
 
-from avvocato_rag_core.reranker import KeywordBoostReranker
-from avvocato_rag_core.schemas.citation import NormCitation
-from avvocato_rag_core.schemas.retrieval import RetrievalHit
+from caucus_rag_core.reranker import KeywordBoostReranker
+from caucus_rag_core.schemas.citation import NormCitation
+from caucus_rag_core.schemas.retrieval import RetrievalHit
 
 
 def _hit(num: str, text: str, lookup: str = "vector") -> RetrievalHit:
@@ -36,7 +36,7 @@ def test_penalizes_colposo_when_query_volontario():
 
 def test_rubrica_boost_active():
     """Regressione: il boost rubrica cercava '(Rubrica)' ma il chunker scrive '[Rubrica]'."""
-    from avvocato_rag_core.reranker import _extract_rubrica
+    from caucus_rag_core.reranker import _extract_rubrica
 
     assert _extract_rubrica("[Rubrica] Omicidio\n\nChiunque cagiona...") == "Omicidio"
 
@@ -45,8 +45,8 @@ def test_abrogato_penalized():
     import asyncio
     from uuid import uuid4
 
-    from avvocato_rag_core.reranker import KeywordBoostReranker
-    from avvocato_rag_core.schemas.retrieval import RetrievalHit
+    from caucus_rag_core.reranker import KeywordBoostReranker
+    from caucus_rag_core.schemas.retrieval import RetrievalHit
 
     vig = RetrievalHit(
         chunk_id=uuid4(),

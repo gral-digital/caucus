@@ -21,10 +21,10 @@ dev:  ## Avvia API + Web in modalità dev (parallelo)
 	pnpm turbo run dev --parallel
 
 dev-api:  ## Solo API
-	cd apps/api && uv run uvicorn avvocato_api.main:app --reload --port 8000
+	cd apps/api && uv run uvicorn caucus_api.main:app --reload --port 8000
 
 dev-web:  ## Solo frontend
-	pnpm --filter @avvocato/web dev
+	pnpm --filter @caucus/web dev
 
 migrate:  ## Applica migration Postgres
 	cd apps/api && uv run alembic upgrade head
@@ -36,27 +36,27 @@ migrate-new:  ## Crea nuova migration (usage: make migrate-new msg="descrizione"
 CODICI := cc cp cpc cpp cost cds cdc ccii ccp cad cts tus tui tue tusl tub tuf tuir cpriv l241 stat l689 lpf dlgs231 aml l190 dlgs33 dlgs39 cam wb ritpag tua tupi cpa cpt tuel tudoc cbc cap iva dpr600 lav81 l604 dlgs23 tumat l392 l898 l76 l91 cnav
 
 fetch-codici:  ## Scarica AKN XML di CC + CP e salva come fixture (richiede rete)
-	uv run avvocato-ingest fetch --codice cc
-	uv run avvocato-ingest fetch --codice cp
+	uv run caucus-ingest fetch --codice cc
+	uv run caucus-ingest fetch --codice cp
 
 fetch-all:  ## Scarica AKN XML di TUTTE le 23 fonti (richiede rete, ~1 req/s)
-	@for c in $(CODICI); do uv run avvocato-ingest fetch --codice $$c || exit 1; done
+	@for c in $(CODICI); do uv run caucus-ingest fetch --codice $$c || exit 1; done
 
 seed-all:  ## Indicizza tutte le 23 fonti da fixture (Postgres + Qdrant). Idempotente.
-	@for c in $(CODICI); do uv run avvocato-ingest ingest --codice $$c --from-fixture || exit 1; done
+	@for c in $(CODICI); do uv run caucus-ingest ingest --codice $$c --from-fixture || exit 1; done
 
 seed-all-fast:  ## Tutte le 23 fonti SENZA embeddings (Postgres-only)
-	@for c in $(CODICI); do uv run avvocato-ingest ingest --codice $$c --from-fixture --skip-embeddings || exit 1; done
+	@for c in $(CODICI); do uv run caucus-ingest ingest --codice $$c --from-fixture --skip-embeddings || exit 1; done
 
 seed-codice-civile:  ## Indicizza Codice Civile (usa fixture se presente, altrimenti scarica)
-	uv run avvocato-ingest ingest --codice cc --from-fixture
+	uv run caucus-ingest ingest --codice cc --from-fixture
 
 seed-codice-penale:  ## Indicizza Codice Penale (usa fixture se presente, altrimenti scarica)
-	uv run avvocato-ingest ingest --codice cp --from-fixture
+	uv run caucus-ingest ingest --codice cp --from-fixture
 
 seed-codici-fast:  ## Indicizza entrambi i codici SENZA embeddings (Postgres-only, 10× più veloce)
-	uv run avvocato-ingest ingest --codice cc --from-fixture --skip-embeddings
-	uv run avvocato-ingest ingest --codice cp --from-fixture --skip-embeddings
+	uv run caucus-ingest ingest --codice cc --from-fixture --skip-embeddings
+	uv run caucus-ingest ingest --codice cp --from-fixture --skip-embeddings
 
 bootstrap-saas:  ## Setup completo SaaS: infra + migrate + fetch CC/CP + indicizza (OpenAI embeddings)
 	$(MAKE) up
@@ -64,13 +64,13 @@ bootstrap-saas:  ## Setup completo SaaS: infra + migrate + fetch CC/CP + indiciz
 	@sleep 5
 	$(MAKE) migrate
 	$(MAKE) fetch-codici
-	uv run avvocato-ingest ingest --codice cc --from-fixture
-	uv run avvocato-ingest ingest --codice cp --from-fixture
+	uv run caucus-ingest ingest --codice cc --from-fixture
+	uv run caucus-ingest ingest --codice cp --from-fixture
 	@echo "✓ Stack pronto. Avvia con: make dev"
 
 parse-codici:  ## Parse-only (nessuna persistenza); verifica conteggio articoli
-	uv run avvocato-ingest parse --codice cc
-	uv run avvocato-ingest parse --codice cp
+	uv run caucus-ingest parse --codice cc
+	uv run caucus-ingest parse --codice cp
 
 lint:  ## Lint (Python + TS)
 	uv run ruff check .

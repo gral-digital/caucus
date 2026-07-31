@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from avvocato_rag_core.query_router import route_query
+from caucus_rag_core.query_router import route_query
 
 
 def test_traffic_intent_routes_cds():

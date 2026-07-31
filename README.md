@@ -77,8 +77,8 @@ make dev                      # API :8000, web :3000
 Optional:
 
 ```bash
-uv run avvocato-ingest ingest-eu --atto gdpr --from-fixture       # EU acts
-uv run avvocato-ingest ingest-cassazione --kind snpen --max 2000  # case law
+uv run caucus-ingest ingest-eu --atto gdpr --from-fixture       # EU acts
+uv run caucus-ingest ingest-cassazione --kind snpen --max 2000  # case law
 make eval                     # run Caucus Bench against your instance
 ```
 
@@ -103,6 +103,8 @@ Normattiva and EUR-Lex are queried at conservative rate limits (≤1 req/s);
 Cassazione decisions come from the public SentenzeWeb service in their
 official anonymized form, harvested at 0.5 req/s. See
 [data/fixtures/normattiva/README.md](data/fixtures/normattiva/README.md).
+Note: the repo ships ~50 MB of official XML fixtures so parser tests are
+reproducible offline.
 
 ## License
 

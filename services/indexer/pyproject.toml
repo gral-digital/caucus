@@ -1,11 +1,11 @@
 [project]
-name = "avvocato-indexer"
+name = "caucus-indexer"
 version = "0.0.1"
 description = "Worker per re-indexing e re-embedding."
 requires-python = ">=3.12"
 dependencies = [
-    "avvocato-rag-core",
-    "avvocato-ingestion",
+    "caucus-rag-core",
+    "caucus-ingestion",
     "dramatiq[redis]>=1.17",
     "structlog>=24.4",
 ]
@@ -15,4 +15,4 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/avvocato_indexer"]
+packages = ["src/caucus_indexer"]

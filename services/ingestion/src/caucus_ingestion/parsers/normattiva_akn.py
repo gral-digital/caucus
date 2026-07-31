@@ -1,0 +1,1165 @@
+"""Parser Akoma Ntoso XML servito da Normattiva.
+
+Normattiva pubblica i testi consolidati vigenti come AKN XML (standard OASIS).
+Il formato servito da Normattiva usa questa struttura semplificata:
+
+    <akomaNtoso>
+      <act>
+        <meta>...</meta>
+        <body>
+          <article>...</article>    <!-- regio decreto di approvazione, 2 articoli -->
+        </body>
+        <attachments>
+          <attachment>                <!-- un attachment per ARTICOLO del codice -->
+            <doc name="CODICE CIVILE-art. 2043">
+              <meta>...</meta>
+              <mainBody>
+                <paragraph>           <!-- un solo <paragraph> container -->
+                  <content>
+                    <p> Art. 2043. \n \n (Rubrica). \n \n comma1 \n \n comma2 ... </p>
+                  </content>
+                </paragraph>
+              </mainBody>
+            </doc>
+          </attachment>
+          ...
+        </attachments>
+      </act>
+    </akomaNtoso>
+
+Quindi:
+- Ogni `<attachment>` = un articolo (o pre-disposizione).
+- Il testo completo dell'articolo è concatenato in un singolo `<p>` con commi
+  separati da ` \n \n `.
+- Le modifiche sono marcate con `(( ... ))` — le conserviamo inline (il
+  contenuto tra doppie parentesi è testo modificato tuttora vigente).
+
+La gerarchia Libro/Titolo/Capo/Sezione NON è codificata a livello di articolo
+nell'XML. Per il primo indice la manteniamo semplice (root = "Codice Civile",
+children = articoli). La gerarchia completa verrà arricchita da una seconda
+pass sull'indice HTML (TODO — non blocca il RAG base).
+"""
+
+from __future__ import annotations
+
+import hashlib
+import re
+from collections.abc import Iterator
+from dataclasses import dataclass
+from datetime import date
+from pathlib import Path
+
+import structlog
+from lxml import etree
+
+from caucus_ingestion.canonical import (
+    CanonicalAct,
+    CanonicalComma,
+    CanonicalCommaLetter,
+    CanonicalPartition,
+    CanonicalRef,
+)
+from caucus_rag_core.schemas.norm import NormPartitionKind, NormSourceType
+
+logger = structlog.get_logger(__name__)
+
+AKN_NS = "http://docs.oasis-open.org/legaldocml/ns/akn/3.0"
+_NS = {"a": AKN_NS}
+
+
+# Metadati canonici per codici conosciuti. Sono i dati sorgente autorevoli che
+# l'XML *non* codifica (es. short_id + data emanazione standardizzata).
+@dataclass(frozen=True, slots=True)
+class CodiceInfo:
+    short_id: str
+    urn: str
+    title: str
+    issued_at: date
+    in_force_from: date
+
+
+# Catalogo delle fonti normative. Ogni entry mappa uno short_id a:
+# - URN NIR utilizzabile su normattiva.it
+# - metadata di base (titolo, data emanazione, data entrata in vigore)
+#
+# Gli short_id sono convenzionali e usati sia dall'utente (CLI) che dalle
+# citazioni machine-readable nel testo LLM (`<cite source="cds" ...>`).
+CODICI_CATALOG: dict[str, CodiceInfo] = {
+    # ===== Codici "storici" =====
+    "cc": CodiceInfo(
+        short_id="cc",
+        urn="urn:nir:stato:regio.decreto:1942-03-16;262",
+        title="Codice Civile",
+        issued_at=date(1942, 3, 16),
+        in_force_from=date(1942, 4, 21),
+    ),
+    "cp": CodiceInfo(
+        short_id="cp",
+        urn="urn:nir:stato:regio.decreto:1930-10-19;1398",
+        title="Codice Penale",
+        issued_at=date(1930, 10, 19),
+        in_force_from=date(1931, 7, 1),
+    ),
+    "cpc": CodiceInfo(
+        short_id="cpc",
+        urn="urn:nir:stato:regio.decreto:1940-10-28;1443",
+        title="Codice di Procedura Civile",
+        issued_at=date(1940, 10, 28),
+        in_force_from=date(1942, 4, 21),
+    ),
+    "cpp": CodiceInfo(
+        short_id="cpp",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1988-09-22;447",
+        title="Codice di Procedura Penale",
+        issued_at=date(1988, 9, 22),
+        in_force_from=date(1989, 10, 24),
+    ),
+    "cost": CodiceInfo(
+        short_id="cost",
+        urn="urn:nir:stato:costituzione",
+        title="Costituzione della Repubblica Italiana",
+        issued_at=date(1947, 12, 27),
+        in_force_from=date(1948, 1, 1),
+    ),
+    # ===== Codici "moderni" =====
+    "cds": CodiceInfo(
+        short_id="cds",
+        urn="urn:nir:stato:decreto.legislativo:1992-04-30;285",
+        title="Codice della Strada",
+        issued_at=date(1992, 4, 30),
+        in_force_from=date(1993, 1, 1),
+    ),
+    "cdc": CodiceInfo(
+        short_id="cdc",
+        urn="urn:nir:stato:decreto.legislativo:2005-09-06;206",
+        title="Codice del Consumo",
+        issued_at=date(2005, 9, 6),
+        in_force_from=date(2005, 10, 23),
+    ),
+    "ccii": CodiceInfo(
+        short_id="ccii",
+        urn="urn:nir:stato:decreto.legislativo:2019-01-12;14",
+        title="Codice della Crisi d'Impresa e dell'Insolvenza",
+        issued_at=date(2019, 1, 12),
+        in_force_from=date(2022, 7, 15),
+    ),
+    "ccp": CodiceInfo(
+        short_id="ccp",
+        urn="urn:nir:stato:decreto.legislativo:2023-03-31;36",
+        title="Codice dei Contratti Pubblici",
+        issued_at=date(2023, 3, 31),
+        in_force_from=date(2023, 7, 1),
+    ),
+    "cad": CodiceInfo(
+        short_id="cad",
+        urn="urn:nir:stato:decreto.legislativo:2005-03-07;82",
+        title="Codice dell'Amministrazione Digitale",
+        issued_at=date(2005, 3, 7),
+        in_force_from=date(2006, 1, 1),
+    ),
+    "cts": CodiceInfo(
+        short_id="cts",
+        urn="urn:nir:stato:decreto.legislativo:2017-07-03;117",
+        title="Codice del Terzo Settore",
+        issued_at=date(2017, 7, 3),
+        in_force_from=date(2017, 8, 3),
+    ),
+    # ===== Testi Unici =====
+    "tus": CodiceInfo(
+        short_id="tus",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1990-10-09;309",
+        title="Testo Unico Stupefacenti",
+        issued_at=date(1990, 10, 9),
+        in_force_from=date(1990, 12, 11),
+    ),
+    "tui": CodiceInfo(
+        short_id="tui",
+        urn="urn:nir:stato:decreto.legislativo:1998-07-25;286",
+        title="Testo Unico Immigrazione",
+        issued_at=date(1998, 7, 25),
+        in_force_from=date(1998, 9, 2),
+    ),
+    "tue": CodiceInfo(
+        short_id="tue",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:2001-06-06;380",
+        title="Testo Unico dell'Edilizia",
+        issued_at=date(2001, 6, 6),
+        in_force_from=date(2003, 6, 30),
+    ),
+    "tusl": CodiceInfo(
+        short_id="tusl",
+        urn="urn:nir:stato:decreto.legislativo:2008-04-09;81",
+        title="Testo Unico Sicurezza sul Lavoro",
+        issued_at=date(2008, 4, 9),
+        in_force_from=date(2008, 5, 15),
+    ),
+    "tub": CodiceInfo(
+        short_id="tub",
+        urn="urn:nir:stato:decreto.legislativo:1993-09-01;385",
+        title="Testo Unico Bancario",
+        issued_at=date(1993, 9, 1),
+        in_force_from=date(1994, 1, 1),
+    ),
+    "tuf": CodiceInfo(
+        short_id="tuf",
+        urn="urn:nir:stato:decreto.legislativo:1998-02-24;58",
+        title="Testo Unico della Finanza",
+        issued_at=date(1998, 2, 24),
+        in_force_from=date(1998, 7, 1),
+    ),
+    "tuir": CodiceInfo(
+        short_id="tuir",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1986-12-22;917",
+        title="Testo Unico delle Imposte sui Redditi",
+        issued_at=date(1986, 12, 22),
+        in_force_from=date(1988, 1, 1),
+    ),
+    # ===== Leggi fondamentali =====
+    "cpriv": CodiceInfo(
+        short_id="cpriv",
+        urn="urn:nir:stato:decreto.legislativo:2003-06-30;196",
+        title="Codice in materia di protezione dei dati personali",
+        issued_at=date(2003, 6, 30),
+        in_force_from=date(2004, 1, 1),
+    ),
+    "l241": CodiceInfo(
+        short_id="l241",
+        urn="urn:nir:stato:legge:1990-08-07;241",
+        title="Legge 241/1990 — Procedimento amministrativo",
+        issued_at=date(1990, 8, 7),
+        in_force_from=date(1990, 9, 13),
+    ),
+    "stat": CodiceInfo(
+        short_id="stat",
+        urn="urn:nir:stato:legge:1970-05-20;300",
+        title="Statuto dei Lavoratori (L. 300/1970)",
+        issued_at=date(1970, 5, 20),
+        in_force_from=date(1970, 7, 9),
+    ),
+    "l689": CodiceInfo(
+        short_id="l689",
+        urn="urn:nir:stato:legge:1981-11-24;689",
+        title="Legge 689/1981 — Modifiche al sistema penale (depenalizzazione)",
+        issued_at=date(1981, 11, 24),
+        in_force_from=date(1982, 2, 20),
+    ),
+    "lpf": CodiceInfo(
+        short_id="lpf",
+        urn="urn:nir:stato:legge:2012-12-31;247",
+        title="Nuova disciplina dell'ordinamento della professione forense (L. 247/2012)",
+        issued_at=date(2012, 12, 31),
+        in_force_from=date(2013, 2, 2),
+    ),
+    # ===== Compliance / 231 / anticorruzione =====
+    "dlgs231": CodiceInfo(
+        short_id="dlgs231",
+        urn="urn:nir:stato:decreto.legislativo:2001-06-08;231",
+        title="Responsabilità amministrativa degli enti (D.Lgs. 231/2001)",
+        issued_at=date(2001, 6, 8),
+        in_force_from=date(2001, 7, 4),
+    ),
+    "aml": CodiceInfo(
+        short_id="aml",
+        urn="urn:nir:stato:decreto.legislativo:2007-11-21;231",
+        title="Antiriciclaggio (D.Lgs. 231/2007)",
+        issued_at=date(2007, 11, 21),
+        in_force_from=date(2008, 1, 1),
+    ),
+    "l190": CodiceInfo(
+        short_id="l190",
+        urn="urn:nir:stato:legge:2012-11-06;190",
+        title="Prevenzione e repressione della corruzione (L. 190/2012)",
+        issued_at=date(2012, 11, 6),
+        in_force_from=date(2012, 11, 28),
+    ),
+    "dlgs33": CodiceInfo(
+        short_id="dlgs33",
+        urn="urn:nir:stato:decreto.legislativo:2013-03-14;33",
+        title="Trasparenza della pubblica amministrazione (D.Lgs. 33/2013)",
+        issued_at=date(2013, 3, 14),
+        in_force_from=date(2013, 4, 20),
+    ),
+    "dlgs39": CodiceInfo(
+        short_id="dlgs39",
+        urn="urn:nir:stato:decreto.legislativo:2013-04-08;39",
+        title="Inconferibilità e incompatibilità di incarichi (D.Lgs. 39/2013)",
+        issued_at=date(2013, 4, 8),
+        in_force_from=date(2013, 5, 4),
+    ),
+    "cam": CodiceInfo(
+        short_id="cam",
+        urn="urn:nir:stato:decreto.legislativo:2011-09-06;159",
+        title="Codice delle leggi antimafia (D.Lgs. 159/2011)",
+        issued_at=date(2011, 9, 6),
+        in_force_from=date(2011, 10, 13),
+    ),
+    "wb": CodiceInfo(
+        short_id="wb",
+        urn="urn:nir:stato:decreto.legislativo:2023-03-10;24",
+        title="Whistleblowing (D.Lgs. 24/2023)",
+        issued_at=date(2023, 3, 10),
+        in_force_from=date(2023, 3, 30),
+    ),
+    "ritpag": CodiceInfo(
+        short_id="ritpag",
+        urn="urn:nir:stato:decreto.legislativo:2002-10-09;231",
+        title="Ritardi di pagamento nelle transazioni commerciali (D.Lgs. 231/2002)",
+        issued_at=date(2002, 10, 9),
+        in_force_from=date(2002, 11, 7),
+    ),
+    # ===== Amministrativo / ambiente / enti locali =====
+    "tua": CodiceInfo(
+        short_id="tua",
+        urn="urn:nir:stato:decreto.legislativo:2006-04-03;152",
+        title="Testo Unico Ambiente (D.Lgs. 152/2006)",
+        issued_at=date(2006, 4, 3),
+        in_force_from=date(2006, 4, 29),
+    ),
+    "tupi": CodiceInfo(
+        short_id="tupi",
+        urn="urn:nir:stato:decreto.legislativo:2001-03-30;165",
+        title="Testo Unico Pubblico Impiego (D.Lgs. 165/2001)",
+        issued_at=date(2001, 3, 30),
+        in_force_from=date(2001, 6, 24),
+    ),
+    "cpa": CodiceInfo(
+        short_id="cpa",
+        urn="urn:nir:stato:decreto.legislativo:2010-07-02;104",
+        title="Codice del Processo Amministrativo (D.Lgs. 104/2010)",
+        issued_at=date(2010, 7, 2),
+        in_force_from=date(2010, 9, 16),
+    ),
+    "cpt": CodiceInfo(
+        short_id="cpt",
+        urn="urn:nir:stato:decreto.legislativo:1992-12-31;546",
+        title="Processo Tributario (D.Lgs. 546/1992)",
+        issued_at=date(1992, 12, 31),
+        in_force_from=date(1996, 4, 1),
+    ),
+    "tuel": CodiceInfo(
+        short_id="tuel",
+        urn="urn:nir:stato:decreto.legislativo:2000-08-18;267",
+        title="Testo Unico Enti Locali (D.Lgs. 267/2000)",
+        issued_at=date(2000, 8, 18),
+        in_force_from=date(2000, 10, 13),
+    ),
+    "tudoc": CodiceInfo(
+        short_id="tudoc",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:2000-12-28;445",
+        title="Testo Unico Documentazione Amministrativa (D.P.R. 445/2000)",
+        issued_at=date(2000, 12, 28),
+        in_force_from=date(2001, 1, 7),
+    ),
+    "cbc": CodiceInfo(
+        short_id="cbc",
+        urn="urn:nir:stato:decreto.legislativo:2004-01-22;42",
+        title="Codice dei Beni Culturali e del Paesaggio (D.Lgs. 42/2004)",
+        issued_at=date(2004, 1, 22),
+        in_force_from=date(2004, 5, 1),
+    ),
+    # ===== Assicurazioni / fisco =====
+    "cap": CodiceInfo(
+        short_id="cap",
+        urn="urn:nir:stato:decreto.legislativo:2005-09-07;209",
+        title="Codice delle Assicurazioni Private (D.Lgs. 209/2005)",
+        issued_at=date(2005, 9, 7),
+        in_force_from=date(2006, 1, 1),
+    ),
+    "iva": CodiceInfo(
+        short_id="iva",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1972-10-26;633",
+        title="Disciplina dell'IVA (D.P.R. 633/1972)",
+        issued_at=date(1972, 10, 26),
+        in_force_from=date(1973, 1, 1),
+    ),
+    "dpr600": CodiceInfo(
+        short_id="dpr600",
+        urn="urn:nir:stato:decreto.del.presidente.della.repubblica:1973-09-29;600",
+        title="Accertamento delle imposte sui redditi (D.P.R. 600/1973)",
+        issued_at=date(1973, 9, 29),
+        in_force_from=date(1974, 1, 1),
+    ),
+    # ===== Lavoro =====
+    "lav81": CodiceInfo(
+        short_id="lav81",
+        urn="urn:nir:stato:decreto.legislativo:2015-06-15;81",
+        title="Disciplina organica dei contratti di lavoro (D.Lgs. 81/2015)",
+        issued_at=date(2015, 6, 15),
+        in_force_from=date(2015, 6, 25),
+    ),
+    "l604": CodiceInfo(
+        short_id="l604",
+        urn="urn:nir:stato:legge:1966-07-15;604",
+        title="Licenziamenti individuali (L. 604/1966)",
+        issued_at=date(1966, 7, 15),
+        in_force_from=date(1966, 8, 21),
+    ),
+    "dlgs23": CodiceInfo(
+        short_id="dlgs23",
+        urn="urn:nir:stato:decreto.legislativo:2015-03-04;23",
+        title="Contratto a tutele crescenti (D.Lgs. 23/2015)",
+        issued_at=date(2015, 3, 4),
+        in_force_from=date(2015, 3, 7),
+    ),
+    "tumat": CodiceInfo(
+        short_id="tumat",
+        urn="urn:nir:stato:decreto.legislativo:2001-03-26;151",
+        title="Testo Unico Maternità e Paternità (D.Lgs. 151/2001)",
+        issued_at=date(2001, 3, 26),
+        in_force_from=date(2001, 4, 27),
+    ),
+    # ===== Civile / famiglia / locazioni / cittadinanza =====
+    "l392": CodiceInfo(
+        short_id="l392",
+        urn="urn:nir:stato:legge:1978-07-27;392",
+        title="Locazioni di immobili urbani (L. 392/1978)",
+        issued_at=date(1978, 7, 27),
+        in_force_from=date(1978, 7, 30),
+    ),
+    "l898": CodiceInfo(
+        short_id="l898",
+        urn="urn:nir:stato:legge:1970-12-01;898",
+        title="Disciplina dei casi di scioglimento del matrimonio (L. 898/1970)",
+        issued_at=date(1970, 12, 1),
+        in_force_from=date(1970, 12, 18),
+    ),
+    "l76": CodiceInfo(
+        short_id="l76",
+        urn="urn:nir:stato:legge:2016-05-20;76",
+        title="Unioni civili e convivenze (L. 76/2016)",
+        issued_at=date(2016, 5, 20),
+        in_force_from=date(2016, 6, 5),
+    ),
+    "l91": CodiceInfo(
+        short_id="l91",
+        urn="urn:nir:stato:legge:1992-02-05;91",
+        title="Cittadinanza italiana (L. 91/1992)",
+        issued_at=date(1992, 2, 5),
+        in_force_from=date(1992, 8, 16),
+    ),
+    "cnav": CodiceInfo(
+        short_id="cnav",
+        urn="urn:nir:stato:regio.decreto:1942-03-30;327",
+        title="Codice della Navigazione",
+        issued_at=date(1942, 3, 30),
+        in_force_from=date(1942, 4, 21),
+    ),
+}
+
+
+# ---------------------------------------------------------------------------
+# Regex
+# ---------------------------------------------------------------------------
+
+# Suffissi latini degli articoli. L'ordine conta: le forme composte devono
+# precedere i loro prefissi (quaterdecies prima di quater, ecc.), altrimenti
+# la alternation si ferma al match più corto ("2-quaterdecies" → "2-quater").
+# Normattiva usa anche forme spezzate da trattino ("2-sex-decies",
+# "2-septies-decies"): le gestiamo permettendo il concatenamento di più
+# suffissi separati da trattino/spazio.
+_LATIN_WORD = (
+    r"(?:sexiesdecies|septiesdecies|octiesdecies|noviesdecies|quinquiesdecies"
+    r"|quaterdecies|terdecies|duodecies|undecies|quindecies|sedecies"
+    r"|duodevicies|undevicies|vicies|semel"
+    r"|quinquies|quater|sexies|septies|octies|novies|nonies|decies|sex|ter|bis)"
+)
+# Suffisso completo: una o più parole latine concatenate ("sex-decies"),
+# con eventuale sotto-numero puntato ("quaterdecies.1").
+_LATIN_SUFFIX = rf"(?:{_LATIN_WORD}(?:[-\s]{_LATIN_WORD})*(?:\.[0-9]+)?)"
+
+# Numero articolo: base + opzionale forma slash ("314/2", numerazione storica
+# CC su adozione) + opzionale suffisso latino.
+_ART_NUM_BODY = rf"[0-9]+(?:/[0-9]+)?(?:[-\s]?{_LATIN_SUFFIX})?"
+
+# "art. 2043" oppure "art. 2043-bis" oppure "2043 bis" oppure "art. 314/2".
+# Alcune fonti (es. CCP) scrivono "Articolo 1." per esteso nel <num>.
+_ARTICLE_NUM_RE = re.compile(
+    rf"art(?:icolo)?\.?\s*({_ART_NUM_BODY})",
+    re.IGNORECASE,
+)
+
+# Una linea "Art. 2043." a inizio testo (preceduta da opt. whitespace)
+_ART_HEADER_RE = re.compile(
+    rf"^\s*Art\.?\s*({_ART_NUM_BODY})\s*\.?\s*",
+    re.IGNORECASE,
+)
+
+# Forme spezzate di Normattiva → forma canonica di citazione.
+_SUFFIX_ALIASES = {
+    "sex-decies": "sexiesdecies",
+    "sexies-decies": "sexiesdecies",
+    "septies-decies": "septiesdecies",
+    "octies-decies": "octiesdecies",
+    "novies-decies": "noviesdecies",
+    "quater-decies": "quaterdecies",
+    "quinquies-decies": "quinquiesdecies",
+    "ter-decies": "terdecies",
+    "duo-decies": "duodecies",
+    "un-decies": "undecies",
+}
+
+
+def _normalize_article_number(raw: str) -> str:
+    """Normalizza un numero articolo: "2043 bis" → "2043-bis", "2-sex-decies" → "2-sexiesdecies"."""
+    num = re.sub(r"\s+", "-", raw.strip()).lower()
+    # Forma attaccata senza separatore (es. fragment AKN "art_2929bis").
+    num = re.sub(rf"^([0-9]+(?:/[0-9]+)?)({_LATIN_WORD})", r"\1-\2", num)
+    m = re.match(r"^([0-9]+(?:/[0-9]+)?)-(.+?)(\.[0-9]+)?$", num)
+    if m:
+        base, suffix, sub = m.group(1), m.group(2), m.group(3) or ""
+        suffix = _SUFFIX_ALIASES.get(suffix, suffix)
+        num = f"{base}-{suffix}{sub}"
+    return num
+
+
+# Rubrica modificata: "(( (Rubrica). ))" con doppie parentesi da aggiornamento.
+_RUBRICA_MOD_RE = re.compile(
+    r"^\s*\(\(\s*\(\s*([^()]+?)\s*\)\s*\.?\s*\)\)\s*\.?\s*",
+    re.DOTALL,
+)
+
+# Rubrica standard: "(Rubrica)." (parentesi singole).
+_RUBRICA_STD_RE = re.compile(
+    r"^\s*\(\s*([^()]+?)\s*\)\s*\.?\s*",
+    re.DOTALL,
+)
+
+# Marcatore di aggiornamenti Normattiva: linea "-----------" seguita da
+# "AGGIORNAMENTO (N)". Tutto ciò che segue NON è testo normativo vigente ma
+# note di modifica storica — lo isoliamo in metadata, non entra nei commi.
+_AGGIORNAMENTO_SEP_RE = re.compile(
+    r"\n\s*-{5,}\s*\n\s*AGGIORNAMENTO\s*\(\s*\d+\s*\)",
+    re.IGNORECASE,
+)
+
+# Split commi: numerazione all'inizio di linea/blocco "N. " oppure "Nbis. "
+_COMMA_NUM_RE = re.compile(
+    r"(?:^|\n\s*\n)\s*"
+    rf"([0-9]+(?:[-\s]?{_LATIN_SUFFIX})?)"
+    r"\s*\.\s+",
+    re.IGNORECASE,
+)
+
+# Lettere dentro un comma: " a) " " b) "
+_LETTER_RE = re.compile(r"(?:^|\n\s*|\s+)([a-z])\)\s+", re.IGNORECASE)
+
+# Articolo abrogato/soppresso: Normattiva lo rende in MAIUSCOLO a inizio testo
+# ("ARTICOLO ABROGATO DALLA L. ...", "COMMA SOPPRESSO..."). Match case-sensitive
+# e ancorato ai primi caratteri per non marcare articoli vigenti che *parlano*
+# di abrogazioni.
+_ABROGATO_RE = re.compile(r"^.{0,40}?\b(ABROGAT|SOPPRESS)", re.DOTALL)
+
+
+def _detect_abrogato(text: str | None) -> bool:
+    if not text:
+        return False
+    return _ABROGATO_RE.search(text.strip()) is not None
+
+
+# ---------------------------------------------------------------------------
+# Rinvii normativi (<ref href="/akn/it/act/...">)
+# ---------------------------------------------------------------------------
+
+# URI AKN di un atto: /akn/it/act/<tipo>/<autorità>/<data>/<numero>/...
+_AKN_ACT_HREF_RE = re.compile(r"^/akn/it/act/[^/]+/[^/]+/(\d{4}-\d{2}-\d{2})/([0-9]+)\b")
+# Fragment articolo: "#art_1284", "#art_16-com1", "#art_2929bis"
+_AKN_ART_FRAGMENT_RE = re.compile(
+    r"art_([0-9]+[a-z0-9]*(?:-?(?:bis|ter|quater|quinquies|sexies|septies|octies|novies|decies))?)(?:-com|$|-)"
+)
+
+
+def _build_date_num_index() -> dict[tuple[str, str], str]:
+    """Mappa (data, numero) dell'atto → short_id, derivata dagli URN del catalogo.
+
+    URN NIR: "urn:nir:stato:regio.decreto:1942-03-16;262" → ("1942-03-16", "262").
+    """
+    index: dict[tuple[str, str], str] = {}
+    for short_id, info in CODICI_CATALOG.items():
+        m = re.search(r":(\d{4}-\d{2}-\d{2});(\d+)$", info.urn)
+        if m:
+            index[(m.group(1), m.group(2))] = short_id
+    return index
+
+
+_DATE_NUM_TO_SHORT_ID = _build_date_num_index()
+
+
+def _extract_refs(element: etree._Element) -> list[CanonicalRef]:
+    """Estrae i rinvii ``<ref>`` risolvibili contro il catalogo fonti.
+
+    Conserviamo solo i ref il cui atto target è nel catalogo (linkabili nel
+    grafo): i rinvii a atti non indicizzati aggiungerebbero solo rumore in
+    questa fase. Dedup per (target_short_id, target_article).
+    """
+    refs: list[CanonicalRef] = []
+    seen: set[tuple[str, str | None]] = set()
+    for ref in element.findall(".//a:ref", _NS):
+        href = ref.get("href", "")
+        m = _AKN_ACT_HREF_RE.match(href)
+        if not m:
+            continue
+        short_id = _DATE_NUM_TO_SHORT_ID.get((m.group(1), m.group(2)))
+        if short_id is None:
+            continue
+        article: str | None = None
+        if "#" in href:
+            fm = _AKN_ART_FRAGMENT_RE.search(href.split("#", 1)[1])
+            if fm:
+                article = _normalize_article_number(fm.group(1))
+        key = (short_id, article)
+        if key in seen:
+            continue
+        seen.add(key)
+        raw = re.sub(r"\s+", " ", "".join(ref.itertext())).strip()[:256]
+        refs.append(
+            CanonicalRef(
+                raw_text=raw,
+                href=href,
+                target_short_id=short_id,
+                target_article=article,
+            )
+        )
+    return refs
+
+
+# ---------------------------------------------------------------------------
+# Parser
+# ---------------------------------------------------------------------------
+
+
+class NormattivaAknParser:
+    """Parser dell'XML AKN per codici serviti da Normattiva."""
+
+    def __init__(self, *, keep_modification_markers: bool = False) -> None:
+        """
+        Args:
+            keep_modification_markers: se True, conserva le doppie parentesi
+                `(( ... ))` che Normattiva usa per marcare testo modificato da
+                atti successivi. Default False (testo pulito).
+        """
+        self._keep_markers = keep_modification_markers
+
+    # ------------------------------------------------------------------
+    # Entry points
+    # ------------------------------------------------------------------
+
+    # Nome fixture: codice_{short_id}_{YYYYMMDD}.akn.xml
+    _FIXTURE_DATE_RE = re.compile(r"_(\d{8})\.akn\.xml$")
+
+    def parse_file(self, xml_path: Path, *, short_id: str) -> CanonicalAct:
+        """Parsa un file AKN salvato localmente.
+
+        La data di vigenza nel nome della fixture è usata come hint per
+        l'expression date (nel formato A i meta AKN portano solo la data
+        storica dell'atto).
+        """
+        xml_bytes = xml_path.read_bytes()
+        hint: date | None = None
+        m = self._FIXTURE_DATE_RE.search(xml_path.name)
+        if m:
+            raw = m.group(1)
+            hint = date(int(raw[:4]), int(raw[4:6]), int(raw[6:8]))
+        return self.parse_bytes(xml_bytes, short_id=short_id, expression_date_hint=hint)
+
+    def parse_bytes(
+        self,
+        xml_bytes: bytes,
+        *,
+        short_id: str,
+        expression_date_hint: date | None = None,
+    ) -> CanonicalAct:
+        if short_id not in CODICI_CATALOG:
+            raise ValueError(f"Unknown codice short_id: {short_id!r}")
+        info = CODICI_CATALOG[short_id]
+
+        tree = etree.fromstring(xml_bytes)
+        articles = list(self._iter_articles(tree))
+        expression_date = self._extract_expression_date(tree)
+        # Il consolidato scaricato è vigente alla data richiesta al portale
+        # (dataVigenza / data nel nome fixture): se più recente della FRBRdate
+        # (che nel formato A è la data storica), è lei l'expression date.
+        if expression_date_hint and (
+            expression_date is None or expression_date_hint > expression_date
+        ):
+            expression_date = expression_date_hint
+        logger.info(
+            "akn.parsed",
+            short_id=short_id,
+            articles=len(articles),
+            expression_date=str(expression_date),
+            size_bytes=len(xml_bytes),
+        )
+
+        # Wrap in a single root partition = il codice stesso.
+        # La gerarchia Libro/Titolo/Capo verrà arricchita in un secondo passaggio
+        # (TODO: parsing dell'indice HTML). Per ora: flat list di articoli.
+        root = CanonicalPartition(
+            kind=NormPartitionKind.LIBRO,  # usiamo 'libro' come stand-in per il root code
+            number="0",
+            label=info.title,
+            rubrica=None,
+            full_text=None,
+            commi=[],
+            children=articles,
+        )
+
+        return CanonicalAct(
+            urn=info.urn,
+            short_id=info.short_id,
+            title=info.title,
+            type=NormSourceType.CODICE,
+            issued_at=info.issued_at,
+            in_force_from=info.in_force_from,
+            in_force_to=None,
+            expression_date=expression_date,
+            source_url=f"https://www.normattiva.it/uri-res/N2Ls?{info.urn}",
+            source_hash=hashlib.sha256(xml_bytes).hexdigest(),
+            root=[root],
+        )
+
+    @staticmethod
+    def _extract_expression_date(tree: etree._Element) -> date | None:
+        """Data di consolidamento dal meta AKN (FRBRExpression/FRBRdate).
+
+        Nel formato A il meta dell'<act> porta la data STORICA dell'atto
+        (es. CC → 1944), mentre i meta degli attachment portano la data del
+        consolidato scaricato: la data dell'espressione consolidata è la
+        MASSIMA tra tutte le FRBRdate presenti nel documento.
+        """
+        best: date | None = None
+        for el in tree.findall(".//a:FRBRExpression/a:FRBRdate", _NS):
+            raw = el.get("date", "")
+            try:
+                d = date.fromisoformat(raw)
+            except ValueError:
+                continue
+            if best is None or d > best:
+                best = d
+        return best
+
+    # ------------------------------------------------------------------
+    # Article extraction
+    # ------------------------------------------------------------------
+
+    def _iter_articles(self, root: etree._Element) -> Iterator[CanonicalPartition]:
+        """Itera gli articoli come CanonicalPartition.
+
+        Normattiva usa due serializzazioni AKN diverse:
+
+        **Formato A — "flat per attachment"** (codici del 1930-1942: CC, CP, CPC):
+          act > attachments > attachment > doc > mainBody > paragraph > content > p
+          Ogni <attachment> è un articolo. Rubrica e commi sono concatenati in un
+          singolo <p> e vanno estratti con regex.
+
+        **Formato B — "canonico AKN"** (decreti moderni: CdS, TU, leggi):
+          act > body > chapter > article > paragraph > content
+          Ogni <article> ha <num>, <heading> (= rubrica nativa!), <paragraph> strutturati.
+          La gerarchia (chapter/section/part) è navigabile.
+
+        Proviamo prima Formato B (più pulito, più informazione). Se 0 articoli,
+        fallback a Formato A.
+        """
+        # Conta entrambi per decidere quale formato è "il vero corpo".
+        attachments = root.findall(".//a:act/a:attachments/a:attachment", _NS)
+        articles_b = root.findall(".//a:act/a:body//a:article", _NS)
+
+        # Euristica: Formato A (flat-per-attachment) è usato dai codici storici
+        # quando gli attachment sono MANY e i loro doc.name contengono "art. N".
+        # In questi casi il <body> ha solo 2-3 article del regio decreto di
+        # approvazione (da scartare).
+        #
+        # Formato B (canonico) è usato dai decreti moderni: articles in body
+        # sono centinaia, attachments pochi o nessuno (o solo allegati tecnici).
+        # ATTENZIONE: gli attachment possono essere anche gli ALLEGATI tecnici
+        # dell'atto (es. CCP: "Allegati - Allegato I.01 art. 1"), i cui nomi
+        # matchano comunque "art. N". Contarli come articoli farebbe scartare
+        # il corpo vero del codice (bug storico: il CCP veniva indicizzato con
+        # i soli allegati). Escludiamo dal conteggio i doc il cui nome contiene
+        # "allegato".
+        attachment_articles = 0
+        attachment_articles_incl_allegati = 0
+        for att in attachments:
+            doc = att.find("a:doc", _NS)
+            if doc is None or not _ARTICLE_NUM_RE.search(doc.get("name", "")):
+                continue
+            attachment_articles_incl_allegati += 1
+            if "allegato" not in doc.get("name", "").lower():
+                attachment_articles += 1
+
+        # Decisione:
+        # - body vuoto → formato A se ci sono attachment-articolo (anche uno solo);
+        # - body con pochi articoli (il decreto di approvazione ne ha 2-3) →
+        #   formato A se gli attachment-articolo dominano. Caso speciale: alcuni
+        #   codici vivono INTERAMENTE in un allegato (es. CPA, d.lgs. 104/2010 =
+        #   2 articoli nel body + il codice in "Allegato 1"): se il body è
+        #   minuscolo e gli attachment-articolo (allegati inclusi) sono tanti,
+        #   il corpo autorevole sono gli attachment.
+        # - body con molti articoli canonici → è sempre il corpo autorevole
+        #   (es. CCP: 233 articoli nel body + 324 allegati tecnici da scartare).
+        if not articles_b:
+            use_attachments = attachment_articles_incl_allegati > 0
+        elif len(articles_b) <= 10:
+            use_attachments = (
+                attachment_articles >= max(10, len(articles_b))
+                or attachment_articles_incl_allegati >= 50
+            )
+        else:
+            use_attachments = False
+        if use_attachments:
+            for att in attachments:
+                doc = att.find("a:doc", _NS)
+                if doc is None:
+                    continue
+                parsed = self._parse_article_doc(doc)
+                if parsed is not None:
+                    yield parsed
+            return
+
+        # Formato B: articoli canonici in <body>
+        for art in articles_b:
+            parsed = self._parse_article_canonical(art)
+            if parsed is not None:
+                yield parsed
+
+    def _parse_article_canonical(self, article: etree._Element) -> CanonicalPartition | None:
+        """Parsa un <article> AKN canonico con <num>/<heading>/<paragraph>."""
+        num_el = article.find("a:num", _NS)
+        if num_el is None:
+            return None
+        # "Art. 186." → "186"
+        num_text = (num_el.text or "").strip()
+        m = _ARTICLE_NUM_RE.search(num_text)
+        if not m:
+            return None
+        num = _normalize_article_number(m.group(1))
+
+        # Rubrica nativa: <heading> (opzionalmente tra parentesi, con eventuali
+        # marcatori di modifica "(( (Oggetto). ))" da rimuovere PRIMA di
+        # spogliare le parentesi esterne — uno strip("().") ingenuo si ferma
+        # sugli spazi interni e lascia rubriche sporche tipo "(Oggetto).").
+        heading_el = article.find("a:heading", _NS)
+        rubrica: str | None = None
+        if heading_el is not None:
+            raw_heading = "".join(heading_el.itertext()).strip()
+            raw_heading = self._clean_markers(raw_heading)
+            paren = re.match(r"^\((.*)\)\s*\.?\s*$", raw_heading, re.DOTALL)
+            if paren:
+                raw_heading = paren.group(1)
+            rubrica = self._cleanup_rubrica(raw_heading.strip(" .")) or None
+
+        # Commi: <paragraph> ripetuti. Il testo può stare in <content> diretto
+        # oppure — per i commi a elenco (definizioni, requisiti, esclusioni) —
+        # in <list><intro>…<point>…. Saltare i paragraph senza <content>
+        # significherebbe perdere interi commi (misurato: fino al 17% del testo
+        # su TU Sicurezza/CCP/TUF), quindi in fallback estraiamo tutto il testo
+        # del paragraph escluso il suo <num>.
+        commi: list[CanonicalComma] = []
+        for p in article.findall("a:paragraph", _NS):
+            pn = p.find("a:num", _NS)
+            pc = p.find("a:content", _NS)
+            # num: "1." → "1", "1-bis." → "1-bis"
+            num_raw = (pn.text or "").strip() if pn is not None else ""
+            comma_num = re.sub(r"\.\s*$", "", num_raw).strip() or str(len(commi) + 1)
+            comma_num = re.sub(r"\s+", "-", comma_num).lower()
+            if pc is not None:
+                text = "".join(pc.itertext()).strip()
+            else:
+                text = self._paragraph_body_text(p, exclude=pn)
+            text = self._clean_markers(text)
+            if text:
+                commi.append(
+                    CanonicalComma(
+                        number=comma_num,
+                        text=text,
+                        letters=self._extract_letters(text),
+                    )
+                )
+
+        # Full text = concat commi
+        if commi:
+            full_text = "\n\n".join(f"{c.number}. {c.text}" for c in commi)
+            if rubrica:
+                full_text = f"[Rubrica] {rubrica}\n\n{full_text}"
+        else:
+            full_text = rubrica or ""
+
+        if not full_text.strip():
+            return None
+
+        return CanonicalPartition(
+            kind=NormPartitionKind.ARTICOLO,
+            number=num,
+            label=f"art. {num}",
+            rubrica=rubrica,
+            full_text=full_text,
+            abrogato=_detect_abrogato(full_text),
+            commi=commi,
+            refs=_extract_refs(article),
+        )
+
+    _ALLEGATO_NUM_RE = re.compile(r"allegato\s*([0-9]+)", re.IGNORECASE)
+
+    def _parse_article_doc(self, doc: etree._Element) -> CanonicalPartition | None:
+        name = doc.get("name", "")
+        num = self._extract_article_number(name)
+        if num is None:
+            return None
+        # Codici interamente contenuti in allegati (es. CPA): gli allegati
+        # successivi al primo (norme di attuazione/transitorie) ricominciano
+        # la numerazione da 1 — senza prefisso colliderebbero con il codice.
+        # Convenzione citazionale: "art. N" nudo = Allegato 1.
+        alm = self._ALLEGATO_NUM_RE.search(name)
+        if alm and int(alm.group(1)) > 1:
+            num = f"all{alm.group(1)}-{num}"
+
+        main_body = doc.find("a:mainBody", _NS)
+        if main_body is None:
+            return None
+
+        raw_text = self._extract_full_text(main_body)
+        if not raw_text.strip():
+            return None
+
+        # Separa testo vigente dalle note di aggiornamento (che Normattiva
+        # accoda dopo il testo normativo vero).
+        vigente_text, aggiornamenti_text = self._strip_aggiornamenti(raw_text)
+
+        rubrica, body = self._split_rubrica(vigente_text, num)
+        commi = self._split_commi(body)
+        full_text = self._clean_markers(vigente_text)
+        # NB: aggiornamenti_text (note storiche) è volutamente escluso dal
+        # testo indicizzato; CanonicalPartition non ha ancora un campo metadata
+        # per conservarlo (TODO fase multivigenza).
+        del aggiornamenti_text
+
+        return CanonicalPartition(
+            kind=NormPartitionKind.ARTICOLO,
+            number=num,
+            label=f"art. {num}",
+            rubrica=rubrica,
+            full_text=full_text,
+            abrogato=_detect_abrogato(full_text),
+            commi=commi,
+            refs=_extract_refs(main_body),
+        )
+
+    @staticmethod
+    def _strip_aggiornamenti(raw_text: str) -> tuple[str, str | None]:
+        """Separa testo vigente da note di aggiornamento.
+
+        Normattiva accoda i ``----------- AGGIORNAMENTO (N)`` con descrizione
+        delle modifiche storiche dopo il testo normativo. Li separiamo così il
+        retriever non li include come commi.
+        """
+        m = _AGGIORNAMENTO_SEP_RE.search(raw_text)
+        if not m:
+            return raw_text, None
+        return raw_text[: m.start()], raw_text[m.start() :]
+
+    # ------------------------------------------------------------------
+    # Text extraction + cleanup
+    # ------------------------------------------------------------------
+
+    def _extract_full_text(self, element: etree._Element) -> str:
+        """Estrae tutto il testo concatenando itertext()."""
+        parts: list[str] = []
+        for t in element.itertext():
+            if t:
+                parts.append(t)
+        return "".join(parts)
+
+    @staticmethod
+    def _paragraph_body_text(p: etree._Element, *, exclude: etree._Element | None) -> str:
+        """Testo di un <paragraph> escludendo il suo <num>.
+
+        Usato per i commi senza <content> diretto (es. <list> con <intro> e
+        <point>): itertext() sui figli preserva intro, lettere "a)" (che vivono
+        nei <num> dei <point>) e testo dei punti, nell'ordine del documento.
+        """
+        parts: list[str] = []
+        if p.text:
+            parts.append(p.text)
+        for child in p:
+            if exclude is not None and child is exclude:
+                if child.tail:
+                    parts.append(child.tail)
+                continue
+            parts.append(" ".join(t for t in child.itertext() if t))
+            if child.tail:
+                parts.append(child.tail)
+        return " ".join(s for s in (part.strip() for part in parts) if s)
+
+    def _extract_article_number(self, attachment_name: str) -> str | None:
+        """Estrae il numero dall'attribute `name` dell'attachment."""
+        m = _ARTICLE_NUM_RE.search(attachment_name)
+        if not m:
+            return None
+        return _normalize_article_number(m.group(1))
+
+    def _split_rubrica(self, text: str, article_num: str) -> tuple[str | None, str]:
+        """Separa la rubrica dall'articolo.
+
+        Formati gestiti:
+          1. Standard:       ``Art. 2043. \\n (Risarcimento per fatto illecito). \\n ...``
+          2. Con aggiornam.: ``Art. 414. \\n (( (Persone che...). )) \\n ...``
+          3. Senza rubrica:  ``Art. N. \\n testo...``
+        """
+        del article_num  # reserved for future disambiguation
+        cleaned = text.strip()
+
+        # 1. Rimuovi header "Art. N."
+        header_match = _ART_HEADER_RE.match(cleaned)
+        if header_match:
+            cleaned = cleaned[header_match.end() :]
+        cleaned = cleaned.lstrip()
+
+        # 2. Rubrica tra doppie parentesi (modificata)
+        if cleaned.startswith("(("):
+            m = _RUBRICA_MOD_RE.match(cleaned)
+            if m:
+                rubrica = self._cleanup_rubrica(m.group(1))
+                body = cleaned[m.end() :].lstrip()
+                return rubrica, self._clean_markers(body)
+
+        # 3. Rubrica con parentesi singole. Le parentesi sono un segnale
+        #    forte, quindi usiamo il filtro permissivo (ammette punti interni
+        #    come "Concorso formale. Reato continuato").
+        m = _RUBRICA_STD_RE.match(cleaned)
+        if m:
+            rubrica_raw = m.group(1).strip()
+            if self._looks_like_rubrica(rubrica_raw, strict=False):
+                body = cleaned[m.end() :].lstrip()
+                return self._cleanup_rubrica(rubrica_raw), self._clean_markers(body)
+
+        # 4. Rubrica "plain": prima riga/paragrafo dopo header, senza parentesi,
+        #    separata da blank line dal corpo. (Es. CP art. 416-bis.)
+        #    Filtro strict per evitare che un comma unico del corpo venga scambiato
+        #    per una rubrica quando il testo è breve.
+        parts = re.split(r"\n\s*\n", cleaned, maxsplit=1)
+        if len(parts) == 2:
+            first_block = parts[0].strip()
+            rest = parts[1]
+            if self._looks_like_rubrica(first_block, strict=True):
+                return self._cleanup_rubrica(first_block), self._clean_markers(rest)
+
+        # 5. Nessuna rubrica identificabile
+        return None, self._clean_markers(cleaned)
+
+    @staticmethod
+    def _looks_like_rubrica(candidate: str, *, strict: bool = True) -> bool:
+        """Euristica: una rubrica è breve e nominale.
+
+        - strict=True: nessun punto interno (usato per rubriche "plain" senza
+          parentesi — serve a evitare falsi positivi sui commi del corpo).
+        - strict=False: ammette punti interni (usato per rubriche tra
+          parentesi, il cui wrapping è già un segnale forte).
+        """
+        if not candidate or len(candidate) > 160:
+            return False
+        if strict and candidate.count(".") > 0:
+            return False
+        words = candidate.split()
+        if not words or len(words) > 15:
+            return False
+        lower = candidate.lower()
+        bad_markers = ("chiunque ", "qualunque ", "è punito", "e' punito", "salvo che")
+        return not any(b in lower for b in bad_markers)
+
+    @staticmethod
+    def _cleanup_rubrica(s: str) -> str:
+        return re.sub(r"\s+", " ", s).strip()
+
+    def _clean_markers(self, text: str) -> str:
+        """Pulisce marcatori `(( ... ))` e whitespace ridondante."""
+        if not self._keep_markers:
+            # Le doppie parentesi `(( ... ))` indicano passaggi introdotti da
+            # modifica successiva ma vigenti. Preserviamo il contenuto, togliamo
+            # le parentesi (e i numeri di nota tipo `((3))`).
+            text = re.sub(r"\(\(\s*([0-9]+)\s*\)\)", "", text)  # ((3)) note refs
+            text = re.sub(r"\(\(\s*", "", text)
+            text = re.sub(r"\s*\)\)", "", text)
+        # Normalizza whitespace: singoli newline in spazio, doppi newline preservati
+        text = re.sub(r"[ \t]+", " ", text)
+        text = re.sub(r"\n[ \t]+", "\n", text)
+        text = re.sub(r"[ \t]+\n", "\n", text)
+        text = re.sub(r"\n{3,}", "\n\n", text)
+        return text.strip()
+
+    # ------------------------------------------------------------------
+    # Comma/letter splitting
+    # ------------------------------------------------------------------
+
+    def _split_commi(self, body: str) -> list[CanonicalComma]:
+        """Divide il corpo dell'articolo in commi.
+
+        Strategia:
+        1. Se ci sono pattern numerati "1.", "2.", "1-bis." all'inizio di blocchi,
+           usali come separatori (affidabile).
+        2. Altrimenti, dividi sui paragrafi separati da blank line (`\n\n`) e
+           numera progressivamente (1, 2, 3, ...).
+        3. Se il testo è un singolo paragrafo senza numerazione, è un comma unico "1".
+        """
+        body = body.strip()
+        if not body:
+            return []
+
+        # Strategy 1: numerazione esplicita
+        matches = list(_COMMA_NUM_RE.finditer(body))
+        if len(matches) >= 2:
+            # Verifica che inizi davvero da "1." per evitare falsi positivi
+            # (es. testi che contengono "17." come riferimento)
+            first_num = matches[0].group(1).lower()
+            if first_num.startswith("1") or first_num == "1-bis":
+                return self._commi_from_matches(body, matches)
+
+        # Strategy 2: split per paragrafo doppio-newline
+        paragraphs = [p.strip() for p in re.split(r"\n\s*\n", body) if p.strip()]
+        if len(paragraphs) > 1:
+            return [
+                CanonicalComma(
+                    number=str(i + 1),
+                    text=para,
+                    letters=self._extract_letters(para),
+                )
+                for i, para in enumerate(paragraphs)
+            ]
+
+        # Strategy 3: comma unico
+        return [
+            CanonicalComma(
+                number="1",
+                text=body,
+                letters=self._extract_letters(body),
+            )
+        ]
+
+    def _commi_from_matches(self, body: str, matches: list[re.Match[str]]) -> list[CanonicalComma]:
+        commi: list[CanonicalComma] = []
+        for i, m in enumerate(matches):
+            number = m.group(1).strip().lower().replace(" ", "-")
+            start = m.end()
+            end = matches[i + 1].start() if i + 1 < len(matches) else len(body)
+            text = body[start:end].strip()
+            if text:
+                commi.append(
+                    CanonicalComma(
+                        number=number,
+                        text=text,
+                        letters=self._extract_letters(text),
+                    )
+                )
+        return commi
+
+    @staticmethod
+    def _extract_letters(text: str) -> list[CanonicalCommaLetter] | None:
+        matches = list(_LETTER_RE.finditer(text))
+        if len(matches) < 2:
+            return None
+        letters: list[CanonicalCommaLetter] = []
+        for i, m in enumerate(matches):
+            start = m.end()
+            end = matches[i + 1].start() if i + 1 < len(matches) else len(text)
+            letters.append(
+                CanonicalCommaLetter(letter=m.group(1).lower(), text=text[start:end].strip())
+            )
+        return letters

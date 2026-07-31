@@ -18,11 +18,11 @@ resolution-markers = [
 
 [manifest]
 members = [
-    "avvocato",
-    "avvocato-api",
-    "avvocato-indexer",
-    "avvocato-ingestion",
-    "avvocato-rag-core",
+    "caucus",
+    "caucus-api",
+    "caucus-indexer",
+    "caucus-ingestion",
+    "caucus-rag-core",
 ]
 
 [[package]]
@@ -301,7 +301,29 @@ wheels = [
 ]
 
 [[package]]
-name = "avvocato"
+name = "backoff"
+version = "2.2.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/47/d7/5bbeb12c44d7c4f2fb5b56abce497eb5ed9f34d85701de869acedd602619/backoff-2.2.1.tar.gz", hash = "sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba", size = 17001, upload-time = "2022-10-05T19:19:32.061Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/73/b6e24bd22e6720ca8ee9a85a0c4a2971af8497d8f3193fa05390cbd46e09/backoff-2.2.1-py3-none-any.whl", hash = "sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8", size = 15148, upload-time = "2022-10-05T19:19:30.546Z" },
+]
+
+[[package]]
+name = "beautifulsoup4"
+version = "4.14.3"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "soupsieve" },
+    { name = "typing-extensions" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c3/b0/1c6a16426d389813b48d95e26898aff79abbde42ad353958ad95cc8c9b21/beautifulsoup4-4.14.3.tar.gz", hash = "sha256:6292b1c5186d356bba669ef9f7f051757099565ad9ada5dd630bd9de5fa7fb86", size = 627737, upload-time = "2025-11-30T15:08:26.084Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/1a/39/47f9197bdd44df24d67ac8893641e16f386c984a0619ef2ee4c51fbbc019/beautifulsoup4-4.14.3-py3-none-any.whl", hash = "sha256:0918bfe44902e6ad8d57732ba310582e98da931428d231a5ecb9e7c703a735bb", size = 107721, upload-time = "2025-11-30T15:08:24.087Z" },
+]
+
+[[package]]
+name = "caucus"
 version = "0.0.1"
 source = { virtual = "." }
 
@@ -328,13 +350,13 @@ dev = [
 ]
 
 [[package]]
-name = "avvocato-api"
+name = "caucus-api"
 version = "0.0.1"
 source = { editable = "apps/api" }
 dependencies = [
     { name = "alembic" },
     { name = "asyncpg" },
-    { name = "avvocato-rag-core" },
+    { name = "caucus-rag-core" },
     { name = "dramatiq", extra = ["redis"] },
     { name = "fastapi" },
     { name = "greenlet" },
@@ -365,7 +387,7 @@ dev = [
 requires-dist = [
     { name = "alembic", specifier = ">=1.14" },
     { name = "asyncpg", specifier = ">=0.30" },
-    { name = "avvocato-rag-core", editable = "services/rag-core" },
+    { name = "caucus-rag-core", editable = "services/rag-core" },
     { name = "dramatiq", extras = ["redis"], specifier = ">=1.17" },
     { name = "fastapi", specifier = ">=0.115" },
     { name = "greenlet", specifier = ">=3.1" },
@@ -390,33 +412,33 @@ requires-dist = [
 provides-extras = ["dev"]
 
 [[package]]
-name = "avvocato-indexer"
+name = "caucus-indexer"
 version = "0.0.1"
 source = { editable = "services/indexer" }
 dependencies = [
-    { name = "avvocato-ingestion" },
-    { name = "avvocato-rag-core" },
+    { name = "caucus-ingestion" },
+    { name = "caucus-rag-core" },
     { name = "dramatiq", extra = ["redis"] },
     { name = "structlog" },
 ]
 
 [package.metadata]
 requires-dist = [
-    { name = "avvocato-ingestion", editable = "services/ingestion" },
-    { name = "avvocato-rag-core", editable = "services/rag-core" },
+    { name = "caucus-ingestion", editable = "services/ingestion" },
+    { name = "caucus-rag-core", editable = "services/rag-core" },
     { name = "dramatiq", extras = ["redis"], specifier = ">=1.17" },
     { name = "structlog", specifier = ">=24.4" },
 ]
 
 [[package]]
-name = "avvocato-ingestion"
+name = "caucus-ingestion"
 version = "0.0.1"
 source = { editable = "services/ingestion" }
 dependencies = [
     { name = "aiolimiter" },
     { name = "asyncpg" },
-    { name = "avvocato-rag-core" },
     { name = "beautifulsoup4" },
+    { name = "caucus-rag-core" },
     { name = "httpx" },
     { name = "lxml" },
     { name = "orjson" },
@@ -437,8 +459,8 @@ pdf = [
 requires-dist = [
     { name = "aiolimiter", specifier = ">=1.2" },
     { name = "asyncpg", specifier = ">=0.30" },
-    { name = "avvocato-rag-core", editable = "services/rag-core" },
     { name = "beautifulsoup4", specifier = ">=4.12" },
+    { name = "caucus-rag-core", editable = "services/rag-core" },
     { name = "docling", marker = "extra == 'pdf'", specifier = ">=2.8" },
     { name = "httpx", specifier = ">=0.28" },
     { name = "lxml", specifier = ">=5.3" },
@@ -453,7 +475,7 @@ requires-dist = [
 provides-extras = ["pdf"]
 
 [[package]]
-name = "avvocato-rag-core"
+name = "caucus-rag-core"
 version = "0.0.1"
 source = { editable = "services/rag-core" }
 dependencies = [
@@ -499,28 +521,6 @@ requires-dist = [
     { name = "torch", marker = "extra == 'reranker-local'", specifier = ">=2.5" },
 ]
 provides-extras = ["embeddings-local", "reranker-local"]
-
-[[package]]
-name = "backoff"
-version = "2.2.1"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/47/d7/5bbeb12c44d7c4f2fb5b56abce497eb5ed9f34d85701de869acedd602619/backoff-2.2.1.tar.gz", hash = "sha256:03f829f5bb1923180821643f8753b0502c3b682293992485b0eef2807afa5cba", size = 17001, upload-time = "2022-10-05T19:19:32.061Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/73/b6e24bd22e6720ca8ee9a85a0c4a2971af8497d8f3193fa05390cbd46e09/backoff-2.2.1-py3-none-any.whl", hash = "sha256:63579f9a0628e06278f7e47b7d7d5b6ce20dc65c5e96a6f3ca99a6adca0396e8", size = 15148, upload-time = "2022-10-05T19:19:30.546Z" },
-]
-
-[[package]]
-name = "beautifulsoup4"
-version = "4.14.3"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "soupsieve" },
-    { name = "typing-extensions" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/c3/b0/1c6a16426d389813b48d95e26898aff79abbde42ad353958ad95cc8c9b21/beautifulsoup4-4.14.3.tar.gz", hash = "sha256:6292b1c5186d356bba669ef9f7f051757099565ad9ada5dd630bd9de5fa7fb86", size = 627737, upload-time = "2025-11-30T15:08:26.084Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/1a/39/47f9197bdd44df24d67ac8893641e16f386c984a0619ef2ee4c51fbbc019/beautifulsoup4-4.14.3-py3-none-any.whl", hash = "sha256:0918bfe44902e6ad8d57732ba310582e98da931428d231a5ecb9e7c703a735bb", size = 107721, upload-time = "2025-11-30T15:08:24.087Z" },
-]
 
 [[package]]
 name = "cbor"
