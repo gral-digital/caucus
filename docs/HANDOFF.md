@@ -121,12 +121,15 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    (~12€ oltre) → decisione dell'owner. **Attenzione**: più cresce, più può
    ri-abbassare il recall normativo → ri-valutare la `case_law_candidate_ratio`.
 4. **Prodotto (fase avviata 2026-07-31, decisione owner: prodotto prima
-   delle metriche; si pubblica tutto insieme)**. Fatto: export .docx del
+   delle metriche; si pubblica tutto insieme)**. Fatto: (a) export .docx del
    parere con citazioni ri-verificate server-side (`routes/export.py` +
-   `services/docx_export.py` + bottone in ChatView; python-docx). Prossimi,
-   in ordine: analisi documentale (upload docx/pdf + chat ancorata a
-   documento e corpus — riusare pattern da Mike, AGPL compatibile), UI a tre
-   moduli (Ricerca/Analisi/Redazione), Word add-in per ultimo.
+   `services/docx_export.py` + bottone in ChatView; python-docx); (b) analisi
+   documentale v1 (`routes/documents.py` + `services/document_extract.py` +
+   tabella `user_document` migrazione 0004 + `ChatRequest.document_ids` +
+   graffetta/chip in UI). Scoperto durante i test: manca la L. 431/1998
+   (locazioni abitative) dal corpus — task segnalato. Prossimi, in ordine:
+   UI a tre moduli (Ricerca/Analisi/Redazione), retrieval FTS sui documenti
+   lunghi (oggi: cap 30k char nel prompt), Word add-in per ultimo.
 5. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.

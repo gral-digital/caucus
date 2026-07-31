@@ -5,6 +5,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Analisi documentale (v1)**: upload di .docx/.pdf (`POST /documents`,
+  testo estratto all'upload, file originale non conservato; PDF scansionati
+  rifiutati con errore chiaro — niente OCR silenzioso), allegato alla chat
+  via `document_ids`. Il documento entra nel prompt come fatti del caso
+  (cap 30k char/doc con troncamento dichiarato al modello), l'incipit
+  alimenta la query di retrieval (il dominio del documento fa emergere la
+  normativa giusta), e le clausole si citano in prosa — i tag `<cite/>`
+  restano riservati alle norme, così il trust layer non valida mai una
+  clausola come fonte normativa. UI: graffetta + chip documento in chat.
 - **Export del parere in Word** (`POST /export/docx` + bottone in chat): il
   server ri-verifica le citazioni contro il corpus al momento dell'export e
   produce un .docx con formattazione da studio (Times New Roman, corpo

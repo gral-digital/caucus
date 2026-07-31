@@ -9,6 +9,7 @@ Lo streaming è SSE (not WebSocket) per semplicità e cacheability via Cloud Run
 
 from __future__ import annotations
 
+import uuid
 from collections.abc import AsyncIterator
 from typing import Literal
 
@@ -47,6 +48,11 @@ class ChatRequest(BaseModel):
     )
     effective_at: str | None = Field(
         None, description="ISO date per stato normativo vigente a quella data."
+    )
+    document_ids: list[uuid.UUID] = Field(
+        default_factory=list,
+        max_length=3,
+        description="Documenti caricati (POST /documents) da usare come contesto del turno.",
     )
 
 

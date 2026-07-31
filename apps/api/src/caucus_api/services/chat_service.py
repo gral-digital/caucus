@@ -123,9 +123,20 @@ class ChatService:
         return cls(search=SearchService.build(session), llm=get_llm_router(), session=session)
 
     async def answer_stream(self, request) -> AsyncIterator[ChatEvent]:  # type: ignore[no-untyped-def]
+        # 0. Documenti allegati (analisi documentale): servono sia al prompt
+        # sia alla query di retrieval, quindi si caricano subito.
+        doc_ids = list(getattr(request, "document_ids", []) or [])
+        doc_rows = await self._fetch_documents(doc_ids) if doc_ids else []
+
         # 1. Retrieve — usa come query il messaggio corrente + ultimo user turn
         # del contesto, per non perdere riferimenti in follow-up brevi.
         retrieval_query_text = self._build_retrieval_query(request)
+        if doc_rows:
+            # L'incipit del documento dà al retrieval il dominio del caso
+            # («contratto di locazione ad uso abitativo» → L. 392/1978), che
+            # la domanda da sola spesso non contiene.
+            head = " ".join(row.text[:300] for row in doc_rows)
+            retrieval_query_text = f"{retrieval_query_text}\n\n[Documento allegato] {head}"
         try:
             effective = date.fromisoformat(request.effective_at) if request.effective_at else None
         except ValueError:
@@ -173,6 +184,11 @@ class ChatService:
             "di volersi basare SOLO su di te per una decisione con conseguenze legali, "
             "ricordaglielo in una frase."
         )
+        # Documenti allegati dall'utente (analisi documentale): entrano nel
+        # contesto PRIMA del blocco normativo — sono i fatti del caso.
+        if doc_rows:
+            system_content += "\n\n" + self._assemble_documents_block(doc_rows)
+
         if result.hits:
             system_content += "\n\n" + self._assemble_context_block(result.hits)
         else:
@@ -276,6 +292,58 @@ class ChatService:
             "score": hit.score_final,
             "excerpt": hit.text[:240],
         }
+
+    # Budget prompt per i documenti allegati: oltre si taglia dichiarandolo.
+    _DOC_PROMPT_CHARS_EACH = 30_000
+    _DOC_PROMPT_CHARS_TOTAL = 60_000
+
+    async def _fetch_documents(self, doc_ids: list[Any]) -> list[Any]:
+        """Carica i documenti richiesti preservando l'ordine del client."""
+        from caucus_api.db.models import UserDocument
+
+        rows = (
+            (
+                await self._session.execute(
+                    select(UserDocument).where(UserDocument.id.in_(doc_ids))
+                )
+            )
+            .scalars()
+            .all()
+        )
+        by_id = {row.id: row for row in rows}
+        return [by_id[i] for i in doc_ids if i in by_id]
+
+    def _assemble_documents_block(self, ordered: list[Any]) -> str:
+        """Blocco DOCUMENTI ALLEGATI per l'analisi documentale.
+
+        Il documento si cita in prosa (clausola/articolo/pagina), MAI con tag
+        ``<cite/>``: quelli restano riservati alle norme del corpus, così il
+        trust layer non valida mai una clausola contrattuale come se fosse
+        una fonte normativa.
+        """
+        parts = [
+            "# DOCUMENTI ALLEGATI DAL CLIENTE (fatti del caso)",
+            "Analizzali con rigore: quando ti riferisci a un passaggio cita la "
+            "clausola/articolo/paragrafo del documento IN PROSA (es. «la clausola 5.2 "
+            "del contratto»), mai con tag <cite/> (riservati alle norme). Se un "
+            "documento è troncato, dillo esplicitamente prima di trarre conclusioni "
+            "generali su di esso.",
+        ]
+        budget = self._DOC_PROMPT_CHARS_TOTAL
+        for row in ordered:
+            cap = min(self._DOC_PROMPT_CHARS_EACH, budget)
+            if cap <= 0:
+                parts.append(f"## {row.filename} — NON incluso: budget di contesto esaurito.")
+                continue
+            text = row.text[:cap]
+            budget -= len(text)
+            cut_notice = ""
+            if row.truncated or len(row.text) > cap:
+                cut_notice = (
+                    " (TRONCATO: il testo qui sotto non è il documento integrale)"
+                )
+            parts.append(f"## Documento: {row.filename}{cut_notice}\n{text}")
+        return "\n\n".join(parts)
 
     @staticmethod
     def _assemble_context_block(hits: list[RetrievalHit]) -> str:

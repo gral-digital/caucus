@@ -17,6 +17,32 @@ export interface ChatRequest {
   corpora?: Array<"codici" | "leggi" | "cassazione">;
   sources?: string[];
   effective_at?: string;
+  document_ids?: string[];
+}
+
+export interface UploadedDocument {
+  id: string;
+  filename: string;
+  char_count: number;
+  truncated: boolean;
+}
+
+export async function uploadDocument(file: File): Promise<UploadedDocument> {
+  const form = new FormData();
+  form.append("file", file);
+  const res = await fetch("/api/v1/documents", { method: "POST", body: form });
+  if (!res.ok) {
+    const detail = await res
+      .json()
+      .then((d) => d.detail as string)
+      .catch(() => null);
+    throw new Error(detail ?? `Upload non riuscito (${res.status})`);
+  }
+  return (await res.json()) as UploadedDocument;
+}
+
+export async function deleteDocument(id: string): Promise<void> {
+  await fetch(`/api/v1/documents/${id}`, { method: "DELETE" });
 }
 
 export interface RetrievalHitSummary {

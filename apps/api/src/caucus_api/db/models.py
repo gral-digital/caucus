@@ -280,3 +280,29 @@ class CaseLawChunk(Base):
     )
 
     case: Mapped[CaseLaw] = relationship(back_populates="chunks")
+
+
+class UserDocument(Base):
+    """Documento caricato dall'utente per l'analisi (contratto, atto, verbale).
+
+    v1: testo estratto all'upload e conservato in Postgres; il file originale
+    non viene salvato. Nessun legame con una "conversazione" persistente
+    (che ancora non esiste): il client referenzia i documenti per id nei
+    turni di chat.
+    """
+
+    __tablename__ = "user_document"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    filename: Mapped[str] = mapped_column(String(255), nullable=False)
+    media_type: Mapped[str] = mapped_column(String(128), nullable=False)
+    text: Mapped[str] = mapped_column(Text, nullable=False)
+    char_count: Mapped[int] = mapped_column(Integer, nullable=False)
+    # True se il testo è stato tagliato al cap di ingestione: il modello deve
+    # saperlo per non fingere di aver letto il documento intero.
+    truncated: Mapped[bool] = mapped_column(nullable=False, default=False)
+    # Attributo di sicurezza per la tenancy futura: popolato server-side.
+    tenant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )

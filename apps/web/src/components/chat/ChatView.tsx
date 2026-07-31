@@ -2,9 +2,12 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  deleteDocument,
   streamChat,
+  uploadDocument,
   type CitationWarnings,
   type RetrievalHitSummary,
+  type UploadedDocument,
 } from "@/lib/chatStream";
 import { CitationsPanel } from "./CitationsPanel";
 import { MessageBubble } from "./MessageBubble";
@@ -31,8 +34,30 @@ const EXAMPLES = [
 
 export function ChatView() {
   const [turns, setTurns] = useState<Turn[]>([]);
+  const [documents, setDocuments] = useState<UploadedDocument[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+
+  const attach = useCallback(async (file: File) => {
+    setUploading(true);
+    setUploadError(null);
+    try {
+      const doc = await uploadDocument(file);
+      // Restano allegati per tutta la conversazione, finché non rimossi.
+      setDocuments((docs) => [...docs.filter((d) => d.id !== doc.id), doc].slice(-3));
+    } catch (err) {
+      setUploadError(err instanceof Error ? err.message : String(err));
+    } finally {
+      setUploading(false);
+    }
+  }, []);
+
+  const detach = useCallback((id: string) => {
+    setDocuments((docs) => docs.filter((d) => d.id !== id));
+    void deleteDocument(id);
+  }, []);
 
   // Auto-scroll al nuovo messaggio
   useEffect(() => {
@@ -56,8 +81,9 @@ export function ChatView() {
       { id, question, answer: "", hits: [], status: "retrieving" },
     ]);
 
+    const document_ids = documentsRef.current.map((d) => d.id);
     try {
-      await streamChat({ question, history }, (ev) => {
+      await streamChat({ question, history, document_ids }, (ev) => {
         setTurns((prev) =>
           prev.map((turn) => {
             if (turn.id !== id) return turn;
@@ -96,6 +122,10 @@ export function ChatView() {
   useEffect(() => {
     turnsRef.current = turns;
   }, [turns]);
+  const documentsRef = useRef<UploadedDocument[]>([]);
+  useEffect(() => {
+    documentsRef.current = documents;
+  }, [documents]);
 
   const isBusy = turns.some(
     (t) => t.status === "retrieving" || t.status === "streaming",
@@ -132,7 +162,15 @@ export function ChatView() {
 
       <div className="border-t border-paper-divider/60 bg-paper">
         <div className="mx-auto max-w-3xl px-6 pb-6 pt-3">
-          <QuestionInput onAsk={ask} disabled={isBusy} />
+          <QuestionInput
+            onAsk={ask}
+            disabled={isBusy}
+            documents={documents}
+            uploading={uploading}
+            uploadError={uploadError}
+            onAttach={attach}
+            onDetach={detach}
+          />
         </div>
       </div>
     </div>
