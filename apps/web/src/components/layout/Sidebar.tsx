@@ -199,43 +199,51 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/25 p-8 backdrop-blur-[2px]"
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-paper-border bg-paper p-6 shadow-xl"
+        className="w-full max-w-4xl rounded-2xl border border-paper-border bg-paper shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Fonti del corpus"
       >
-        <div className="mb-1 flex items-start justify-between">
-          <h2 className="font-serif text-xl text-ink">Fonti del corpus</h2>
+        <div className="flex items-baseline justify-between gap-6 border-b border-paper-border/70 px-8 pb-4 pt-6">
+          <div className="flex items-baseline gap-4">
+            <h2 className="font-serif text-[22px] tracking-tight text-ink">
+              Fonti del corpus
+            </h2>
+            <span className="text-[12.5px] text-ink-subtle">
+              Testi consolidati Normattiva ed EUR-Lex · ogni citazione è verificata
+              contro queste fonti
+            </span>
+          </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Chiudi"
-            className="rounded-full p-1.5 text-ink-subtle transition hover:bg-paper-hover hover:text-ink"
+            className="-mr-2 rounded-full p-1.5 text-ink-subtle transition hover:bg-paper-hover hover:text-ink"
           >
             <X size={16} />
           </button>
         </div>
-        <p className="mb-5 text-[13px] leading-relaxed text-ink-muted">
-          Testi consolidati Normattiva e atti EUR-Lex, con filtro di vigenza; ogni
-          citazione nelle risposte è verificata contro queste fonti. In più,
-          giurisprudenza di Cassazione civile e penale (testo integrale
-          anonimizzato, corpus in crescita).
-        </p>
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+
+        <div className="grid grid-cols-2 gap-x-8 gap-y-6 px-8 py-6 md:grid-cols-4">
           {FONTI.map((group) => (
             <div key={group.label}>
-              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
-                {group.label}
+              <div className="mb-2 flex items-baseline justify-between border-b border-paper-border/60 pb-1.5">
+                <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+                  {group.label}
+                </span>
+                <span className="font-mono text-[10px] text-ink-subtle">
+                  {group.items.length}
+                </span>
               </div>
-              <ul className="flex flex-col gap-0.5">
+              <ul className="flex flex-col gap-[3px]">
                 {group.items.map((it) => (
-                  <li key={it} className="text-[13px] leading-relaxed text-ink-muted">
+                  <li key={it} className="text-[12px] leading-[1.5] text-ink-muted">
                     {it}
                   </li>
                 ))}
@@ -243,9 +251,16 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
             </div>
           ))}
         </div>
-        <p className="mt-5 border-t border-paper-border/70 pt-3 text-[11.5px] text-ink-subtle">
-          Fonti normative aggiornate ai testi vigenti al 17/04/2026.
-        </p>
+
+        <div className="flex items-center justify-between rounded-b-2xl border-t border-paper-border/70 bg-paper-panel px-8 py-3.5">
+          <span className="text-[12px] text-ink-muted">
+            + Giurisprudenza di Cassazione civile e penale — testo integrale
+            anonimizzato, corpus in crescita
+          </span>
+          <span className="text-[11.5px] text-ink-subtle">
+            Testi vigenti al 17/04/2026
+          </span>
+        </div>
       </div>
     </div>
   );

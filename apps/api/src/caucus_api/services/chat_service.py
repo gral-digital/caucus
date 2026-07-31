@@ -233,7 +233,9 @@ class ChatService:
         # Documenti allegati dall'utente (analisi documentale): entrano nel
         # contesto PRIMA del blocco normativo — sono i fatti del caso.
         if doc_rows:
-            system_content += "\n\n" + self._assemble_documents_block(doc_rows)
+            system_content += "\n\n" + self._assemble_documents_block(
+                doc_rows, question=str(request.question)
+            )
 
         if result.hits:
             system_content += "\n\n" + self._assemble_context_block(result.hits)
@@ -359,13 +361,14 @@ class ChatService:
         by_id = {row.id: row for row in rows}
         return [by_id[i] for i in doc_ids if i in by_id]
 
-    def _assemble_documents_block(self, ordered: list[Any]) -> str:
+    def _assemble_documents_block(self, ordered: list[Any], *, question: str) -> str:
         """Blocco DOCUMENTI ALLEGATI per l'analisi documentale.
 
         Il documento si cita in prosa (clausola/articolo/pagina), MAI con tag
         ``<cite/>``: quelli restano riservati alle norme del corpus, così il
         trust layer non valida mai una clausola contrattuale come se fosse
-        una fonte normativa.
+        una fonte normativa. Oltre il budget non si taglia "solo testa": si
+        selezionano i passaggi pertinenti alla domanda (document_excerpts).
         """
         parts = [
             "# DOCUMENTI ALLEGATI DAL CLIENTE (fatti del caso)",
@@ -375,18 +378,21 @@ class ChatService:
             "documento è troncato, dillo esplicitamente prima di trarre conclusioni "
             "generali su di esso.",
         ]
+        from caucus_api.services.document_excerpts import select_relevant_excerpts
+
         budget = self._DOC_PROMPT_CHARS_TOTAL
         for row in ordered:
             cap = min(self._DOC_PROMPT_CHARS_EACH, budget)
             if cap <= 0:
                 parts.append(f"## {row.filename} — NON incluso: budget di contesto esaurito.")
                 continue
-            text = row.text[:cap]
+            text, excerpted = select_relevant_excerpts(row.text, question, budget=cap)
             budget -= len(text)
             cut_notice = ""
-            if row.truncated or len(row.text) > cap:
+            if row.truncated or excerpted:
                 cut_notice = (
-                    " (TRONCATO: il testo qui sotto non è il documento integrale)"
+                    " (PARZIALE: testa del documento + passaggi pertinenti alla "
+                    "domanda; le omissioni sono marcate)"
                 )
             parts.append(f"## Documento: {row.filename}{cut_notice}\n{text}")
         return "\n\n".join(parts)
