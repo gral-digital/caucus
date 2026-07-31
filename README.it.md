@@ -32,6 +32,7 @@ adversarial e domande fuori corpus — lo stack di riferimento misura oggi:
 | Citation recall | **94%** |
 | **Citazioni allucinate** (sulle risposte che citano) | **0,0%** |
 | Rifiuto su richieste illecite | **100%** |
+| Rifiuti indebiti su domande professionali legittime | misurati (vedi benchmark) |
 
 Metodologia e regole anti-gaming: [benchmark/](benchmark/README.md).
 

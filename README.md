@@ -32,6 +32,7 @@ out-of-corpus questions — the reference stack currently measures:
 | Citation recall | **94%** |
 | **Hallucinated citations** (over citing answers) | **0.0%** |
 | Refusal on adversarial requests | **100%** |
+| Over-refusal on legitimate professional questions | measured (see benchmark) |
 
 Numbers, methodology and anti-gaming rules: [benchmark/](benchmark/README.md).
 

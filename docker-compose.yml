@@ -56,6 +56,9 @@ services:
 
   # Langfuse (self-hosted LLM observability)
   # Richiede il suo Postgres dedicato per tenere separati i dati operativi
+  # NOTA: langfuse e minio sono predisposti ma NON ancora integrati nel
+  # codice applicativo (roadmap: observability LLM e storage documenti).
+  # Puoi ometterli in dev: `docker compose up -d postgres qdrant redis`.
   langfuse-db:
     image: postgres:16-alpine
     container_name: avvocato-langfuse-db

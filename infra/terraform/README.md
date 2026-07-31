@@ -1,4 +1,14 @@
-# Terraform — infra GCP
+# Terraform (riferimento PARZIALE — non deployabile as-is)
+
+> ⚠️ **STATO (2026-07-31)**: questo modulo è un **riferimento incompleto**,
+> non un deploy funzionante, e non è mai stato applicato end-to-end.
+> Mancano almeno: il vector store (Qdrant non è nel modulo — senza di esso il
+> RAG non parte), `google_sql_user`, le `google_secret_manager_secret`, una
+> service account dedicata per il servizio web, il backend GCS per lo state e
+> l'ingress ristretto. Da trattare come traccia architetturale.
+>
+> Per provare Caucus usa lo stack locale (`make up`): è quello testato.
+> Un deploy di riferimento completo è in roadmap.
 
 Stack minimale per `avvocato-dev` e `avvocato-prod`, regione `europe-west1`.
 
