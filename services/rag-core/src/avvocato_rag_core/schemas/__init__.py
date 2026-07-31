@@ -26,21 +26,18 @@ from avvocato_rag_core.schemas.retrieval import (
 )
 
 __all__ = [
-    # citation
-    "Citation",
-    "NormCitation",
     "CaseLawCitation",
+    "Citation",
     "CitationKind",
-    # norm
-    "NormSource",
-    "NormSourceType",
-    "NormPartition",
-    "NormPartitionKind",
-    "NormComma",
     "NormChunk",
     "NormChunkKind",
-    # retrieval
-    "RetrievalQuery",
+    "NormCitation",
+    "NormComma",
+    "NormPartition",
+    "NormPartitionKind",
+    "NormSource",
+    "NormSourceType",
     "RetrievalHit",
+    "RetrievalQuery",
     "RetrievalResult",
 ]

@@ -49,7 +49,10 @@ def _make_minimal_akn(attachments: list[tuple[str, str]]) -> bytes:
         </akomaNtoso>
         """
     )
-    return xml.encode("utf-8")
+    # NB: l'interpolazione di att_xml azzera il prefisso comune, quindi il
+    # dedent non rimuove l'indentazione della prima riga: lxml rifiuta
+    # whitespace prima della dichiarazione XML. Strip esplicito.
+    return xml.strip().encode("utf-8")
 
 
 def test_parses_rubrica_between_parens():
@@ -178,3 +181,46 @@ def test_article_without_rubrica():
     # Abrogated article: rubrica None is acceptable (abrogazione non ha rubrica)
     # ma l'articolo deve comunque essere estratto
     assert art.number == "17"
+
+
+def test_article_number_slash_form():
+    """CC storico: 'art. 314/2' non deve collassare su '314'."""
+    xml = _make_minimal_akn(
+        [
+            (
+                "CODICE CIVILE-art. 314/2",
+                " Art. 314/2. \n \n ARTICOLO ABROGATO DALLA L. 4 MAGGIO 1983, N. 184.",
+            )
+        ]
+    )
+    act = NormattivaAknParser().parse_bytes(xml, short_id="cc")
+    art = act.root[0].children[0]
+    assert art.number == "314/2"
+    assert art.abrogato is True
+
+
+def test_article_number_beyond_decies():
+    """Codice Privacy: 2-undecies e 2-quaterdecies.1 non devono collassare."""
+    xml = _make_minimal_akn(
+        [
+            ("X-art. 2 undecies", " Art. 2-undecies. \n \n (Limitazioni). \n \n Testo."),
+            ("X-art. 2 quaterdecies", " Art. 2-quaterdecies. \n \n (Autorizzati). \n \n Testo."),
+        ]
+    )
+    act = NormattivaAknParser().parse_bytes(xml, short_id="cpriv")
+    nums = [a.number for a in act.root[0].children]
+    assert nums == ["2-undecies", "2-quaterdecies"]
+
+
+def test_abrogato_flag_not_set_on_vigente():
+    xml = _make_minimal_akn(
+        [
+            (
+                "CODICE CIVILE-art. 2043",
+                " Art. 2043. \n \n (Risarcimento). \n \n Qualunque fatto doloso o colposo"
+                " che menziona norme abrogate resta vigente.",
+            )
+        ]
+    )
+    act = NormattivaAknParser().parse_bytes(xml, short_id="cc")
+    assert act.root[0].children[0].abrogato is False

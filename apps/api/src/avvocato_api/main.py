@@ -5,6 +5,7 @@ Monta le route versionate sotto /api/v1 e applica middleware di base.
 
 from __future__ import annotations
 
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 import structlog
@@ -19,7 +20,7 @@ logger = structlog.get_logger(__name__)
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):  # noqa: ARG001
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001
     configure_logging()
     settings = get_settings()
     logger.info(
@@ -44,17 +45,12 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    # Dev locale: accettiamo entrambi 3000 (default Next) e 3100 (fallback se 3000 è
-    # occupato da un altro progetto). In prod: env-driven sul dominio pubblico.
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:3100",
-        "http://127.0.0.1:3000",
-        "http://127.0.0.1:3100",
-    ],
+    # Env-driven (CORS_ALLOW_ORIGINS, comma-separated). Il default in config
+    # copre il dev locale (3000/3100); in prod impostare il dominio pubblico.
+    allow_origins=[o.strip() for o in get_settings().cors_allow_origins.split(",") if o.strip()],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-API-Key"],
 )
 
 app.include_router(health.router, prefix="/api/v1", tags=["health"])

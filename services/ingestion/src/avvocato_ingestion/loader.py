@@ -1,22 +1,28 @@
 """Loader: persiste CanonicalAct → Postgres + Qdrant.
 
-Idempotente: rieseguito, fa upsert. Il criterio di idempotenza è:
-- `norm_source` per `urn` (unique key).
-- `norm_partition` per (source_id, kind, number, effective_from).
-- `norm_comma` per (partition_id, ordinal, effective_from).
+Idempotenza: delete-and-replace per fonte. Prima di caricare, il loader
+elimina tutte le partizioni esistenti della fonte (cascade su commi, chunk,
+citazioni via FK) e i punti Qdrant con payload `source == short_id`. Un re-run
+produce quindi esattamente lo stesso corpus, mai duplicati.
 
-Quando un testo cambia, il loader chiude il vecchio record con `effective_to`
-e inserisce uno nuovo con `effective_from` oggi. Questo è lo schema di
-versioning documentato in docs/DATA_MODEL.md §5.
+NB: il versioning multivigenza (chiusura del vecchio record con `effective_to`
++ insert della nuova versione, docs/DATA_MODEL.md §5) NON è ancora
+implementato: ogni load rappresenta un singolo snapshot consolidato, datato
+con `expression_date` (FRBRExpression/FRBRdate del meta AKN). Un vincolo di
+unicità su (source_id, kind, number) non è applicabile oggi: il CC contiene
+legittimamente duplicati (artt. 1-31 delle preleggi + artt. 1-31 del codice)
+finché la gerarchia resta piatta.
 """
 
 from __future__ import annotations
 
 import time
+import uuid
+from datetime import date
 from uuid import uuid4
 
 import structlog
-from sqlalchemy import select
+from sqlalchemy import delete
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -49,9 +55,7 @@ class Loader:
         skip_embeddings: bool = False,
     ) -> None:
         if not skip_embeddings and (embedder is None or vectorstore is None):
-            raise ValueError(
-                "embedder e vectorstore sono richiesti se skip_embeddings=False"
-            )
+            raise ValueError("embedder e vectorstore sono richiesti se skip_embeddings=False")
         self._s = session
         self._embedder = embedder
         self._vs = vectorstore
@@ -69,7 +73,19 @@ class Loader:
             await self._vs.ensure_collection(self._collection)
 
         source = await self._upsert_source(act)
+        await self._delete_existing(source_id=source.id, short_id=act.short_id)
         all_chunks: list[BuiltChunk] = []
+
+        # effective_from = data del consolidato (FRBRdate), NON la data storica
+        # di entrata in vigore dell'atto: il testo parsato è quello vigente
+        # alla data dello snapshot, non quello del 1942/1993.
+        effective_from = act.expression_date or act.in_force_from
+        if act.expression_date is None:
+            logger.warning(
+                "loader.no_expression_date",
+                short_id=act.short_id,
+                fallback=str(act.in_force_from),
+            )
 
         # Walk top-level: ogni partition è radice (Libri) o Articoli se semplice.
         for top in act.root:
@@ -79,7 +95,7 @@ class Loader:
                 parent_id=None,
                 parent_path=act.short_id,
                 source_short_id=act.short_id,
-                effective_from_iso=act.in_force_from.isoformat(),
+                effective_from_iso=effective_from.isoformat(),
                 effective_to_iso=act.in_force_to.isoformat() if act.in_force_to else None,
                 chunk_sink=all_chunks,
             )
@@ -100,9 +116,7 @@ class Loader:
             indexed_qdrant=not self._skip_embeddings,
         )
 
-    async def _persist_chunks_without_embeddings(
-        self, chunks: list[BuiltChunk]
-    ) -> None:
+    async def _persist_chunks_without_embeddings(self, chunks: list[BuiltChunk]) -> None:
         for chunk in chunks:
             self._s.add(
                 NormChunk(
@@ -119,6 +133,23 @@ class Loader:
         await self._s.flush()
 
     # ------------------------------------------------------------------
+
+    async def _delete_existing(self, *, source_id: uuid.UUID, short_id: str) -> None:
+        """Idempotenza: rimuove il corpus esistente della fonte prima del reload.
+
+        Postgres: delete di norm_partition (cascade FK su commi/chunk/citazioni).
+        Qdrant: delete dei punti con payload source == short_id.
+        """
+        res = await self._s.execute(
+            delete(NormPartition).where(NormPartition.source_id == source_id)
+        )
+        deleted = getattr(res, "rowcount", 0) or 0
+        if deleted:
+            logger.info("loader.replaced_existing", short_id=short_id, partitions=deleted)
+        if self._vs is not None:
+            await self._vs.delete_by_payload(
+                collection=self._collection, field="source", value=short_id
+            )
 
     async def _upsert_source(self, act: CanonicalAct) -> NormSource:
         stmt = (
@@ -151,8 +182,8 @@ class Loader:
         self,
         node: CanonicalPartition,
         *,
-        source_id,
-        parent_id,
+        source_id: uuid.UUID,
+        parent_id: uuid.UUID | None,
         parent_path: str,
         source_short_id: str,
         effective_from_iso: str,
@@ -176,12 +207,15 @@ class Loader:
             full_text=node.full_text,
             effective_from=_parse_iso(effective_from_iso),
             effective_to=_parse_iso(effective_to_iso) if effective_to_iso else None,
+            metadata_={"abrogato": True} if node.abrogato else {},
         )
+        # Niente flush per-partizione: gli id sono generati client-side (uuid4),
+        # quindi parent_id e partition_id sono già noti. Un flush ogni ~3000
+        # partizioni costava un round-trip ciascuno.
         self._s.add(partition)
-        await self._s.flush()
 
         # Commi solo per articoli
-        commi_rows: list[tuple] = []
+        commi_rows: list[tuple[uuid.UUID, str, str]] = []
         if node.kind == NormPartitionKind.ARTICOLO and node.commi:
             for idx, c in enumerate(node.commi):
                 row = NormComma(
@@ -190,7 +224,7 @@ class Loader:
                     ordinal=idx,
                     number=c.number,
                     text=c.text,
-                    letters=[dict(letter=l.letter, text=l.text) for l in c.letters]
+                    letters=[{"letter": letter.letter, "text": letter.text} for letter in c.letters]
                     if c.letters
                     else None,
                     effective_from=_parse_iso(effective_from_iso),
@@ -209,6 +243,7 @@ class Loader:
                     commi=commi_rows,
                     effective_from_iso=effective_from_iso,
                     effective_to_iso=effective_to_iso,
+                    abrogato=node.abrogato,
                 )
             )
 
@@ -236,6 +271,8 @@ class Loader:
         micro_batch = 64
         total = len(chunks)
         start_time = time.perf_counter()
+
+        assert self._embedder is not None and self._vs is not None  # guardato nel costruttore
 
         for i in range(0, total, micro_batch):
             batch = chunks[i : i + micro_batch]
@@ -283,9 +320,7 @@ class Loader:
 # ----------------------------------------------------------------------
 
 
-def _parse_iso(v: str):
-    from datetime import date
-
+def _parse_iso(v: str) -> date:
     return date.fromisoformat(v)
 
 
@@ -296,7 +331,10 @@ def _build_ltree_path(parent_path: str, node: CanonicalPartition) -> str:
     'bis/ter' in snake_case preservato.
     """
     segment = f"{node.kind.value}_{node.number}".lower()
-    segment = segment.replace("-", "_").replace(" ", "_")
+    # "/" e "." compaiono nei numeri storici ("314/2") e nei sotto-numeri
+    # ("2-quaterdecies.1"): vanno mappati a separatore esplicito, non rimossi,
+    # altrimenti "314/2" collassa su "3142".
+    segment = segment.replace("-", "_").replace(" ", "_").replace("/", "_").replace(".", "_")
     segment = "".join(ch for ch in segment if ch.isalnum() or ch == "_")
     return f"{parent_path}.{segment}"
 

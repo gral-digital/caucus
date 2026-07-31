@@ -97,9 +97,7 @@ class NormPartition(BaseModel):
         ...,
         description="ltree materialized path, es. 'cc.libro_iv.titolo_ix.capo_i.art_2043'.",
     )
-    citation: str = Field(
-        ..., description="Forma canonica display, es. 'art. 2043 c.c.'."
-    )
+    citation: str = Field(..., description="Forma canonica display, es. 'art. 2043 c.c.'.")
     rubrica: str | None = None
     full_text: str | None = Field(
         None, description="Testo completo; popolato solo per partizioni foglia (articoli)."

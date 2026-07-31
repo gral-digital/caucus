@@ -5,6 +5,18 @@ description = "Piattaforma AI enterprise per il settore legale italiano"
 readme = "README.md"
 requires-python = ">=3.12"
 
+[dependency-groups]
+# Toolchain condivisa: la CI esegue `uv run ruff|mypy|pytest`, che senza
+# queste dipendenze fallirebbe con "Failed to spawn".
+dev = [
+    "ruff>=0.8",
+    "mypy>=1.13",
+    "pytest>=8.3",
+    "pytest-asyncio>=0.25",
+    "pytest-cov>=6.0",
+    "respx>=0.22",
+]
+
 [tool.uv.workspace]
 members = [
     "apps/api",
@@ -39,12 +51,25 @@ select = [
 ]
 ignore = ["E501"]  # line too long — handled by formatter
 
+[tool.ruff.lint.per-file-ignores]
+# FastAPI: Depends() nei default degli argomenti è l'idioma standard.
+"apps/api/**" = ["B008"]
+
+[tool.ruff.lint.isort]
+known-first-party = [
+    "avvocato_api",
+    "avvocato_ingestion",
+    "avvocato_indexer",
+    "avvocato_rag_core",
+]
+
 [tool.ruff.format]
 quote-style = "double"
 
 [tool.mypy]
 python_version = "3.12"
 strict = true
+plugins = ["pydantic.mypy"]
 warn_return_any = true
 warn_unused_configs = true
 ignore_missing_imports = true

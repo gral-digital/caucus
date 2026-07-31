@@ -37,14 +37,29 @@ app = typer.Typer(
 FIXTURE_DIR = Path("data/fixtures/normattiva")
 
 
+# Nomi storici che non seguono il pattern codice_{short_id}_*.akn.xml.
+_LEGACY_FIXTURE_PREFIX = {"cc": "codice_civile", "cp": "codice_penale"}
+
+
 def _fixture_path(short_id: str) -> Path:
-    mapping = {
-        "cc": "codice_civile_20260417.akn.xml",
-        "cp": "codice_penale_20260417.akn.xml",
-        "cpc": "codice_procedura_civile_20260417.akn.xml",
-        "cpp": "codice_procedura_penale_20260417.akn.xml",
-    }
-    return FIXTURE_DIR / mapping[short_id]
+    """Trova la fixture più recente per una fonte del catalogo.
+
+    Pattern: ``codice_{short_id}_YYYYMMDD.akn.xml`` (cc/cp usano i nomi storici
+    ``codice_civile_*`` / ``codice_penale_*``). Con più snapshot, vince il più
+    recente (ordinamento lessicografico della data nel nome).
+    """
+    if short_id not in CODICI_CATALOG:
+        raise typer.BadParameter(
+            f"Fonte sconosciuta: {short_id!r}. Valori validi: {', '.join(sorted(CODICI_CATALOG))}"
+        )
+    prefix = _LEGACY_FIXTURE_PREFIX.get(short_id, f"codice_{short_id}")
+    candidates = sorted(FIXTURE_DIR.glob(f"{prefix}_*.akn.xml"))
+    if not candidates:
+        raise typer.BadParameter(
+            f"Nessuna fixture per {short_id!r} in {FIXTURE_DIR}. "
+            f"Esegui `avvocato-ingest fetch -c {short_id}`."
+        )
+    return candidates[-1]
 
 
 # ----------------------------------------------------------------------
@@ -53,7 +68,10 @@ def _fixture_path(short_id: str) -> Path:
 @app.command("fetch")
 def cmd_fetch(
     codice: Annotated[
-        str, typer.Option("--codice", "-c", help="cc | cp | cpc | cpp")
+        str,
+        typer.Option(
+            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ... — vedi CODICI_CATALOG)"
+        ),
     ],
     output: Annotated[
         Path, typer.Option("--output", "-o", help="Destinazione XML (file o cartella)")
@@ -85,7 +103,12 @@ async def _run_fetch(codice: str, output: Path) -> None:
 
 @app.command("parse")
 def cmd_parse(
-    codice: Annotated[str, typer.Option("--codice", "-c", help="cc | cp | cpc | cpp")],
+    codice: Annotated[
+        str,
+        typer.Option(
+            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ... — vedi CODICI_CATALOG)"
+        ),
+    ],
     xml_path: Annotated[
         Path | None,
         typer.Option("--xml", help="Path al file AKN XML (default: fixture repo)"),
@@ -118,7 +141,12 @@ def cmd_parse(
 
 @app.command("ingest")
 def cmd_ingest(
-    codice: Annotated[str, typer.Option("--codice", "-c", help="cc | cp | cpc | cpp")],
+    codice: Annotated[
+        str,
+        typer.Option(
+            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ... — vedi CODICI_CATALOG)"
+        ),
+    ],
     from_fixture: Annotated[
         bool,
         typer.Option(
@@ -164,29 +192,14 @@ async def _run_ingest(codice: str, from_fixture: bool, skip_embeddings: bool) ->
 
     # Import locali per mantenere la CLI veloce per `parse`.
     from avvocato_ingestion.loader import Loader
-    from avvocato_rag_core.embeddings.base import EmbeddingProvider
+    from avvocato_rag_core.embeddings.factory import create_embedding_provider
     from avvocato_rag_core.vectorstore.qdrant_store import QdrantStore
 
-    embedder: EmbeddingProvider | None = None
-    vectorstore: QdrantStore | None = None
+    embedder = None
+    vectorstore = None
 
     if not skip_embeddings:
-        backend = settings.embedding_backend.lower()
-        if backend == "ollama":
-            from avvocato_rag_core.embeddings.ollama import OllamaEmbeddingProvider
-
-            embedder = OllamaEmbeddingProvider(
-                base_url=settings.ollama_base_url,
-                model=settings.ollama_embedding_model,
-                dense_dim=settings.embedding_dim,
-            )
-        elif backend == "local":
-            from avvocato_rag_core.embeddings.local import LocalBGEM3Provider
-
-            embedder = LocalBGEM3Provider(model_name=settings.embedding_model)
-        else:
-            raise RuntimeError(f"Unsupported embedding backend for CLI: {backend!r}")
-
+        embedder = create_embedding_provider(settings)
         vectorstore = QdrantStore(
             url=settings.qdrant_url,
             api_key=settings.qdrant_api_key,

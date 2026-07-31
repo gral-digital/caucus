@@ -10,8 +10,10 @@ from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
-from avvocato_api.db import Base  # noqa: F401
-from avvocato_api.db import models  # noqa: F401 — registra i modelli
+from avvocato_api.db import (
+    Base,
+    models,  # noqa: F401 — registra i modelli
+)
 from avvocato_rag_core.config import get_settings
 
 config = context.config

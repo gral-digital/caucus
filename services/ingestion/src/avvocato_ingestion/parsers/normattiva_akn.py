@@ -44,10 +44,10 @@ from __future__ import annotations
 
 import hashlib
 import re
+from collections.abc import Iterator
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
-from typing import Iterator
 
 import structlog
 from lxml import etree
@@ -256,17 +256,64 @@ CODICI_CATALOG: dict[str, CodiceInfo] = {
 # Regex
 # ---------------------------------------------------------------------------
 
-# "art. 2043" oppure "art. 2043-bis" oppure "2043 bis"
+# Suffissi latini degli articoli. L'ordine conta: le forme composte devono
+# precedere i loro prefissi (quaterdecies prima di quater, ecc.), altrimenti
+# la alternation si ferma al match più corto ("2-quaterdecies" → "2-quater").
+# Normattiva usa anche forme spezzate da trattino ("2-sex-decies",
+# "2-septies-decies"): le gestiamo permettendo il concatenamento di più
+# suffissi separati da trattino/spazio.
+_LATIN_WORD = (
+    r"(?:sexiesdecies|septiesdecies|octiesdecies|noviesdecies|quinquiesdecies"
+    r"|quaterdecies|terdecies|duodecies|undecies|quindecies|sedecies"
+    r"|duodevicies|undevicies|vicies|semel"
+    r"|quinquies|quater|sexies|septies|octies|novies|nonies|decies|sex|ter|bis)"
+)
+# Suffisso completo: una o più parole latine concatenate ("sex-decies"),
+# con eventuale sotto-numero puntato ("quaterdecies.1").
+_LATIN_SUFFIX = rf"(?:{_LATIN_WORD}(?:[-\s]{_LATIN_WORD})*(?:\.[0-9]+)?)"
+
+# Numero articolo: base + opzionale forma slash ("314/2", numerazione storica
+# CC su adozione) + opzionale suffisso latino.
+_ART_NUM_BODY = rf"[0-9]+(?:/[0-9]+)?(?:[-\s]?{_LATIN_SUFFIX})?"
+
+# "art. 2043" oppure "art. 2043-bis" oppure "2043 bis" oppure "art. 314/2".
+# Alcune fonti (es. CCP) scrivono "Articolo 1." per esteso nel <num>.
 _ARTICLE_NUM_RE = re.compile(
-    r"art\.\s*([0-9]+(?:[-\s]?(?:bis|ter|quater|quinquies|sexies|septies|octies|novies|decies))?)",
+    rf"art(?:icolo)?\.?\s*({_ART_NUM_BODY})",
     re.IGNORECASE,
 )
 
 # Una linea "Art. 2043." a inizio testo (preceduta da opt. whitespace)
 _ART_HEADER_RE = re.compile(
-    r"^\s*Art\.?\s*([0-9]+(?:[-\s]?(?:bis|ter|quater|quinquies|sexies|septies|octies|novies|decies))?)\s*\.?\s*",
+    rf"^\s*Art\.?\s*({_ART_NUM_BODY})\s*\.?\s*",
     re.IGNORECASE,
 )
+
+# Forme spezzate di Normattiva → forma canonica di citazione.
+_SUFFIX_ALIASES = {
+    "sex-decies": "sexiesdecies",
+    "sexies-decies": "sexiesdecies",
+    "septies-decies": "septiesdecies",
+    "octies-decies": "octiesdecies",
+    "novies-decies": "noviesdecies",
+    "quater-decies": "quaterdecies",
+    "quinquies-decies": "quinquiesdecies",
+    "ter-decies": "terdecies",
+    "duo-decies": "duodecies",
+    "un-decies": "undecies",
+}
+
+
+def _normalize_article_number(raw: str) -> str:
+    """Normalizza un numero articolo: "2043 bis" → "2043-bis", "2-sex-decies" → "2-sexiesdecies"."""
+    num = re.sub(r"\s+", "-", raw.strip()).lower()
+    m = re.match(r"^([0-9]+(?:/[0-9]+)?)-(.+?)(\.[0-9]+)?$", num)
+    if m:
+        base, suffix, sub = m.group(1), m.group(2), m.group(3) or ""
+        suffix = _SUFFIX_ALIASES.get(suffix, suffix)
+        num = f"{base}-{suffix}{sub}"
+    return num
+
 
 # Rubrica modificata: "(( (Rubrica). ))" con doppie parentesi da aggiornamento.
 _RUBRICA_MOD_RE = re.compile(
@@ -291,13 +338,25 @@ _AGGIORNAMENTO_SEP_RE = re.compile(
 # Split commi: numerazione all'inizio di linea/blocco "N. " oppure "Nbis. "
 _COMMA_NUM_RE = re.compile(
     r"(?:^|\n\s*\n)\s*"
-    r"([0-9]+(?:[-\s]?(?:bis|ter|quater|quinquies|sexies|septies|octies|novies|decies))?)"
+    rf"([0-9]+(?:[-\s]?{_LATIN_SUFFIX})?)"
     r"\s*\.\s+",
     re.IGNORECASE,
 )
 
 # Lettere dentro un comma: " a) " " b) "
 _LETTER_RE = re.compile(r"(?:^|\n\s*|\s+)([a-z])\)\s+", re.IGNORECASE)
+
+# Articolo abrogato/soppresso: Normattiva lo rende in MAIUSCOLO a inizio testo
+# ("ARTICOLO ABROGATO DALLA L. ...", "COMMA SOPPRESSO..."). Match case-sensitive
+# e ancorato ai primi caratteri per non marcare articoli vigenti che *parlano*
+# di abrogazioni.
+_ABROGATO_RE = re.compile(r"^.{0,40}?\b(ABROGAT|SOPPRESS)", re.DOTALL)
+
+
+def _detect_abrogato(text: str | None) -> bool:
+    if not text:
+        return False
+    return _ABROGATO_RE.search(text.strip()) is not None
 
 
 # ---------------------------------------------------------------------------
@@ -333,10 +392,12 @@ class NormattivaAknParser:
 
         tree = etree.fromstring(xml_bytes)
         articles = list(self._iter_articles(tree))
+        expression_date = self._extract_expression_date(tree)
         logger.info(
             "akn.parsed",
             short_id=short_id,
             articles=len(articles),
+            expression_date=str(expression_date),
             size_bytes=len(xml_bytes),
         )
 
@@ -361,10 +422,31 @@ class NormattivaAknParser:
             issued_at=info.issued_at,
             in_force_from=info.in_force_from,
             in_force_to=None,
+            expression_date=expression_date,
             source_url=f"https://www.normattiva.it/uri-res/N2Ls?{info.urn}",
             source_hash=hashlib.sha256(xml_bytes).hexdigest(),
             root=[root],
         )
+
+    @staticmethod
+    def _extract_expression_date(tree: etree._Element) -> date | None:
+        """Data di consolidamento dal meta AKN dell'atto (FRBRExpression/FRBRdate).
+
+        Cerca prima nel meta dell'<act> (non in quelli degli attachment, che
+        possono divergere). Formato atteso: date="YYYY-MM-DD".
+        """
+        for xpath in (
+            ".//a:act/a:meta/a:identification/a:FRBRExpression/a:FRBRdate",
+            ".//a:FRBRExpression/a:FRBRdate",
+        ):
+            el = tree.find(xpath, _NS)
+            if el is not None:
+                raw = el.get("date", "")
+                try:
+                    return date.fromisoformat(raw)
+                except ValueError:
+                    logger.warning("akn.bad_expression_date", raw=raw)
+        return None
 
     # ------------------------------------------------------------------
     # Article extraction
@@ -399,14 +481,31 @@ class NormattivaAknParser:
         #
         # Formato B (canonico) è usato dai decreti moderni: articles in body
         # sono centinaia, attachments pochi o nessuno (o solo allegati tecnici).
+        # ATTENZIONE: gli attachment possono essere anche gli ALLEGATI tecnici
+        # dell'atto (es. CCP: "Allegati - Allegato I.01 art. 1"), i cui nomi
+        # matchano comunque "art. N". Contarli come articoli farebbe scartare
+        # il corpo vero del codice (bug storico: il CCP veniva indicizzato con
+        # i soli allegati). Escludiamo dal conteggio i doc il cui nome contiene
+        # "allegato".
         attachment_articles = sum(
             1
             for att in attachments
             if (doc := att.find("a:doc", _NS)) is not None
             and _ARTICLE_NUM_RE.search(doc.get("name", ""))
+            and "allegato" not in doc.get("name", "").lower()
         )
 
-        use_attachments = attachment_articles >= max(10, len(articles_b))
+        # Decisione:
+        # - body vuoto → formato A se ci sono attachment-articolo (anche uno solo);
+        # - body con pochi articoli (il regio decreto di approvazione dei codici
+        #   storici ne ha 2-3) → formato A se gli attachment-articolo dominano;
+        # - body con molti articoli canonici → è sempre il corpo autorevole.
+        if not articles_b:
+            use_attachments = attachment_articles > 0
+        elif len(articles_b) <= 10:
+            use_attachments = attachment_articles >= max(10, len(articles_b))
+        else:
+            use_attachments = False
         if use_attachments:
             for att in attachments:
                 doc = att.find("a:doc", _NS)
@@ -423,9 +522,7 @@ class NormattivaAknParser:
             if parsed is not None:
                 yield parsed
 
-    def _parse_article_canonical(
-        self, article: etree._Element
-    ) -> CanonicalPartition | None:
+    def _parse_article_canonical(self, article: etree._Element) -> CanonicalPartition | None:
         """Parsa un <article> AKN canonico con <num>/<heading>/<paragraph>."""
         num_el = article.find("a:num", _NS)
         if num_el is None:
@@ -435,29 +532,40 @@ class NormattivaAknParser:
         m = _ARTICLE_NUM_RE.search(num_text)
         if not m:
             return None
-        num = re.sub(r"\s+", "-", m.group(1).strip()).lower()
+        num = _normalize_article_number(m.group(1))
 
-        # Rubrica nativa: <heading> (opzionalmente tra parentesi)
+        # Rubrica nativa: <heading> (opzionalmente tra parentesi, con eventuali
+        # marcatori di modifica "(( (Oggetto). ))" da rimuovere PRIMA di
+        # spogliare le parentesi esterne — uno strip("().") ingenuo si ferma
+        # sugli spazi interni e lascia rubriche sporche tipo "(Oggetto).").
         heading_el = article.find("a:heading", _NS)
         rubrica: str | None = None
         if heading_el is not None:
             raw_heading = "".join(heading_el.itertext()).strip()
-            # Rimuovi parentesi e punto finale: "(Guida sotto l'influenza dell'alcool)." → "Guida sotto l'influenza dell'alcool"
-            rubrica = raw_heading.strip("().").strip()
-            rubrica = self._cleanup_rubrica(rubrica) if rubrica else None
+            raw_heading = self._clean_markers(raw_heading)
+            paren = re.match(r"^\((.*)\)\s*\.?\s*$", raw_heading, re.DOTALL)
+            if paren:
+                raw_heading = paren.group(1)
+            rubrica = self._cleanup_rubrica(raw_heading.strip(" .")) or None
 
-        # Commi: <paragraph> ripetuti, ciascuno con <num> e <content>
+        # Commi: <paragraph> ripetuti. Il testo può stare in <content> diretto
+        # oppure — per i commi a elenco (definizioni, requisiti, esclusioni) —
+        # in <list><intro>…<point>…. Saltare i paragraph senza <content>
+        # significherebbe perdere interi commi (misurato: fino al 17% del testo
+        # su TU Sicurezza/CCP/TUF), quindi in fallback estraiamo tutto il testo
+        # del paragraph escluso il suo <num>.
         commi: list[CanonicalComma] = []
         for p in article.findall("a:paragraph", _NS):
             pn = p.find("a:num", _NS)
             pc = p.find("a:content", _NS)
-            if pc is None:
-                continue
             # num: "1." → "1", "1-bis." → "1-bis"
             num_raw = (pn.text or "").strip() if pn is not None else ""
             comma_num = re.sub(r"\.\s*$", "", num_raw).strip() or str(len(commi) + 1)
             comma_num = re.sub(r"\s+", "-", comma_num).lower()
-            text = "".join(pc.itertext()).strip()
+            if pc is not None:
+                text = "".join(pc.itertext()).strip()
+            else:
+                text = self._paragraph_body_text(p, exclude=pn)
             text = self._clean_markers(text)
             if text:
                 commi.append(
@@ -485,6 +593,7 @@ class NormattivaAknParser:
             label=f"art. {num}",
             rubrica=rubrica,
             full_text=full_text,
+            abrogato=_detect_abrogato(full_text),
             commi=commi,
         )
 
@@ -509,10 +618,10 @@ class NormattivaAknParser:
         rubrica, body = self._split_rubrica(vigente_text, num)
         commi = self._split_commi(body)
         full_text = self._clean_markers(vigente_text)
-
-        metadata = {"source": "normattiva"}
-        if aggiornamenti_text:
-            metadata["aggiornamenti"] = self._clean_markers(aggiornamenti_text)
+        # NB: aggiornamenti_text (note storiche) è volutamente escluso dal
+        # testo indicizzato; CanonicalPartition non ha ancora un campo metadata
+        # per conservarlo (TODO fase multivigenza).
+        del aggiornamenti_text
 
         return CanonicalPartition(
             kind=NormPartitionKind.ARTICOLO,
@@ -520,6 +629,7 @@ class NormattivaAknParser:
             label=f"art. {num}",
             rubrica=rubrica,
             full_text=full_text,
+            abrogato=_detect_abrogato(full_text),
             commi=commi,
         )
 
@@ -548,15 +658,33 @@ class NormattivaAknParser:
                 parts.append(t)
         return "".join(parts)
 
+    @staticmethod
+    def _paragraph_body_text(p: etree._Element, *, exclude: etree._Element | None) -> str:
+        """Testo di un <paragraph> escludendo il suo <num>.
+
+        Usato per i commi senza <content> diretto (es. <list> con <intro> e
+        <point>): itertext() sui figli preserva intro, lettere "a)" (che vivono
+        nei <num> dei <point>) e testo dei punti, nell'ordine del documento.
+        """
+        parts: list[str] = []
+        if p.text:
+            parts.append(p.text)
+        for child in p:
+            if exclude is not None and child is exclude:
+                if child.tail:
+                    parts.append(child.tail)
+                continue
+            parts.append(" ".join(t for t in child.itertext() if t))
+            if child.tail:
+                parts.append(child.tail)
+        return " ".join(s for s in (part.strip() for part in parts) if s)
+
     def _extract_article_number(self, attachment_name: str) -> str | None:
         """Estrae il numero dall'attribute `name` dell'attachment."""
         m = _ARTICLE_NUM_RE.search(attachment_name)
         if not m:
             return None
-        raw = m.group(1).strip()
-        # Normalizza spaziatura: "2043 bis" → "2043-bis"
-        raw = re.sub(r"\s+", "-", raw)
-        return raw.lower()
+        return _normalize_article_number(m.group(1))
 
     def _split_rubrica(self, text: str, article_num: str) -> tuple[str | None, str]:
         """Separa la rubrica dall'articolo.
@@ -695,9 +823,7 @@ class NormattivaAknParser:
             )
         ]
 
-    def _commi_from_matches(
-        self, body: str, matches: list[re.Match[str]]
-    ) -> list[CanonicalComma]:
+    def _commi_from_matches(self, body: str, matches: list[re.Match[str]]) -> list[CanonicalComma]:
         commi: list[CanonicalComma] = []
         for i, m in enumerate(matches):
             number = m.group(1).strip().lower().replace(" ", "-")

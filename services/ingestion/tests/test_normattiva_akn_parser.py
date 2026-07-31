@@ -15,9 +15,7 @@ import pytest
 from avvocato_ingestion.parsers.normattiva_akn import NormattivaAknParser
 from avvocato_rag_core.schemas.norm import NormPartitionKind
 
-FIXTURE_DIR = (
-    Path(__file__).resolve().parents[3] / "data" / "fixtures" / "normattiva"
-)
+FIXTURE_DIR = Path(__file__).resolve().parents[3] / "data" / "fixtures" / "normattiva"
 
 CC_XML = FIXTURE_DIR / "codice_civile_20260417.akn.xml"
 CP_XML = FIXTURE_DIR / "codice_penale_20260417.akn.xml"
@@ -118,7 +116,7 @@ def test_cp_total_article_count(cp_articles):
     [
         ("575", "omicidio"),
         ("612-bis", "atti persecutori"),
-        ("416-bis", "mafiosa"),
+        ("416-bis", "mafioso"),
         ("110", "concorrono nel reato"),
         ("640", "truffa"),
         ("56", "delitto tentato"),
@@ -139,9 +137,7 @@ def test_cp_rubrica_coverage_on_active_articles(cp_articles):
     active = [a for a in cp_articles if not _is_abrogato(a.full_text or "")]
     with_rubrica = [a for a in active if a.rubrica]
     coverage = len(with_rubrica) / len(active)
-    assert coverage >= 0.85, (
-        f"CP rubrica coverage: {coverage:.1%} su {len(active)} articoli attivi"
-    )
+    assert coverage >= 0.85, f"CP rubrica coverage: {coverage:.1%} su {len(active)} articoli attivi"
 
 
 # ---------------------------------------------------------------------------
@@ -166,6 +162,7 @@ def test_no_duplicate_article_numbers(cc_articles):
     # che nel CC proper — è corretto. Verifichiamo solo che non ci siano
     # duplicati TOTALI esagerati.
     from collections import Counter
+
     dups = [n for n, c in Counter(numbers).items() if c > 2]
     assert not dups, f"Articoli con più di 2 occorrenze: {dups}"
 

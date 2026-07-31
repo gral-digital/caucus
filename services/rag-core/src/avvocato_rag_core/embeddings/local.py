@@ -71,7 +71,7 @@ class LocalBGEM3Provider(EmbeddingProvider):
         import asyncio
 
         def _encode() -> dict[str, Any]:
-            return model.encode(
+            return model.encode(  # type: ignore[no-any-return]
                 list(texts),
                 batch_size=self._batch_size,
                 max_length=self._max_length,
@@ -86,7 +86,7 @@ class LocalBGEM3Provider(EmbeddingProvider):
 
         vectors: list[EmbeddingVector] = []
         for dense, sparse in zip(dense_vecs, sparse_vecs, strict=True):
-            indices = [int(k) for k in sparse.keys()]
+            indices = [int(k) for k in sparse]
             values = [float(v) for v in sparse.values()]
             vectors.append(
                 EmbeddingVector(

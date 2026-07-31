@@ -10,7 +10,6 @@ from datetime import date, datetime
 from typing import Any
 
 from sqlalchemy import (
-    JSON,
     CheckConstraint,
     Computed,
     Date,
@@ -32,9 +31,7 @@ from avvocato_api.db.base import Base
 class NormSource(Base):
     __tablename__ = "norm_source"
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     urn: Mapped[str] = mapped_column(String(256), unique=True, nullable=False)
     short_id: Mapped[str] = mapped_column(String(64), unique=True, nullable=False)
     title: Mapped[str] = mapped_column(Text, nullable=False)
@@ -58,7 +55,7 @@ class NormSource(Base):
         nullable=False,
     )
 
-    partitions: Mapped[list["NormPartition"]] = relationship(back_populates="source")
+    partitions: Mapped[list[NormPartition]] = relationship(back_populates="source")
 
 
 class NormPartition(Base):
@@ -78,9 +75,7 @@ class NormPartition(Base):
         ),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     source_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("norm_source.id", ondelete="CASCADE"), nullable=False
     )
@@ -104,13 +99,13 @@ class NormPartition(Base):
     )
 
     source: Mapped[NormSource] = relationship(back_populates="partitions")
-    parent: Mapped["NormPartition | None"] = relationship(
+    parent: Mapped[NormPartition | None] = relationship(
         remote_side="NormPartition.id", back_populates="children"
     )
-    children: Mapped[list["NormPartition"]] = relationship(
+    children: Mapped[list[NormPartition]] = relationship(
         back_populates="parent", cascade="all, delete-orphan"
     )
-    commi: Mapped[list["NormComma"]] = relationship(
+    commi: Mapped[list[NormComma]] = relationship(
         back_populates="partition", cascade="all, delete-orphan"
     )
 
@@ -126,9 +121,7 @@ class NormComma(Base):
         ),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     partition_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("norm_partition.id", ondelete="CASCADE"),
@@ -151,9 +144,7 @@ class NormCitation(Base):
         Index("ix_norm_citation_to", "to_partition_id"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     from_partition_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("norm_partition.id", ondelete="CASCADE"),
@@ -191,9 +182,7 @@ class NormChunk(Base):
         Index("ix_norm_chunk_partition", "partition_id"),
     )
 
-    id: Mapped[uuid.UUID] = mapped_column(
-        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
-    )
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     partition_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True),
         ForeignKey("norm_partition.id", ondelete="CASCADE"),

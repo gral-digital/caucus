@@ -11,11 +11,11 @@ from __future__ import annotations
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 
-from avvocato_api.deps import get_corpus_map, get_llm_router, get_vectorstore  # noqa: F401
+from avvocato_api.deps import rate_limit, require_api_auth
 from avvocato_api.services.search_service import SearchService
 from avvocato_rag_core.schemas.retrieval import RetrievalQuery, RetrievalResult
 
-router = APIRouter()
+router = APIRouter(dependencies=[Depends(require_api_auth), Depends(rate_limit)])
 
 
 class SearchRequest(BaseModel):
@@ -32,5 +32,9 @@ async def search(
     service: SearchService = Depends(SearchService.factory),
 ) -> SearchResponse:
     """Retrieval hybrid + (opzionale) rerank. Nessuna generazione LLM."""
-    result = await service.search(body.query)
+    # tenant_id è un attributo di sicurezza: NON deve mai arrivare dal client
+    # (IDOR pronto all'uso il giorno in cui l'indice contiene dati tenant).
+    # Verrà popolato server-side dal contesto auth quando esisterà la tenancy.
+    query = body.query.model_copy(update={"tenant_id": None})
+    result = await service.search(query)
     return SearchResponse(result=result)

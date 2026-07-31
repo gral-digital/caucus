@@ -8,7 +8,6 @@ layer di persistenza.
 from __future__ import annotations
 
 from datetime import date
-from typing import Self
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -41,12 +40,16 @@ class CanonicalPartition(BaseModel):
     label: str
     rubrica: str | None = None
     full_text: str | None = None
+    # True se il testo indica abrogazione/soppressione: l'articolo resta nel
+    # corpus (serve per la storia e per rispondere "è stato abrogato"), ma il
+    # retrieval può filtrarlo/penalizzarlo.
+    abrogato: bool = False
     commi: list[CanonicalComma] = Field(default_factory=list)
-    children: list["CanonicalPartition"] = Field(default_factory=list)
+    children: list[CanonicalPartition] = Field(default_factory=list)
 
-    def walk(self) -> list[Self]:
+    def walk(self) -> list[CanonicalPartition]:
         """Ritorna flat tree (DFS)."""
-        out: list[Self] = [self]
+        out: list[CanonicalPartition] = [self]
         for c in self.children:
             out.extend(c.walk())
         return out
@@ -64,6 +67,11 @@ class CanonicalAct(BaseModel):
     issued_at: date
     in_force_from: date
     in_force_to: date | None = None
+    # Data dell'espressione consolidata (FRBRExpression/FRBRdate del meta AKN):
+    # il testo parsato è "vigente a questa data". Da usare come effective_from
+    # delle partizioni — usare in_force_from (data storica dell'atto) farebbe
+    # affermare che il testo consolidato di oggi era vigente decenni fa.
+    expression_date: date | None = None
     source_url: str | None = None
     source_hash: str | None = None
     root: list[CanonicalPartition]

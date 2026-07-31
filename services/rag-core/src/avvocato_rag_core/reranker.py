@@ -9,8 +9,10 @@ direttamente gli score hybrid di Qdrant (RRF).
 
 from __future__ import annotations
 
+import re
 from abc import ABC, abstractmethod
 from collections.abc import Sequence
+from typing import Any
 
 import structlog
 
@@ -54,9 +56,9 @@ class LocalBGEReranker(Reranker):
         self._device = device
         self._use_fp16 = use_fp16
         self._batch_size = batch_size
-        self._model = None
+        self._model: Any = None
 
-    def _lazy_load(self):
+    def _lazy_load(self) -> Any:
         if self._model is None:
             from FlagEmbedding import FlagReranker
 
@@ -77,11 +79,10 @@ class LocalBGEReranker(Reranker):
         pairs = [[query, h.text] for h in hits]
 
         def _score() -> list[float]:
-            return model.compute_score(pairs, normalize=True, batch_size=self._batch_size)
+            raw = model.compute_score(pairs, normalize=True, batch_size=self._batch_size)
+            return [float(x) for x in raw] if isinstance(raw, list) else [float(raw)]
 
         scores = await asyncio.to_thread(_score)
-        if not isinstance(scores, list):
-            scores = [scores]
 
         reranked = [
             h.model_copy(update={"score_rerank": float(s), "score_final": float(s)})
@@ -90,3 +91,122 @@ class LocalBGEReranker(Reranker):
         reranked.sort(key=lambda h: h.score_final, reverse=True)
         logger.info("rerank_done", total=len(reranked), kept=top_k)
         return reranked[:top_k]
+
+
+class KeywordBoostReranker(Reranker):
+    """Reranker leggero senza ML: overlap lessicale + disambiguazione rubriche."""
+
+    _NEGATIVE_PAIRS: tuple[tuple[str, str], ...] = (
+        ("volontario", "colposo"),
+        ("volontaria", "colposo"),
+        ("dolo", "colposo"),
+        ("extracontrattuale", "contrattuale"),
+    )
+
+    async def rerank(
+        self, query: str, hits: Sequence[RetrievalHit], top_k: int
+    ) -> list[RetrievalHit]:
+        if not hits:
+            return []
+
+        q_tokens = set(_tokenize(query))
+        scored: list[tuple[float, RetrievalHit]] = []
+
+        for hit in hits:
+            text = hit.text.lower()
+            tokens = set(_tokenize(text))
+            overlap = len(q_tokens & tokens) / max(len(q_tokens), 1)
+
+            boost = 0.0
+            if hit.metadata.get("lookup") == "direct":
+                boost += 3.0
+            elif hit.metadata.get("lookup") == "fts":
+                boost += 1.0
+
+            rubrica = _extract_rubrica(text)
+            if rubrica:
+                rub_tokens = set(_tokenize(rubrica))
+                boost += 0.5 * len(q_tokens & rub_tokens) / max(len(q_tokens), 1)
+
+            penalty = 0.0
+            for pos, neg in self._NEGATIVE_PAIRS:
+                if pos in query.lower() and neg in text:
+                    penalty += 2.0
+
+            # Articoli abrogati: restano nel corpus (per rispondere "è stato
+            # abrogato?") ma non devono battere le norme vigenti.
+            if hit.metadata.get("abrogato"):
+                penalty += 1.5
+
+            final = overlap + boost - penalty + 0.1 * hit.score_final
+            scored.append(
+                (final, hit.model_copy(update={"score_rerank": final, "score_final": final}))
+            )
+
+        scored.sort(key=lambda x: x[0], reverse=True)
+        logger.info("keyword_rerank.done", total=len(hits), kept=top_k)
+        return [h for _, h in scored[:top_k]]
+
+
+class CohereReranker(Reranker):
+    """Cross-encoder Cohere rerank-multilingual-v3.0 (SaaS, no GPU locale)."""
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str = "rerank-multilingual-v3.0",
+    ) -> None:
+        self._api_key = api_key
+        self._model = model
+
+    async def rerank(
+        self, query: str, hits: Sequence[RetrievalHit], top_k: int
+    ) -> list[RetrievalHit]:
+        if not hits:
+            return []
+
+        import httpx
+
+        docs = [h.text or " " for h in hits]
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                "https://api.cohere.com/v1/rerank",
+                headers={
+                    "Authorization": f"Bearer {self._api_key}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": self._model,
+                    "query": query,
+                    "documents": docs,
+                    "top_n": min(top_k, len(hits)),
+                },
+            )
+            resp.raise_for_status()
+            data = resp.json()
+
+        by_idx = {r["index"]: float(r["relevance_score"]) for r in data["results"]}
+        reranked = [
+            h.model_copy(
+                update={
+                    "score_rerank": by_idx[i],
+                    "score_final": by_idx[i],
+                }
+            )
+            for i, h in enumerate(hits)
+            if i in by_idx
+        ]
+        reranked.sort(key=lambda h: h.score_final, reverse=True)
+        logger.info("cohere_rerank.done", total=len(hits), kept=len(reranked))
+        return reranked[:top_k]
+
+
+def _tokenize(text: str) -> list[str]:
+    return [t for t in re.findall(r"[a-zà-ù0-9]+", text.lower()) if len(t) > 2]
+
+
+def _extract_rubrica(text: str) -> str | None:
+    # Il chunker scrive "[Rubrica] <testo>" (parentesi QUADRE — chunker.py).
+    m = re.search(r"\[Rubrica\]\s*([^\n]+)", text, re.I)
+    return m.group(1).strip() if m else None

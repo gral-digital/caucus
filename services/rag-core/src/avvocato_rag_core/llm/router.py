@@ -54,7 +54,7 @@ class LLMRouter:
         self._extra = extra_params or {}
 
         litellm.drop_params = True  # compatibilità tra provider con schema differenti
-        litellm.set_verbose = False
+        litellm.set_verbose = False  # type: ignore[attr-defined]
 
     async def chat(
         self,

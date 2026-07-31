@@ -42,6 +42,7 @@ def build_chunks(
     commi: list[tuple[UUID, str, str]],
     effective_from_iso: str,
     effective_to_iso: str | None = None,
+    abrogato: bool = False,
 ) -> list[BuiltChunk]:
     """Costruisce i chunk per un articolo.
 
@@ -63,6 +64,7 @@ def build_chunks(
         "partition_id": str(partition_id),
         "effective_from": effective_from_iso,
         "effective_to": effective_to_iso or "9999-12-31",
+        "abrogato": abrogato,
     }
 
     # 1. Articolo-full
@@ -107,9 +109,7 @@ def build_chunks(
     return out
 
 
-def _window_chunks(
-    partition_id: UUID, text: str, base_meta: dict[str, object]
-) -> list[BuiltChunk]:
+def _window_chunks(partition_id: UUID, text: str, base_meta: dict[str, object]) -> list[BuiltChunk]:
     window = 2048  # caratteri ≈ 512 token
     overlap = 256  # caratteri ≈ 64 token
     chunks: list[BuiltChunk] = []

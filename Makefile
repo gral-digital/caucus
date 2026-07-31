@@ -9,7 +9,7 @@ install:  ## Installa tutte le dipendenze (Python via uv, Node via pnpm)
 
 up:  ## Avvia infra locale (Postgres, Qdrant, Redis, Langfuse)
 	docker compose up -d
-	@echo "Postgres:  localhost:5432  (user=avvocato db=avvocato)"
+	@echo "Postgres:  localhost:55432  (user=avvocato db=avvocato)"
 	@echo "Qdrant:    http://localhost:6333/dashboard"
 	@echo "Redis:     localhost:6379"
 	@echo "Langfuse:  http://localhost:3001"
@@ -32,9 +32,21 @@ migrate:  ## Applica migration Postgres
 migrate-new:  ## Crea nuova migration (usage: make migrate-new msg="descrizione")
 	cd apps/api && uv run alembic revision --autogenerate -m "$(msg)"
 
+# Tutte le fonti del catalogo (CODICI_CATALOG in parsers/normattiva_akn.py)
+CODICI := cc cp cpc cpp cost cds cdc ccii ccp cad cts tus tui tue tusl tub tuf tuir cpriv l241 stat l689 lpf
+
 fetch-codici:  ## Scarica AKN XML di CC + CP e salva come fixture (richiede rete)
 	uv run avvocato-ingest fetch --codice cc
 	uv run avvocato-ingest fetch --codice cp
+
+fetch-all:  ## Scarica AKN XML di TUTTE le 23 fonti (richiede rete, ~1 req/s)
+	@for c in $(CODICI); do uv run avvocato-ingest fetch --codice $$c || exit 1; done
+
+seed-all:  ## Indicizza tutte le 23 fonti da fixture (Postgres + Qdrant). Idempotente.
+	@for c in $(CODICI); do uv run avvocato-ingest ingest --codice $$c --from-fixture || exit 1; done
+
+seed-all-fast:  ## Tutte le 23 fonti SENZA embeddings (Postgres-only)
+	@for c in $(CODICI); do uv run avvocato-ingest ingest --codice $$c --from-fixture --skip-embeddings || exit 1; done
 
 seed-codice-civile:  ## Indicizza Codice Civile (usa fixture se presente, altrimenti scarica)
 	uv run avvocato-ingest ingest --codice cc --from-fixture
@@ -45,6 +57,16 @@ seed-codice-penale:  ## Indicizza Codice Penale (usa fixture se presente, altrim
 seed-codici-fast:  ## Indicizza entrambi i codici SENZA embeddings (Postgres-only, 10× più veloce)
 	uv run avvocato-ingest ingest --codice cc --from-fixture --skip-embeddings
 	uv run avvocato-ingest ingest --codice cp --from-fixture --skip-embeddings
+
+bootstrap-saas:  ## Setup completo SaaS: infra + migrate + fetch CC/CP + indicizza (OpenAI embeddings)
+	$(MAKE) up
+	@echo "Attendo Postgres..."
+	@sleep 5
+	$(MAKE) migrate
+	$(MAKE) fetch-codici
+	uv run avvocato-ingest ingest --codice cc --from-fixture
+	uv run avvocato-ingest ingest --codice cp --from-fixture
+	@echo "✓ Stack pronto. Avvia con: make dev"
 
 parse-codici:  ## Parse-only (nessuna persistenza); verifica conteggio articoli
 	uv run avvocato-ingest parse --codice cc
@@ -66,6 +88,9 @@ typecheck:
 test:
 	uv run pytest
 	pnpm turbo run test
+
+eval-lexroom:  ## Benchmark E2E vs standard Lexroom (richiede API up + corpus indicizzato)
+	uv run python scripts/eval_lexroom_benchmark.py --json-out reports/eval_lexroom_latest.json
 
 clean:
 	docker compose down -v

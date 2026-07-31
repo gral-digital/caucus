@@ -22,6 +22,7 @@ from dataclasses import dataclass
 
 import httpx
 import structlog
+from aiolimiter import AsyncLimiter
 from tenacity import (
     AsyncRetrying,
     retry_if_exception_type,
@@ -45,14 +46,13 @@ class AknDownload:
     short_id: str
     urn: str
     xml_bytes: bytes
-    dataGU: str
-    codiceRedaz: str
-    dataVigenza: str
+    # mixedCase intenzionale: rispecchiano 1:1 i parametri del portale Normattiva.
+    dataGU: str  # noqa: N815
+    codiceRedaz: str  # noqa: N815
+    dataVigenza: str  # noqa: N815
 
 
-_CARICA_AKN_LINK_RE = re.compile(
-    r'href="([^"]*caricaAKN\?[^"]*)"', re.IGNORECASE
-)
+_CARICA_AKN_LINK_RE = re.compile(r'href="([^"]*caricaAKN\?[^"]*)"', re.IGNORECASE)
 
 
 class NormattivaFetcher:
@@ -67,10 +67,14 @@ class NormattivaFetcher:
         user_agent: str,
         timeout: float = 60.0,
         max_retries: int = 3,
+        requests_per_second: float = 1.0,
     ) -> None:
         self._user_agent = user_agent
         self._timeout = timeout
         self._max_retries = max_retries
+        # Rate-limit dichiarato nel docstring del modulo: 1 req/s di default,
+        # per rispetto del portale (endpoint non contrattualizzato).
+        self._limiter = AsyncLimiter(max_rate=requests_per_second, time_period=1.0)
 
     async def fetch_codice(self, short_id: str) -> AknDownload:
         """Scarica AKN XML del codice indicato (es. 'cc', 'cp')."""
@@ -116,10 +120,7 @@ class NormattivaFetcher:
             headers={
                 "User-Agent": self._user_agent,
                 "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
-                "Accept": (
-                    "text/html,application/xhtml+xml,application/xml;"
-                    "q=0.9,*/*;q=0.8"
-                ),
+                "Accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"),
             },
             timeout=self._timeout,
             follow_redirects=True,
@@ -133,21 +134,18 @@ class NormattivaFetcher:
             reraise=True,
         )
 
-    async def _fetch_permalink_params(
-        self, client: httpx.AsyncClient, urn: str
-    ) -> dict[str, str]:
+    async def _fetch_permalink_params(self, client: httpx.AsyncClient, urn: str) -> dict[str, str]:
         # IMPORTANTE: Normattiva serve solo URN con `;` letterale (non URL-encoded
         # come `%3B`). httpx.AsyncClient.get(url, params={...}) fa url-encoding
         # automatico e rompe il dispatcher di Normattiva. Costruiamo l'URL a mano.
-        resp = await client.get(f"{self.BASE_PERMALINK}?{urn}")
+        async with self._limiter:
+            resp = await client.get(f"{self.BASE_PERMALINK}?{urn}")
         resp.raise_for_status()
         html = resp.text
 
         match = _CARICA_AKN_LINK_RE.search(html)
         if not match:
-            raise NormattivaFetchError(
-                f"Link 'caricaAKN' non trovato nella pagina per URN {urn!r}"
-            )
+            raise NormattivaFetchError(f"Link 'caricaAKN' non trovato nella pagina per URN {urn!r}")
         query = match.group(1).split("?", 1)[1].replace("&amp;", "&")
         params: dict[str, str] = {}
         for pair in query.split("&"):
@@ -157,9 +155,7 @@ class NormattivaFetcher:
 
         required = {"dataGU", "codiceRedaz", "dataVigenza"}
         if not required.issubset(params):
-            raise NormattivaFetchError(
-                f"Parametri mancanti nel link caricaAKN: {params}"
-            )
+            raise NormattivaFetchError(f"Parametri mancanti nel link caricaAKN: {params}")
         return {k: params[k] for k in required}
 
     async def _download_akn(
@@ -168,19 +164,18 @@ class NormattivaFetcher:
         referer_urn: str,
         params: dict[str, str],
     ) -> bytes:
-        resp = await client.get(
-            self.BASE_CARICA_AKN,
-            params=params,
-            headers={
-                "Accept": "application/xml,text/xml,*/*",
-                "Referer": f"{self.BASE_PERMALINK}?{referer_urn}",
-            },
-        )
+        async with self._limiter:
+            resp = await client.get(
+                self.BASE_CARICA_AKN,
+                params=params,
+                headers={
+                    "Accept": "application/xml,text/xml,*/*",
+                    "Referer": f"{self.BASE_PERMALINK}?{referer_urn}",
+                },
+            )
         resp.raise_for_status()
         content = resp.content
         head = content[:500]
         if not (head.startswith(b"<?xml") or b"akomaNtoso" in head):
-            raise NormattivaFetchError(
-                "Risposta da caricaAKN non è XML (probabile login/redirect)"
-            )
+            raise NormattivaFetchError("Risposta da caricaAKN non è XML (probabile login/redirect)")
         return content

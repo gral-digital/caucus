@@ -40,7 +40,9 @@ def upgrade() -> None:
     # ---- norm_source ----
     op.create_table(
         "norm_source",
-        sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
+        sa.Column(
+            "id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")
+        ),
         sa.Column("urn", sa.String(256), nullable=False, unique=True),
         sa.Column("short_id", sa.String(64), nullable=False, unique=True),
         sa.Column("title", sa.Text, nullable=False),
@@ -51,21 +53,43 @@ def upgrade() -> None:
         sa.Column("source_url", sa.Text, nullable=True),
         sa.Column("source_hash", sa.String(128), nullable=True),
         sa.Column("metadata", JSONB, nullable=False, server_default="{}"),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("NOW()"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("NOW()"), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("NOW()"),
+            nullable=False,
+        ),
+        sa.Column(
+            "updated_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("NOW()"),
+            nullable=False,
+        ),
     )
 
     # ---- norm_partition ----
     op.create_table(
         "norm_partition",
-        sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
-        sa.Column("source_id", UUID(as_uuid=True), sa.ForeignKey("norm_source.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("parent_id", UUID(as_uuid=True), sa.ForeignKey("norm_partition.id", ondelete="CASCADE"), nullable=True),
+        sa.Column(
+            "id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")
+        ),
+        sa.Column(
+            "source_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_source.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "parent_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_partition.id", ondelete="CASCADE"),
+            nullable=True,
+        ),
         sa.Column("kind", sa.String(32), nullable=False),
         sa.Column("number", sa.String(32), nullable=False),
         sa.Column("label", sa.Text, nullable=False),
         sa.Column("ordinal", sa.Integer, nullable=False),
-        sa.Column("path", sa.String(512), nullable=False),   # serializzato da ltree
+        sa.Column("path", sa.String(512), nullable=False),  # serializzato da ltree
         sa.Column("citation", sa.String(256), nullable=False),
         sa.Column("rubrica", sa.Text, nullable=True),
         sa.Column("full_text", sa.Text, nullable=True),
@@ -97,25 +121,59 @@ def upgrade() -> None:
     # ---- norm_comma ----
     op.create_table(
         "norm_comma",
-        sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
-        sa.Column("partition_id", UUID(as_uuid=True), sa.ForeignKey("norm_partition.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")
+        ),
+        sa.Column(
+            "partition_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_partition.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("ordinal", sa.Integer, nullable=False),
         sa.Column("number", sa.String(32), nullable=False),
         sa.Column("text", sa.Text, nullable=False),
         sa.Column("letters", JSONB, nullable=True),
         sa.Column("effective_from", sa.Date, nullable=False),
         sa.Column("effective_to", sa.Date, nullable=True),
-        sa.UniqueConstraint("partition_id", "ordinal", "effective_from", name="uq_norm_comma_partition_ordinal_effective"),
+        sa.UniqueConstraint(
+            "partition_id",
+            "ordinal",
+            "effective_from",
+            name="uq_norm_comma_partition_ordinal_effective",
+        ),
     )
 
     # ---- norm_citation ----
     op.create_table(
         "norm_citation",
-        sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
-        sa.Column("from_partition_id", UUID(as_uuid=True), sa.ForeignKey("norm_partition.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("from_comma_id", UUID(as_uuid=True), sa.ForeignKey("norm_comma.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("to_partition_id", UUID(as_uuid=True), sa.ForeignKey("norm_partition.id", ondelete="SET NULL"), nullable=True),
-        sa.Column("to_source_id", UUID(as_uuid=True), sa.ForeignKey("norm_source.id", ondelete="SET NULL"), nullable=True),
+        sa.Column(
+            "id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")
+        ),
+        sa.Column(
+            "from_partition_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_partition.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "from_comma_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_comma.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+        sa.Column(
+            "to_partition_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_partition.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
+        sa.Column(
+            "to_source_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_source.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
         sa.Column("raw_text", sa.Text, nullable=False),
         sa.Column("citation_kind", sa.String(32), nullable=False),
         sa.Column("confidence", sa.Float, nullable=False, server_default="1.0"),
@@ -126,9 +184,21 @@ def upgrade() -> None:
     # ---- norm_chunk ----
     op.create_table(
         "norm_chunk",
-        sa.Column("id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")),
-        sa.Column("partition_id", UUID(as_uuid=True), sa.ForeignKey("norm_partition.id", ondelete="CASCADE"), nullable=False),
-        sa.Column("comma_id", UUID(as_uuid=True), sa.ForeignKey("norm_comma.id", ondelete="SET NULL"), nullable=True),
+        sa.Column(
+            "id", UUID(as_uuid=True), primary_key=True, server_default=sa.text("uuid_generate_v4()")
+        ),
+        sa.Column(
+            "partition_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_partition.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
+        sa.Column(
+            "comma_id",
+            UUID(as_uuid=True),
+            sa.ForeignKey("norm_comma.id", ondelete="SET NULL"),
+            nullable=True,
+        ),
         sa.Column("chunk_kind", sa.String(32), nullable=False),
         sa.Column("text", sa.Text, nullable=False),
         sa.Column(
@@ -139,7 +209,12 @@ def upgrade() -> None:
         sa.Column("token_count", sa.Integer, nullable=False),
         sa.Column("qdrant_point_id", UUID(as_uuid=True), nullable=False),
         sa.Column("metadata", JSONB, nullable=False, server_default="{}"),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("NOW()"), nullable=False),
+        sa.Column(
+            "created_at",
+            sa.DateTime(timezone=True),
+            server_default=sa.text("NOW()"),
+            nullable=False,
+        ),
     )
     op.create_index("ix_norm_chunk_partition", "norm_chunk", ["partition_id"])
     op.create_index("ix_norm_chunk_tsv", "norm_chunk", ["text_tsv"], postgresql_using="gin")

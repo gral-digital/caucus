@@ -1,0 +1,28 @@
+# Mai nel build context: segreti e ambienti locali
+.env
+.env.*
+*.pem
+*.key
+service-account*.json
+
+# Ambienti e cache
+.venv
+node_modules
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.ruff_cache
+.turbo
+.next
+
+# VCS e tooling
+.git
+.github
+.claude
+
+# Dati pesanti non necessari all'immagine
+data/
+reports/
+volumes/
+docs/

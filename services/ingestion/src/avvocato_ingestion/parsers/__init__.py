@@ -10,4 +10,4 @@ from avvocato_ingestion.parsers.normattiva_akn import (
     NormattivaAknParser,
 )
 
-__all__ = ["NormattivaAknParser", "CodiceInfo", "CODICI_CATALOG"]
+__all__ = ["CODICI_CATALOG", "CodiceInfo", "NormattivaAknParser"]

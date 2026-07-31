@@ -6,15 +6,14 @@ import re
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from datetime import date
-from typing import Any
+from typing import Any, ClassVar
 
 import structlog
-from fastapi import Depends
-from sqlalchemy import select
+from sqlalchemy import or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from avvocato_api.db.models import NormPartition, NormSource
-from avvocato_api.deps import get_db_session, get_llm_router
+from avvocato_api.deps import get_llm_router
 from avvocato_api.services.search_service import SearchService
 from avvocato_rag_core.llm.router import LLMMessage, LLMRouter
 from avvocato_rag_core.schemas.retrieval import RetrievalHit, RetrievalQuery
@@ -72,27 +71,33 @@ Markdown: `**grassetto**`, `- liste`, paragrafi separati. I tag `<cite/>` vengon
 
 
 class ChatService:
-    def __init__(
-        self, search: SearchService, llm: LLMRouter, session: AsyncSession
-    ) -> None:
+    def __init__(self, search: SearchService, llm: LLMRouter, session: AsyncSession) -> None:
         self._search = search
         self._llm = llm
         self._session = session
 
     @classmethod
-    def factory(
-        cls,
-        search: SearchService = Depends(SearchService.factory),
-        llm: LLMRouter = Depends(get_llm_router),
-        session: AsyncSession = Depends(get_db_session),
-    ) -> "ChatService":
-        return cls(search=search, llm=llm, session=session)
+    def build(cls, session: AsyncSession) -> ChatService:
+        """Costruzione esplicita con una sessione già aperta.
+
+        Non usare Depends(get_db_session) per gli endpoint streaming: FastAPI
+        chiude le dependency `yield` PRIMA di produrre il body streamato, e
+        tutto il lavoro DB di questo service avviene durante lo streaming.
+        """
+        return cls(search=SearchService.build(session), llm=get_llm_router(), session=session)
 
     async def answer_stream(self, request) -> AsyncIterator[ChatEvent]:  # type: ignore[no-untyped-def]
         # 1. Retrieve — usa come query il messaggio corrente + ultimo user turn
         # del contesto, per non perdere riferimenti in follow-up brevi.
         retrieval_query_text = self._build_retrieval_query(request)
-        effective = date.fromisoformat(request.effective_at) if request.effective_at else None
+        try:
+            effective = date.fromisoformat(request.effective_at) if request.effective_at else None
+        except ValueError:
+            yield ChatEvent(
+                name="error",
+                data={"message": "effective_at non valido: atteso formato ISO YYYY-MM-DD"},
+            )
+            return
         query = RetrievalQuery(
             text=retrieval_query_text,
             corpora=request.corpora,
@@ -112,7 +117,18 @@ class ChatService:
         )
 
         # 2. Prompt assembly con storico conversazione
-        system_content = SYSTEM_PROMPT
+        system_content = SYSTEM_PROMPT + (
+            "\n\n# Contesto operativo (fatti, non negoziabili)\n"
+            f"- Data odierna: {date.today().isoformat()}.\n"
+            "- Il corpus indicizzato contiene i testi consolidati Normattiva di 23 fonti "
+            "(codici, testi unici, leggi fondamentali). NON contiene giurisprudenza, "
+            "prassi amministrativa, né normativa UE: se la risposta dipende da queste, dillo.\n"
+            "- Sei un assistente AI: non sei un avvocato iscritto all'albo, questa "
+            "conversazione non è un parere legale e non instaura un rapporto "
+            "professionale. Non dichiararlo a ogni risposta, ma se il cliente mostra "
+            "di volersi basare SOLO su di te per una decisione con conseguenze legali, "
+            "ricordaglielo in una frase."
+        )
         if result.hits:
             system_content += "\n\n" + self._assemble_context_block(result.hits)
         else:
@@ -125,13 +141,12 @@ class ChatService:
             )
 
         messages: list[LLMMessage] = [LLMMessage(role="system", content=system_content)]
-        # Storico: gli ultimi 10 turni (user+assistant) per non saturare il contesto
-        # di Qwen3:8b (~32k token). Il retrieval è basato sul turno corrente quindi
-        # non servono i vecchi messaggi ai fini delle citazioni, ma servono per
-        # continuità di dialogo.
+        # Storico: gli ultimi 10 turni (user+assistant) per non saturare il contesto.
+        # Il retrieval è basato sul turno corrente quindi non servono i vecchi
+        # messaggi ai fini delle citazioni, ma servono per continuità di dialogo.
         for m in (request.history or [])[-10:]:
-            role = m.role if m.role in ("user", "assistant") else "user"
-            messages.append(LLMMessage(role=role, content=m.content))
+            # Il Literal di ChatMessage garantisce già user|assistant.
+            messages.append(LLMMessage(role=m.role, content=m.content))
         messages.append(LLMMessage(role="user", content=request.question))
 
         # 3. Stream LLM, bufferizzando il testo per validare le citazioni finali
@@ -142,21 +157,34 @@ class ChatService:
                     raw_text_parts.append(chunk.content)
                     yield ChatEvent(name="token", data={"text": chunk.content})
                 if chunk.finish_reason:
-                    # 4. Validazione citazioni contro DB
-                    raw = "".join(raw_text_parts)
+                    raw = self._promote_freeform_citations("".join(raw_text_parts), result.hits)
                     validation = await self._validate_citations(raw, result.hits)
-                    if validation["invalid"]:
-                        yield ChatEvent(
-                            name="citation_warnings",
-                            data=validation,
-                        )
+                    # Warning anche su grounding debole (articolo esistente ma
+                    # NON nel contesto fornito: l'allucinazione più insidiosa)
+                    # e su citazioni di articoli abrogati — non solo su invalid.
+                    has_soft_warnings = any(
+                        c.get("grounding") == "weak" or c.get("abrogato")
+                        for c in validation["valid"]
+                    )
+                    if validation["invalid"] or has_soft_warnings:
+                        yield ChatEvent(name="citation_warnings", data=validation)
+                    # final_text = testo con le citazioni in prosa promosse a
+                    # tag <cite/>: la UI può sostituire il testo streamato per
+                    # rendere linkabili anche le citazioni scritte in prosa.
                     yield ChatEvent(
-                        name="done", data={"finish_reason": chunk.finish_reason}
+                        name="done",
+                        data={"finish_reason": chunk.finish_reason, "final_text": raw},
                     )
                     return
-        except Exception as exc:  # pragma: no cover - runtime-only
+        except Exception:  # pragma: no cover - runtime-only
+            # Mai rimandare str(exc) al client: i messaggi dei provider LLM
+            # possono contenere nomi modello, org id, dettagli di quota e
+            # frammenti di prompt. Dettaglio nei log, messaggio opaco al client.
             logger.exception("llm_stream_failed")
-            yield ChatEvent(name="error", data={"message": str(exc)})
+            yield ChatEvent(
+                name="error",
+                data={"message": "Errore interno durante la generazione. Riprova."},
+            )
 
     # ------------------------------------------------------------------
 
@@ -168,7 +196,7 @@ class ChatService:
         lo arricchisce con l'ultimo turno utente per non perdere contesto.
         Altrimenti usa solo il turno corrente.
         """
-        q = request.question.strip()
+        q = str(request.question).strip()
         if len(q) >= 25 or not request.history:
             return q
         # Cerca l'ultimo turno user nello storico
@@ -202,13 +230,14 @@ class ChatService:
                 + "/>"
             )
             blocks.append(
-                f"[{idx}] {hit.citation.to_display()}   tag: {cite_tag}\n"
-                f"    {hit.text.strip()}"
+                f"[{idx}] {hit.citation.to_display()}   tag: {cite_tag}\n    {hit.text.strip()}"
             )
         return (
             "# CONTESTO NORMATIVO (unica fonte ammessa per le citazioni)\n\n"
             + "\n\n".join(blocks)
             + "\n\n> Puoi citare SOLO le norme elencate sopra usando i tag indicati. "
+            "Ogni volta che menzioni un articolo nel testo DEVI usare il tag `<cite/>` corrispondente — "
+            "non scrivere «art. X c.c.» in prosa senza tag. "
             "Se la norma giusta per la domanda non è nell'elenco, ammettilo anziché inventarla."
         )
 
@@ -236,45 +265,92 @@ class ChatService:
         re.IGNORECASE,
     )
 
-    _SUFFIX_TO_SHORT_ID = {
-        "cc": "cc", "c.c": "cc", "c. c": "cc",
-        "cp": "cp", "c.p": "cp", "c. p": "cp",
-        "cpc": "cpc", "c.p.c": "cpc", "c. p. c": "cpc", "c.p. c": "cpc",
-        "cpp": "cpp", "c.p.p": "cpp", "c. p. p": "cpp",
+    _SUFFIX_TO_SHORT_ID: ClassVar[dict[str, str]] = {
+        "cc": "cc",
+        "c.c": "cc",
+        "c. c": "cc",
+        "cp": "cp",
+        "c.p": "cp",
+        "c. p": "cp",
+        "cpc": "cpc",
+        "c.p.c": "cpc",
+        "c. p. c": "cpc",
+        "c.p. c": "cpc",
+        "cpp": "cpp",
+        "c.p.p": "cpp",
+        "c. p. p": "cpp",
         "cost": "cost",
-        "cds": "cds", "cod. strada": "cds", "cod strada": "cds",
-        "cdc": "cdc", "cod. cons": "cdc",
+        "cds": "cds",
+        "cod. strada": "cds",
+        "cod strada": "cds",
+        "cdc": "cdc",
+        "cod. cons": "cdc",
         "ccii": "ccii",
-        "ccp": "ccp", "cod. contr. pubbl": "ccp",
+        "ccp": "ccp",
+        "cod. contr. pubbl": "ccp",
         "cad": "cad",
         "cts": "cts",
-        "tu stup": "tus", "tus": "tus",
-        "tu imm": "tui", "tui": "tui",
-        "tu ed": "tue", "tue": "tue",
-        "tu sic": "tusl", "tu sic. lav": "tusl", "tusl": "tusl",
+        "tu stup": "tus",
+        "tus": "tus",
+        "tu imm": "tui",
+        "tui": "tui",
+        "tu ed": "tue",
+        "tue": "tue",
+        "tu sic": "tusl",
+        "tu sic. lav": "tusl",
+        "tusl": "tusl",
         "tub": "tub",
         "tuf": "tuf",
         "tuir": "tuir",
-        "cod. privacy": "cpriv", "cpriv": "cpriv",
-        "l. 241": "l241", "l 241": "l241",
-        "st. lav": "stat", "st lav": "stat",
-        "l. 689": "l689", "l 689": "l689",
-        "l. 247": "lpf", "l 247": "lpf",
+        "cod. privacy": "cpriv",
+        "cpriv": "cpriv",
+        "l. 241": "l241",
+        "l 241": "l241",
+        "st. lav": "stat",
+        "st lav": "stat",
+        "l. 689": "l689",
+        "l 689": "l689",
+        "l. 247": "lpf",
+        "l 247": "lpf",
     }
 
     @classmethod
     def _normalize_suffix(cls, suffix: str) -> str | None:
         """Normalizza una sigla come scritta dal LLM a un short_id interno."""
-        s = re.sub(r"\s+", " ", suffix.lower().replace(".", ".")).strip()
+        s = re.sub(r"\s+", " ", suffix.lower()).strip()
         # Ripuliamo: "c.c." → "cc", "c. p." → "cp", ecc.
         no_dots = s.replace(".", "").replace(" ", "")
         if no_dots in cls._SUFFIX_TO_SHORT_ID:
             return cls._SUFFIX_TO_SHORT_ID[no_dots]
         return cls._SUFFIX_TO_SHORT_ID.get(s)
 
-    async def _validate_citations(
-        self, text: str, hits: list[RetrievalHit]
-    ) -> dict[str, Any]:
+    @classmethod
+    def _promote_freeform_citations(cls, text: str, hits: list[RetrievalHit]) -> str:
+        """Converte citazioni in prosa grounded in tag ``<cite/>`` per la UI."""
+        hit_by_num: dict[tuple[str, str], RetrievalHit] = {}
+        for h in hits:
+            if h.citation is None:
+                continue
+            hit_by_num[(h.citation.source.lower(), h.citation.num.lower())] = h
+
+        def repl(m: re.Match[str]) -> str:
+            num = re.sub(r"\s+", "-", m.group(1).strip()).lower()
+            suffix = cls._normalize_suffix(m.group(3) or "")
+            if suffix is None:
+                return m.group(0)
+            hit = hit_by_num.get((suffix, num))
+            if hit is None or hit.citation is None:
+                return m.group(0)
+            tag = (
+                f'<cite source="{hit.citation.source}" part="articolo" num="{hit.citation.num}"'
+                + (f' comma="{hit.citation.comma}"' if hit.citation.comma else "")
+                + "/>"
+            )
+            return tag
+
+        return cls._FREEFORM_CITE_PATTERN.sub(repl, text)
+
+    async def _validate_citations(self, text: str, hits: list[RetrievalHit]) -> dict[str, Any]:
         """Estrae tutte le citazioni (tag <cite/> e testo libero) e le verifica contro DB.
 
         Il modello piccolo spesso cita in prosa ("art. 17 c.p.") invece di usare
@@ -318,24 +394,41 @@ class ChatService:
         )
         src_map: dict[str, Any] = {r.short_id: r.id for r in src_rows}
 
-        valid: list[dict[str, str]] = []
-        invalid: list[dict[str, str]] = []
+        today = date.today()
+        valid: list[dict[str, Any]] = []
+        invalid: list[dict[str, Any]] = []
         for c in unique:
             source_id = src_map.get(c["source"])
             if source_id is None:
                 invalid.append({**c, "reason": "fonte non indicizzata"})
                 continue
-            exists = await self._session.execute(
-                select(NormPartition.id)
-                .where(NormPartition.source_id == source_id)
-                .where(NormPartition.kind == "articolo")
-                .where(NormPartition.number == c["num"])
-                .limit(1)
-            )
-            if exists.scalar_one_or_none() is not None:
-                valid.append(c)
+            row = (
+                await self._session.execute(
+                    select(NormPartition.metadata_)
+                    .where(NormPartition.source_id == source_id)
+                    .where(NormPartition.kind == "articolo")
+                    .where(NormPartition.number == c["num"])
+                    # Vigenza: un articolo la cui versione non è vigente oggi
+                    # non deve risultare "valid" senza segnalazione.
+                    .where(NormPartition.effective_from <= today)
+                    .where(
+                        or_(
+                            NormPartition.effective_to.is_(None),
+                            NormPartition.effective_to > today,
+                        )
+                    )
+                    .limit(1)
+                )
+            ).scalar_one_or_none()
+            if row is not None:
+                entry: dict[str, Any] = dict(c)
+                if (row or {}).get("abrogato"):
+                    # L'articolo esiste ma è abrogato: citarlo come vigente è
+                    # un errore legale — flag esplicito per la UI.
+                    entry["abrogato"] = True
+                valid.append(entry)
             else:
-                invalid.append({**c, "reason": "articolo non esistente nel DB"})
+                invalid.append({**c, "reason": "articolo non esistente o non vigente nel DB"})
 
         # Hit-grounded check: era tra i passaggi forniti al LLM?
         hit_keys = {

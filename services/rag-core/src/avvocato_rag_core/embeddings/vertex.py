@@ -28,7 +28,7 @@ class VertexEmbeddingProvider(EmbeddingProvider):
         region: str,
         model_id: str = "text-multilingual-embedding-002",
         dense_dim: int = 768,
-        access_token_factory: "AccessTokenFactory",
+        access_token_factory: AccessTokenFactory,
         http_client: httpx.AsyncClient | None = None,
     ) -> None:
         self._project = project
@@ -68,8 +68,7 @@ class VertexEmbeddingProvider(EmbeddingProvider):
         resp.raise_for_status()
         data = resp.json()
         return [
-            EmbeddingVector(dense=p["embeddings"]["values"])
-            for p in data.get("predictions", [])
+            EmbeddingVector(dense=p["embeddings"]["values"]) for p in data.get("predictions", [])
         ]
 
 

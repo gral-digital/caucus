@@ -24,16 +24,12 @@ class NormCitation(BaseModel):
     model_config = ConfigDict(frozen=True)
 
     kind: Literal[CitationKind.NORM] = CitationKind.NORM
-    source: str = Field(
-        ..., description="short_id della fonte, es. 'cc', 'cp', 'dlgs-231-2001'."
-    )
+    source: str = Field(..., description="short_id della fonte, es. 'cc', 'cp', 'dlgs-231-2001'.")
     part: Literal["libro", "titolo", "capo", "sezione", "articolo", "art"] = "art"
     num: str = Field(..., description="Numero preservato come stringa, es. '2043', '570-bis'.")
     comma: str | None = None
     letter: str | None = None
-    number: str | None = Field(
-        None, description="Sotto-numero di una lettera (es. '1)', '2)')."
-    )
+    number: str | None = Field(None, description="Sotto-numero di una lettera (es. '1)', '2)').")
     effective_at: date | None = Field(
         None,
         description="Data per versioning. None = testo vigente.",

@@ -35,6 +35,20 @@ class QdrantStore:
         """Crea la collection se non esiste, con schema hybrid dense+sparse."""
         existing = await self._client.get_collections()
         if any(c.name == name for c in existing.collections):
+            info = await self._client.get_collection(name)
+            vectors = info.config.params.vectors
+            dense_cfg = vectors.get("dense") if isinstance(vectors, dict) else vectors
+            current_dim = getattr(dense_cfg, "size", None) if dense_cfg else None
+            if current_dim is not None and current_dim != self._dense_dim:
+                # MAI cancellare silenziosamente: un cambio di EMBEDDING_DIM
+                # distruggerebbe l'intero indice senza conferma. La collection
+                # va eliminata esplicitamente (o EMBEDDING_DIM allineato).
+                raise RuntimeError(
+                    f"Collection {name!r} ha dense_dim={current_dim}, "
+                    f"config richiede {self._dense_dim}. Rifiutato per evitare "
+                    "perdita dati: allinea EMBEDDING_DIM/EMBEDDING_MODEL oppure "
+                    "elimina la collection esplicitamente e re-ingesta."
+                )
             return
 
         await self._client.create_collection(
@@ -91,6 +105,21 @@ class QdrantStore:
             )
         await self._client.upsert(collection_name=collection, points=points, wait=False)
 
+    async def delete_by_payload(self, *, collection: str, field: str, value: str) -> None:
+        """Elimina tutti i punti con payload ``field == value`` (no-op se la collection non esiste)."""
+        existing = await self._client.get_collections()
+        if not any(c.name == collection for c in existing.collections):
+            return
+        await self._client.delete(
+            collection_name=collection,
+            points_selector=qm.FilterSelector(
+                filter=qm.Filter(
+                    must=[qm.FieldCondition(key=field, match=qm.MatchValue(value=value))]
+                )
+            ),
+            wait=True,
+        )
+
     async def hybrid_search(
         self,
         collection: str,
@@ -106,9 +135,7 @@ class QdrantStore:
         if query.sparse is not None:
             prefetch.append(
                 qm.Prefetch(
-                    query=qm.SparseVector(
-                        indices=query.sparse.indices, values=query.sparse.values
-                    ),
+                    query=qm.SparseVector(indices=query.sparse.indices, values=query.sparse.values),
                     using="sparse",
                     limit=limit,
                 )

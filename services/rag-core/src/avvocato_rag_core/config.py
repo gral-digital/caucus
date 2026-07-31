@@ -23,6 +23,19 @@ class Settings(BaseSettings):
     app_env: Literal["local", "dev", "prod"] = "local"
     log_level: str = "INFO"
 
+    # API security
+    # Token condiviso richiesto su /chat e /search (header Authorization: Bearer
+    # o X-API-Key). Se vuoto: consentito SOLO con app_env=local; in dev/prod
+    # l'API rifiuta le richieste (fail-closed) finché non è configurato.
+    api_auth_token: str | None = None
+    # Origini CORS ammesse, separate da virgola.
+    cors_allow_origins: str = (
+        "http://localhost:3000,http://localhost:3100,http://127.0.0.1:3000,http://127.0.0.1:3100"
+    )
+    # Richieste per minuto per IP su /chat e /search (0 = disabilitato).
+    # NB: limiter in-memory per processo; con più istanze passare a Redis.
+    rate_limit_per_minute: int = 30
+
     # Postgres
     database_url: str = Field(
         "postgresql+asyncpg://avvocato:avvocato@localhost:5432/avvocato",
@@ -53,19 +66,31 @@ class Settings(BaseSettings):
     langfuse_secret_key: str | None = None
 
     # LLM
-    llm_primary_model: str = "vertex_ai/llama-3.3-70b-instruct"
-    llm_fallback_model: str = "vertex_ai/claude-sonnet-4-5"
+    llm_primary_model: str = "openai/gpt-4o-mini"
+    llm_fallback_model: str = "openai/gpt-4o"
+    # NB: embedding_model è usato SOLO dal backend "local" (bge-m3 → 1024 dim).
+    # embedding_dim deve essere coerente col backend attivo: 1536 per il default
+    # openai/text-embedding-3-small, 1024 per local/bge-m3 e ollama/bge-m3.
+    # La factory (embeddings/factory.py) fallisce con messaggio chiaro se divergono.
     embedding_model: str = "BAAI/bge-m3"
-    embedding_dim: int = 1024
+    embedding_dim: int = 1536
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
+    # auto | keyword | cohere | local | noop
+    reranker_backend: str = "auto"
+    cohere_api_key: str | None = None
+    cohere_rerank_model: str = "rerank-multilingual-v3.0"
 
-    # Ollama (dev locale: zero cloud, zero costi)
+    # OpenAI (SaaS default)
+    openai_api_key: str | None = None
+    openai_embedding_model: str = "text-embedding-3-small"
+
+    # Ollama (dev locale offline: zero cloud, zero costi)
     ollama_base_url: str = "http://localhost:11434"
     ollama_llm_model: str = "qwen3:8b"
     ollama_embedding_model: str = "bge-m3"
-    # Backend selection: 'ollama' | 'vertex' | 'local'
-    embedding_backend: str = "ollama"
-    llm_backend: str = "ollama"
+    # Backend selection: 'openai' | 'ollama' | 'vertex' | 'local'
+    embedding_backend: str = "openai"
+    llm_backend: str = "openai"
 
     # GCP
     gcp_project: str | None = None

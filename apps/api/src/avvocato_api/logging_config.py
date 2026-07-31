@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import logging
 import sys
+from collections.abc import MutableMapping
+from typing import Any
 
 import structlog
 
@@ -20,7 +22,7 @@ def configure_logging() -> None:
         level=level,
     )
 
-    processors: list = [
+    processors: list[structlog.typing.Processor] = [
         structlog.contextvars.merge_contextvars,
         structlog.processors.add_log_level,
         structlog.processors.TimeStamper(fmt="iso", utc=True),
@@ -48,7 +50,9 @@ def configure_logging() -> None:
     )
 
 
-def _rename_level_to_severity(_, __, event_dict: dict) -> dict:
+def _rename_level_to_severity(
+    _logger: object, _method: str, event_dict: MutableMapping[str, Any]
+) -> MutableMapping[str, Any]:
     if "level" in event_dict:
-        event_dict["severity"] = event_dict.pop("level").upper()
+        event_dict["severity"] = str(event_dict.pop("level")).upper()
     return event_dict
