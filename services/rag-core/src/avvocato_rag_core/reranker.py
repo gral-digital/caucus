@@ -120,6 +120,8 @@ class KeywordBoostReranker(Reranker):
             boost = 0.0
             if hit.metadata.get("lookup") == "direct":
                 boost += 3.0
+            elif hit.metadata.get("lookup") == "expansion":
+                boost += 1.5
             elif hit.metadata.get("lookup") == "fts":
                 boost += 1.0
 

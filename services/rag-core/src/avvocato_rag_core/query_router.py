@@ -19,7 +19,18 @@ _ARTICLE_RE = re.compile(
     r"\s+"
     r"(c\.?\s*c\.?|c\.?\s*p\.?|c\.?\s*p\.?\s*c\.?|c\.?\s*p\.?\s*p\.?|"
     r"cod\.?\s*strada|cds|cdc|cost\.?|cpc|cpp|cad|ccii|ccp|"
-    r"tu\s*stup\.?|tuir|stat\.?|l\.?\s*241)",
+    r"tu\s*stup\.?|tuir|stat\.?|l\.?\s*241|"
+    # Forme lunghe (query utente in linguaggio naturale + output della query
+    # expansion LLM, che scrive "art. 612-bis codice penale")
+    r"(?:del\s+|della\s+)?codice\s+civile|(?:del\s+)?codice\s+penale|"
+    r"(?:del\s+)?codice\s+di\s+procedura\s+civile|"
+    r"(?:del\s+)?codice\s+di\s+procedura\s+penale|"
+    r"(?:della\s+)?costituzione|(?:del\s+)?codice\s+della\s+strada|"
+    r"(?:del\s+)?codice\s+del\s+consumo|(?:del\s+)?codice\s+del\s+turismo|"
+    r"(?:del\s+)?gdpr|(?:dello\s+)?statuto\s+dei\s+lavoratori|"
+    r"(?:del\s+)?d\.?\s*lgs\.?\s*(?:n\.?\s*)?231\s*/\s*2001|"
+    r"(?:del\s+)?testo\s+unico\s+(?:sull[ae]\s+|dell[ae]\s+)?"
+    r"(?:immigrazione|edilizia|bancario|finanza|ambiente|sicurezza\s+sul\s+lavoro))",
     re.IGNORECASE,
 )
 
@@ -46,6 +57,42 @@ _SUFFIX_TO_SHORT: dict[str, str] = {
     "stat": "stat",
     "l. 241": "l241",
     "l 241": "l241",
+    # Forme lunghe (normalizzate: minuscole, senza punti né spazi)
+    "codicecivile": "cc",
+    "delcodicecivile": "cc",
+    "dellacodicecivile": "cc",
+    "codicepenale": "cp",
+    "delcodicepenale": "cp",
+    "codicediproceduracivile": "cpc",
+    "delcodicediproceduracivile": "cpc",
+    "codicediprocedurapenale": "cpp",
+    "delcodicediprocedurapenale": "cpp",
+    "costituzione": "cost",
+    "dellacostituzione": "cost",
+    "codicedellastrada": "cds",
+    "delcodicedellastrada": "cds",
+    "codicedelconsumo": "cdc",
+    "delcodicedelconsumo": "cdc",
+    "gdpr": "gdpr",
+    "delgdpr": "gdpr",
+    "statutodeilavoratori": "stat",
+    "dellostatutodeilavoratori": "stat",
+    "dlgs231/2001": "dlgs231",
+    "deldlgs231/2001": "dlgs231",
+    "dlgsn231/2001": "dlgs231",
+    "testounicosullimmigrazione": "tui",
+    "testounicodellimmigrazione": "tui",
+    "deltestounicosullimmigrazione": "tui",
+    "testounicodelledilizia": "tue",
+    "deltestounicodelledilizia": "tue",
+    "testounicobancario": "tub",
+    "deltestounicobancario": "tub",
+    "testounicodellafinanza": "tuf",
+    "deltestounicodellafinanza": "tuf",
+    "testounicodellambiente": "tua",
+    "deltestounicodellambiente": "tua",
+    "testounicosullasicurezzasullavoro": "tusl",
+    "deltestounicosullasicurezzasullavoro": "tusl",
 }
 
 

@@ -32,6 +32,10 @@ class Settings(BaseSettings):
     cors_allow_origins: str = (
         "http://localhost:3000,http://localhost:3100,http://127.0.0.1:3000,http://127.0.0.1:3100"
     )
+    # Query expansion LLM prima del retrieval (chiude il gap lessicale
+    # linguaggio utente ↔ testo normativo; +0.3-1s di latenza, 1 chiamata LLM).
+    query_expansion_enabled: bool = True
+
     # Richieste per minuto per IP su /chat e /search (0 = disabilitato).
     # NB: limiter in-memory per processo; con più istanze passare a Redis.
     rate_limit_per_minute: int = 30

@@ -280,7 +280,15 @@ class ChatService:
         r"(c\.?\s*c\.?|c\.?\s*p\.?|c\.?\s*p\.?\s*c\.?|c\.?\s*p\.?\s*p\.?|"
         r"cost\.?|cod\.?\s*strada|cds|cdc|ccii|ccp|cad|cts|"
         r"tu\s*stup\.?|tu\s*imm\.?|tu\s*ed\.?|tu\s*sic\.?|tub|tuf|tuir|"
-        r"cod\.?\s*privacy|l\.?\s*241|st\.?\s*lav\.?|l\.?\s*689|l\.?\s*247)",
+        r"cod\.?\s*privacy|l\.?\s*241|st\.?\s*lav\.?|l\.?\s*689|l\.?\s*247|"
+        # Forme lunghe che i modelli scrivono in prosa naturale
+        r"(?:del\s+)?codice\s+civile|(?:del\s+)?codice\s+penale|"
+        r"(?:del\s+)?codice\s+di\s+procedura\s+civile|"
+        r"(?:del\s+)?codice\s+di\s+procedura\s+penale|"
+        r"(?:della\s+)?costituzione|(?:del\s+)?codice\s+della\s+strada|"
+        r"(?:del\s+)?codice\s+del\s+consumo|(?:del\s+)?gdpr|"
+        r"(?:del\s+)?d\.?\s*lgs\.?\s*(?:n\.?\s*)?231\s*/\s*2001|"
+        r"(?:dello\s+)?statuto\s+dei\s+lavoratori|(?:dell')?\s*ai\s+act)",
         re.IGNORECASE,
     )
 
@@ -331,6 +339,30 @@ class ChatService:
         "l 689": "l689",
         "l. 247": "lpf",
         "l 247": "lpf",
+        # Forme lunghe (normalizzate senza punti/spazi da _normalize_suffix)
+        "codicecivile": "cc",
+        "delcodicecivile": "cc",
+        "codicepenale": "cp",
+        "delcodicepenale": "cp",
+        "codicediproceduracivile": "cpc",
+        "delcodicediproceduracivile": "cpc",
+        "codicediprocedurapenale": "cpp",
+        "delcodicediprocedurapenale": "cpp",
+        "costituzione": "cost",
+        "dellacostituzione": "cost",
+        "codicedellastrada": "cds",
+        "delcodicedellastrada": "cds",
+        "codicedelconsumo": "cdc",
+        "delcodicedelconsumo": "cdc",
+        "gdpr": "gdpr",
+        "delgdpr": "gdpr",
+        "dlgs231/2001": "dlgs231",
+        "deldlgs231/2001": "dlgs231",
+        "dlgsn231/2001": "dlgs231",
+        "statutodeilavoratori": "stat",
+        "dellostatutodeilavoratori": "stat",
+        "aiact": "aiact",
+        "dell'aiact": "aiact",
     }
 
     @classmethod

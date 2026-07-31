@@ -9,6 +9,7 @@ lookup diretto le pinnava pure in cima.
 
 from __future__ import annotations
 
+import re
 from datetime import date
 from typing import Any
 from uuid import UUID
@@ -75,9 +76,24 @@ class FtsRetriever:
         )
 
         rows = (await self._session.execute(sql, params)).mappings().all()
+        or_fallback = False
+        if not rows:
+            # websearch_to_tsquery è AND-semantico: con query lunghe (es. dopo
+            # query expansion) l'AND di 15+ termini non matcha nulla. Fallback:
+            # OR dei termini significativi — ts_rank premia chi ne matcha di più.
+            # I risultati OR sono però rumorosi (articoli lunghi pieni di parole
+            # comuni): vengono marcati "fts-or" e NON ricevono boost dal reranker.
+            words = set(re.findall(r"[a-zà-ù0-9]{3,}", fts_query.lower()))
+            if words:
+                params["q"] = " OR ".join(sorted(words)[:32])
+                rows = (await self._session.execute(sql, params)).mappings().all()
+                or_fallback = True
         hits: list[RetrievalHit] = []
         for row in rows:
-            hits.append(self._row_to_hit(row, score=float(row["rank"])))
+            hit = self._row_to_hit(row, score=float(row["rank"]))
+            if or_fallback:
+                hit = hit.model_copy(update={"metadata": {**hit.metadata, "lookup": "fts-or"}})
+            hits.append(hit)
         logger.info("fts_search.done", n=len(hits), intent=routed.intent, effective_at=str(eff))
         return hits
 

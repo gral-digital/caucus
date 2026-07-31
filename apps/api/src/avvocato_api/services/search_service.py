@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import replace
 from functools import lru_cache
 from time import perf_counter
 
@@ -10,12 +11,13 @@ import structlog
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from avvocato_api.deps import get_corpus_map, get_db_session, get_vectorstore
+from avvocato_api.deps import get_corpus_map, get_db_session, get_llm_router, get_vectorstore
 from avvocato_api.services.fts_retriever import FtsRetriever
 from avvocato_rag_core.config import get_settings
 from avvocato_rag_core.embeddings.base import EmbeddingProvider
 from avvocato_rag_core.embeddings.factory import create_embedding_provider
 from avvocato_rag_core.hit_merge import ensure_direct_articles_first, reciprocal_rank_fusion
+from avvocato_rag_core.query_expander import LLMQueryExpander
 from avvocato_rag_core.query_router import apply_routing, route_query
 from avvocato_rag_core.reranker import Reranker
 from avvocato_rag_core.reranker_factory import create_reranker
@@ -34,6 +36,13 @@ def _get_embedder() -> EmbeddingProvider:
 @lru_cache(maxsize=1)
 def _get_reranker() -> Reranker:
     return create_reranker(get_settings())
+
+
+@lru_cache(maxsize=1)
+def _get_expander() -> LLMQueryExpander | None:
+    if not get_settings().query_expansion_enabled:
+        return None
+    return LLMQueryExpander(get_llm_router())
 
 
 class SearchService:
@@ -87,6 +96,32 @@ class SearchService:
         routed = route_query(query.text, base_sources=query.sources)
         effective_query = apply_routing(query, routed)
 
+        # Query expansion LLM: arricchisce il testo per embedding e FTS con la
+        # terminologia giuridica tecnica. Mai per il lookup diretto (i numeri
+        # suggeriti dal modello potrebbero essere sbagliati).
+        expander = _get_expander()
+        expansion_refs: tuple = ()
+        if expander is not None:
+            expansion = await expander.expand(routed.original_text)
+            if expansion:
+                effective_query = effective_query.model_copy(
+                    update={"text": f"{effective_query.text}\n{expansion}"}
+                )
+                # L'espansione alimenta anche il ramo FTS...
+                routed = replace(
+                    routed, fts_extra_terms=(*routed.fts_extra_terms, expansion)
+                )
+                # ...e i riferimenti espliciti che contiene ("art. 2043 codice
+                # civile") diventano candidati di lookup NON pinnati: se il
+                # modello ha suggerito l'articolo giusto è un hit esatto, se ha
+                # sbagliato il reranker lo affossa.
+                exp_routed = route_query(expansion)
+                user_refs = {(a.source, a.num) for a in routed.direct_articles}
+                expansion_refs = tuple(
+                    a for a in exp_routed.direct_articles
+                    if (a.source, a.num) not in user_refs
+                )[:4]
+
         logger.info(
             "search.route",
             intent=routed.intent,
@@ -107,15 +142,32 @@ class SearchService:
         )
         vector_result = await vector_task
 
+        # Candidati dall'espansione LLM: lookup esatto ma senza pin, score
+        # moderato e marcatura dedicata.
+        expansion_hits = []
+        if expansion_refs:
+            raw_exp = await self._fts.direct_articles(
+                expansion_refs, effective_at=effective_query.effective_at
+            )
+            expansion_hits = [
+                h.model_copy(
+                    update={
+                        "score_final": 1.0,
+                        "metadata": {**h.metadata, "lookup": "expansion"},
+                    }
+                )
+                for h in raw_exp
+            ]
+
         pin_ids = [h.chunk_id for h in direct_hits]
         merged = reciprocal_rank_fusion(
-            [direct_hits, fts_hits, vector_result.hits],
+            [direct_hits, expansion_hits, fts_hits, vector_result.hits],
             top_k=effective_query.top_k_retrieve,
             pin_first=pin_ids or None,
             # Il lookup per numero di articolo è deterministico: pesa il triplo
-            # dei rami probabilistici, così la citazione esatta dell'utente
-            # domina il ranking senza dipendere solo dai workaround di pinning.
-            weights=[3.0, 1.0, 1.0],
+            # dei rami probabilistici. I candidati dell'espansione LLM pesano
+            # più del probabilistico ma meno del lookup utente.
+            weights=[3.0, 1.5, 1.0, 1.0],
         )
 
         reranked = await self._reranker.rerank(
@@ -127,6 +179,17 @@ class SearchService:
         reranked = ensure_direct_articles_first(
             reranked, direct=direct_keys, top_k=effective_query.top_k_rerank
         )
+        # Dedup per partizione: lo stesso articolo non deve occupare più slot
+        # del top-k con chunk diversi (articolo-full + comma) — spreca contesto
+        # e maschera articoli diversi rilevanti.
+        seen_partitions: set[object] = set()
+        deduped = []
+        for h in reranked:
+            if h.partition_id in seen_partitions:
+                continue
+            seen_partitions.add(h.partition_id)
+            deduped.append(h)
+        reranked = deduped
 
         # One-hop expansion sul grafo dei rinvii: gli articoli citati dai top
         # hit entrano nel contesto come materiale ausiliario (in coda).

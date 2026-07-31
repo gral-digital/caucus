@@ -11,7 +11,7 @@ from avvocato_rag_core.schemas.retrieval import RetrievalHit
 # il metadata del ramo più autorevole (lookup diretto > FTS > vettoriale) deve
 # sopravvivere alla fusione, altrimenti il boost del reranker sul lookup
 # diretto non scatta proprio sui chunk confermati da più rami.
-_LOOKUP_PRIORITY = {"direct": 2, "fts": 1}
+_LOOKUP_PRIORITY = {"direct": 3, "expansion": 2, "fts": 1}
 
 
 def _lookup_priority(hit: RetrievalHit) -> int:
