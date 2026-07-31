@@ -17,7 +17,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   NIS2, DORA, MiCA, eIDAS, DSA, DMA, direttive), harvest incrementale
   Cassazione da SentenzeWeb (testo integrale anonimizzato, resumabile).
 - **Caucus Bench** (`benchmark/`, MIT): primo benchmark legale italiano
-  aperto — 162 casi, metriche source-aware, hallucination rate solo sulle
+  aperto — 171 casi, metriche source-aware, hallucination rate solo sulle
   risposte che citano, casi abrogati/adversarial/out-of-corpus.
 - **Trust layer**: validazione post-generazione delle citazioni (esistenza,
   fonte, vigenza, abrogazione, grounding sul contesto).
