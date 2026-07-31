@@ -1,6 +1,6 @@
 {
-  "version": "2.0",
-  "description": "Gold set v2 — copertura 23 fonti, casi hard (abrogati, bis/ter/oltre-decies, multi-hop, out-of-scope, adversarial). Versionato in git: OGNI modifica va motivata nel commit e mai adattata a posteriori all'output del sistema.",
+  "version": "2.1",
+  "description": "Gold set v2 — copertura 23 fonti, casi hard (abrogati, bis/ter/oltre-decies, multi-hop, out-of-scope, adversarial). Versionato in git: OGNI modifica va motivata nel commit e mai adattata a posteriori all'output del sistema. v2.1: aggiunti casi per corpus esteso (UE, compliance, giurisprudenza); gap-gdpr convertito in caso positivo perché il GDPR ora È indicizzato.",
   "scoring_notes": "Nessun punteggio per assenza di citazioni: una risposta senza citazioni con should_cite atteso ha citation_recall=0. keywords_groups: ogni gruppo è soddisfatto da almeno una variante (substring case-insensitive).",
   "cases": [
     {
@@ -3253,12 +3253,35 @@
       ]
     },
     {
-      "id": "gap-gdpr",
-      "category": "gap",
+      "id": "gdpr-6",
+      "category": "privacy-ue",
       "question": "Quali sono le basi giuridiche del trattamento secondo l'articolo 6 del GDPR?",
-      "hard": true,
-      "expect_gap_admission": true,
-      "notes": "Il GDPR (Reg. UE 2016/679) NON è indicizzato: la risposta deve ammetterlo, non inventare il testo dell'art. 6 GDPR citandolo come corpus"
+      "must_retrieve": [
+        {
+          "source": "gdpr",
+          "num": "6"
+        }
+      ],
+      "should_cite_any": [
+        {
+          "source": "gdpr",
+          "num": "6"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "consenso"
+        ],
+        [
+          "contratto",
+          "contrattual"
+        ],
+        [
+          "obbligo legale",
+          "legittimo interesse"
+        ]
+      ],
+      "notes": "Era gap-gdpr quando il GDPR non era indicizzato (v2.0); dal corpus v2.1 è un caso positivo."
     },
     {
       "id": "gap-cassazione",
@@ -3437,6 +3460,328 @@
         ]
       ],
       "hard": true
+    },
+    {
+      "id": "gdpr-17",
+      "category": "privacy-ue",
+      "question": "Ho chiesto a un sito di cancellare i miei dati: quali diritti mi dà il GDPR?",
+      "must_retrieve": [
+        {
+          "source": "gdpr",
+          "num": "17"
+        }
+      ],
+      "should_cite_any": [
+        {
+          "source": "gdpr",
+          "num": "17"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "cancellazione",
+          "oblio"
+        ],
+        [
+          "senza ingiustificato ritardo",
+          "motivi"
+        ]
+      ]
+    },
+    {
+      "id": "gdpr-83",
+      "category": "privacy-ue",
+      "question": "A quanto possono arrivare le sanzioni del GDPR per un'azienda?",
+      "must_retrieve": [
+        {
+          "source": "gdpr",
+          "num": "83"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "20 000 000",
+          "20 milioni",
+          "4 %",
+          "4%"
+        ],
+        [
+          "fatturato"
+        ]
+      ]
+    },
+    {
+      "id": "aiact-5",
+      "category": "ai-ue",
+      "hard": true,
+      "question": "Quali pratiche di intelligenza artificiale sono vietate dall'AI Act?",
+      "must_retrieve": [
+        {
+          "source": "aiact",
+          "num": "5"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "vietat",
+          "proibite",
+          "divieto"
+        ],
+        [
+          "subliminal",
+          "social scoring",
+          "punteggio sociale",
+          "vulnerabilit",
+          "biometric"
+        ]
+      ]
+    },
+    {
+      "id": "nis2-21",
+      "category": "cyber-ue",
+      "question": "Quali misure di gestione dei rischi di cibersicurezza impone la NIS2 alle imprese?",
+      "must_retrieve": [
+        {
+          "source": "nis2",
+          "num": "21"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "rischi",
+          "rischio"
+        ],
+        [
+          "misure",
+          "tecniche"
+        ]
+      ]
+    },
+    {
+      "id": "dircons-9",
+      "category": "consumo-ue",
+      "question": "La direttiva UE sui diritti dei consumatori prevede il recesso dagli acquisti a distanza?",
+      "must_retrieve_any": [
+        {
+          "source": "dircons",
+          "num": "9"
+        },
+        {
+          "source": "cdc",
+          "num": "52"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "recesso"
+        ],
+        [
+          "quattordici",
+          "14"
+        ]
+      ]
+    },
+    {
+      "id": "dlgs231-6",
+      "category": "compliance",
+      "hard": true,
+      "question": "Come può una società evitare la responsabilità da reato dei propri dipendenti secondo il D.Lgs. 231?",
+      "must_retrieve": [
+        {
+          "source": "dlgs231",
+          "num": "6"
+        }
+      ],
+      "should_cite_any": [
+        {
+          "source": "dlgs231",
+          "num": "6"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "modell",
+          "organizzazione"
+        ],
+        [
+          "organismo di vigilanza",
+          "vigilanza"
+        ]
+      ]
+    },
+    {
+      "id": "dlgs231-25",
+      "category": "compliance",
+      "question": "La corruzione rientra tra i reati presupposto della responsabilità degli enti?",
+      "must_retrieve_any": [
+        {
+          "source": "dlgs231",
+          "num": "25"
+        },
+        {
+          "source": "dlgs231",
+          "num": "24"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "corruzione",
+          "concussione"
+        ],
+        [
+          "sanzione",
+          "quote"
+        ]
+      ]
+    },
+    {
+      "id": "aml-17",
+      "category": "compliance",
+      "question": "Quando scatta l'obbligo di adeguata verifica della clientela antiriciclaggio?",
+      "must_retrieve_any": [
+        {
+          "source": "aml",
+          "num": "17"
+        },
+        {
+          "source": "aml",
+          "num": "18"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "adeguata verifica"
+        ],
+        [
+          "clientela",
+          "cliente"
+        ]
+      ]
+    },
+    {
+      "id": "dlgs33-5",
+      "category": "compliance",
+      "question": "Cos'è l'accesso civico generalizzato e come si esercita?",
+      "must_retrieve": [
+        {
+          "source": "dlgs33",
+          "num": "5"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "accesso civico"
+        ],
+        [
+          "chiunque"
+        ]
+      ]
+    },
+    {
+      "id": "wb-12",
+      "category": "compliance",
+      "question": "Che tutele ha un dipendente che segnala illeciti visti in azienda?",
+      "must_retrieve_any": [
+        {
+          "source": "wb",
+          "num": "17"
+        },
+        {
+          "source": "wb",
+          "num": "12"
+        },
+        {
+          "source": "wb",
+          "num": "4"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "segnala"
+        ],
+        [
+          "ritorsi",
+          "riservatezza",
+          "protezione"
+        ]
+      ]
+    },
+    {
+      "id": "tua-256",
+      "category": "ambiente",
+      "question": "Cosa rischia chi gestisce rifiuti senza autorizzazione?",
+      "must_retrieve": [
+        {
+          "source": "tua",
+          "num": "256"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "rifiuti"
+        ],
+        [
+          "arresto",
+          "ammenda",
+          "sanzion"
+        ]
+      ]
+    },
+    {
+      "id": "cpa-7",
+      "category": "amministrativo",
+      "question": "Quali controversie rientrano nella giurisdizione del giudice amministrativo?",
+      "must_retrieve": [
+        {
+          "source": "cpa",
+          "num": "7"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "giurisdizione"
+        ],
+        [
+          "interessi legittimi",
+          "pubblici poteri"
+        ]
+      ]
+    },
+    {
+      "id": "cnav-1",
+      "category": "navigazione",
+      "question": "Quali fonti regolano la navigazione secondo il codice della navigazione?",
+      "must_retrieve": [
+        {
+          "source": "cnav",
+          "num": "1"
+        }
+      ],
+      "keywords_groups": [
+        [
+          "navigazione"
+        ],
+        [
+          "diritto",
+          "legge",
+          "norme"
+        ]
+      ]
+    },
+    {
+      "id": "cass-behaviour",
+      "category": "giurisprudenza",
+      "hard": true,
+      "question": "Ci sono sentenze recenti della Cassazione penale in tema di stupefacenti?",
+      "keywords_groups": [
+        [
+          "cass",
+          "cassazione",
+          "corpus",
+          "non trovo"
+        ]
+      ],
+      "notes": "Non vincoliamo estremi specifici: la risposta deve o citare in prosa sentenze DEL CONTESTO o ammettere di non averne. Il validator segnala comunque citazioni normative inventate."
     }
   ]
 }
