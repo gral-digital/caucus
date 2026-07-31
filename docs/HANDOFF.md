@@ -21,11 +21,11 @@ documentare aspirazioni come feature, sempre misurare sul benchmark.**
 ## 2. Stato in una riga
 
 Funzionante e verificato. Eval 171 casi (gold v2.3): **pass 96%, pass(hard)
-95%, recall@8 97%, MRR 0.87, citation recall 97%, hallucination 0%,
-over-refusal 0%, refusal adversarial 100%, gap admission 100%, TTFT p50 8.7s
-(macchina NON idle: harvest attivo; ~6s idle)**. Varianza tra run della stessa
-config: pass 95.3–95.9%. 93 test Python + 9 TS verdi, ruff+mypy strict+tsc+
-eslint puliti, CI bloccante.
+100%, recall@8 97%, MRR 0.85, citation recall 94%, hallucination 0%,
+over-refusal 0%, refusal adversarial 100%, gap admission 100%, TTFT p50 4.6s
+(harvest attivo; probe idle ~4s)**. Varianza tra run della stessa config:
+pass 95.3–95.9%. 93 test Python + 9 TS verdi, ruff+mypy strict+tsc+eslint
+puliti, CI bloccante.
 
 ## 3. Architettura (dove sta cosa)
 
@@ -106,11 +106,15 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    cds-multi-2054, cpp-335, cpp-438/cost-* ("risposta senza citazioni",
    generazione). NON tentare di nuovo il ramo FTS globale sul testo espanso
    (vedi §5).
-2. **Latenza**: TTFT p50 ~6s idle (~8.7s con harvest attivo) vs 2.2s
-   pre-espansione-4o. Piste oneste: espansione con modello più veloce di pari
-   qualità, streaming parallelo espansione/vector, ridurre rerank_candidates
-   misurando il costo in recall. Da NON fare: tornare a mini senza misurare
-   (mini perde 3/14 articoli sui casi difficili, A/B in sessione).
+2. **Latenza — pass fatto (2026-07-31 sera)**: TTFT p50 8.7s→4.6s, p95
+   23s→10.1s a pari pass/recall (costo: MRR 0.89→0.85, cite recall ~94%).
+   Come: espansione → gpt-4.1-mini (A/B sul prompt finale: 9/14 vs 7/14 di
+   4o-mini e 6/14 di 4o — il prompt conta più del modello; nano 2/14,
+   inutilizzabile), reranker max_length 512→384 (~3s→0.8s), ramo vettoriale
+   in parallelo all'espansione (sulla query pre-espansione). Residuo ~4s
+   idle = espansione 1.7s + rerank 1s + primo token gpt-4o ~1.5s: per
+   scendere ancora servono scelte di prodotto (modello di generazione più
+   reattivo, o espansione adattiva), da misurare.
 3. **Harvest Cassazione** verso 200k: gira in background
    (`scripts/harvest_cassazione_full.sh`, log `/tmp/harvest_cassazione.log`,
    ~50k fatte). Resumabile e idempotente. Il completo (~430k) sfora il budget

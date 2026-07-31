@@ -123,6 +123,13 @@ class SearchService:
             if expander is not None
             else None
         )
+        # Il ramo vettoriale parte SUBITO sulla query routata (pre-espansione),
+        # in parallelo all'espansione LLM: attendere l'espansione per embeddare
+        # il testo arricchito metteva in serie i due passi più lenti
+        # (espansione ~1.7s + vettoriale ~0.5s). Il gap lessicale che
+        # l'embedding perde è coperto dai candidati d'espansione, dal FTS
+        # scoped e dal reranker (che riceve comunque la query espansa).
+        vector_task = asyncio.create_task(self._retriever.retrieve(effective_query))
         direct_hits = await self._fts.direct_articles(
             routed.direct_articles, effective_at=effective_query.effective_at
         )
@@ -172,9 +179,6 @@ class SearchService:
                         effective_at=effective_query.effective_at,
                     )
 
-        # Il ramo vettoriale (embedder+Qdrant, niente sessione DB) gira in
-        # parallelo al lookup DB dei candidati dell'espansione.
-        vector_task = asyncio.create_task(self._retriever.retrieve(effective_query))
         expansion_hits = []
         candidate_refs = tuple(
             dict.fromkeys((*expansion_refs, *suggested_refs))

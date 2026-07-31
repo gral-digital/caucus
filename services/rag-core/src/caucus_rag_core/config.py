@@ -35,8 +35,11 @@ class Settings(BaseSettings):
     # Query expansion LLM prima del retrieval (chiude il gap lessicale
     # linguaggio utente ↔ testo normativo; +0.3-1s di latenza, 1 chiamata LLM).
     query_expansion_enabled: bool = True
-    # Modello per l'espansione (piccolo e veloce, separato dalla generazione)
-    query_expansion_model: str = "openai/gpt-4o-mini"
+    # Modello per l'espansione (piccolo e veloce, separato dalla generazione).
+    # A/B sul prompt strutturato attuale (10 casi difficili, articoli attesi
+    # nei RIF): gpt-4.1-mini 9/14, gpt-4o-mini 7/14, gpt-4o 6/14 — il prompt
+    # conta più della taglia del modello, e 4.1-mini è il migliore misurato.
+    query_expansion_model: str = "openai/gpt-4.1-mini"
 
     # Richieste per minuto per IP su /chat e /search (0 = disabilitato).
     # NB: limiter in-memory per processo; con più istanze passare a Redis.
@@ -86,6 +89,12 @@ class Settings(BaseSettings):
     # Candidati passati al reranker (dal top del merge RRF): il cross-encoder
     # costa ~lineare nel numero di coppie.
     rerank_candidates: int = 30
+    # Lunghezza massima (token) delle coppie query+chunk nel cross-encoder.
+    # Misurato su MPS (30 coppie): 512 → ~3s, 384 → ~0.8s. I chunk sono in
+    # gran parte sotto i 384 token; gli articolo-full lunghi vengono troncati
+    # in coda, dove il segnale (header + rubrica + primi commi) è già passato.
+    reranker_max_length: int = 384
+    reranker_batch_size: int = 16
     # Frazione del budget candidati assegnata alla giurisprudenza (il resto
     # va alla normativa, fonte primaria). 0.25 = 1 sentenza ogni 4 norme.
     case_law_candidate_ratio: float = 0.25

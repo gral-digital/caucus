@@ -38,6 +38,8 @@ def create_reranker(settings: Settings | None = None) -> Reranker:
             return CrossEncoderReranker(
                 model_name=cfg.reranker_model,
                 device=cfg.reranker_device,
+                max_length=cfg.reranker_max_length,
+                batch_size=cfg.reranker_batch_size,
             )
         if importlib.util.find_spec("FlagEmbedding") is not None:
             return LocalBGEReranker(

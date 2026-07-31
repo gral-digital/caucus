@@ -8,7 +8,7 @@ was otherwise idle.
 
 | System | Date | Gold set | Pass | Pass (hard) | Recall@8 | MRR | Cite recall | Halluc. | Refusal | Over-refusal | Gap adm. | Notes |
 |---|---|---|---|---|---|---|---|---|---|---|---|---|
-| **Caucus reference** (gpt-4o + gpt-4o structured expansion + text-embedding-3-small + bge-reranker-v2-m3 local) | 2026-07-31 | v2.3 | **96%** | 95% | **97%** | 0.87 | 97% | **0.0%** | 100% | **0%** | 100% | corpus: 50 Normattiva + 14 EU + 50k Cassazione; Apple M-series (MPS, **not idle**: harvest attivo); TTFT p50 8.7s / p95 23s; 0 errors / 171 |
+| **Caucus reference** (gpt-4o + gpt-4.1-mini structured expansion + text-embedding-3-small + bge-reranker-v2-m3 local, max_length 384) | 2026-07-31 | v2.3 | **96%** | **100%** | **97%** | 0.85 | 94% | **0.0%** | 100% | **0%** | 100% | corpus: 50 Normattiva + 14 EU + 56k Cassazione; Apple M-series (MPS, **not idle**: harvest attivo); TTFT p50 4.6s / p95 10.1s (probe idle ~4s); 0 errors / 171 |
 | Caucus (previous, keyword-reranker fallback) | 2026-07-31 | v2.3 | 85% | 78% | 85% | 0.74 | 90% | 0.0% | 100% | 0% | 100% | superseded — vedi correzione sotto |
 
 > **Reading the numbers honestly.**
@@ -25,12 +25,17 @@ was otherwise idle.
 > - **Run-to-run variance is real**: across 4 runs of the same configuration,
 >   pass ranged 95.3–95.9% and recall@8 96.2–97.5% (OpenAI nondeterminism in
 >   expansion and generation). We report the last full run, not the best one.
-> - **Latency regressed by design**: expansion moved from gpt-4o-mini to
->   gpt-4o (~+1.5s, measured 8/14 vs 5/14 expected articles on the hardest
->   cases) and the repair pass adds one LLM call when a citation is invalid.
->   TTFT p50 was also measured while the Cassazione harvest was indexing in
->   background; on an idle machine earlier runs measured p50 ~6.1s. A latency
->   pass (streaming expansion, smaller candidate budget) is open work.
+> - **Latency pass (same day, measured)**: expansion model re-A/B'd on the
+>   final prompt — gpt-4.1-mini beat both gpt-4o-mini (9/14 vs 7/14 expected
+>   articles) and gpt-4o (6/14): the structured prompt matters more than model
+>   size. Cross-encoder max_length 512→384 (~3s→~0.8s per 30 pairs on MPS;
+>   chunks are mostly under 384 tokens). Vector branch now runs concurrently
+>   with expansion (on the routed pre-expansion query; the lexical gap is
+>   covered by expansion candidates, scoped FTS and the reranker query).
+>   Net effect: TTFT p50 8.7s→4.6s, p95 23s→10.1s at equal pass/recall;
+>   the measured cost is MRR 0.89→0.85 and citation recall ~97%→94%
+>   (within observed run variance). Both evals ran with the harvest indexing
+>   in background; idle probes put TTFT p50 near 4s.
 
 ## Reproduction
 
