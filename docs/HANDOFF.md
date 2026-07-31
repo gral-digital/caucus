@@ -150,10 +150,26 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    pre-release insieme alle icone definitive. La fase prodotto
    pre-pubblicazione è COMPLETA: prossimo passo test completo (eval +
    E2E) e poi pubblicazione.
-5. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
+5. **Giurisprudenza di merito — fetcher Giustizia Amministrativa PRONTO**
+   (`services/ingestion/.../fetchers/giustizia_amministrativa.py`, 4 test):
+   ricerca portlet Liferay (instance id + p_auth estratti a runtime, MAI
+   hardcodati), paginazione verificata live (CdS e TAR Milano), testo
+   integrale da mdp.* con trim dei metadati interni del gestionale (path di
+   rete, operatori — NON devono finire nel corpus). ToS verificati
+   2026-07-31: no robots.txt, no clausole anti-riuso, pubblicità legale;
+   postura SentenzeWeb (0.5 req/s, UA identificato). PDF storici scartati
+   in v1. **Manca il loader**: riusare il pattern cassazione_loader
+   (case_law con kind ga_cds/ga_tar_*, display «Cons. St., Sez. IV, n.
+   6189/2026» da aggiungere a CaseLawCitation, quota corpus). Costo
+   embedding ~7€/100k provvedimenti — partire con CdS ultimi 3 anni + TAR
+   Roma/Milano/Napoli. Per il merito CIVILE: la Banca Dati pubblica del
+   Ministero (3,5M sentenze) richiede SPID e non consente harvest — dopo
+   la pubblicazione, richiesta formale di accesso programmatico come
+   progetto open di interesse pubblico.
+6. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.
-6. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
+7. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
    self-hosted BGE-M3 (azzera costi/dipendenza US, il codice c'è già),
    structured output per le citazioni, conversazioni server-side + audit log.
 
