@@ -1,30 +1,25 @@
 "use client";
 
 import {
-  Briefcase,
-  Building2,
-  Car,
+  BookOpen,
   FileText,
   Gavel,
-  Landmark,
   PenSquare,
   Scale,
   ScrollText,
   Settings,
-  ShieldCheck,
+  X,
 } from "lucide-react";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { ChatMode } from "@/lib/chatStream";
 
 /**
- * Sidebar in stile Claude. Fissa a sinistra, sfondo beige chiarissimo,
- * logo + "Nuova conversazione" in alto, area "Moduli / corpora" al centro,
- * footer con profilo utente in basso.
+ * Sidebar minimale: logo, nuova conversazione, moduli, footer.
  *
- * L'elenco dei corpora qui è DISPLAY-ONLY: mostra cosa c'è nell'indice,
- * non seleziona un filtro (quello sarà M2). Il retriever cerca di default
- * su tutti i corpora.
+ * Il catalogo delle fonti NON vive più qui (era un elenco di 50+ voci sempre
+ * aperto): sta nel pannello «Fonti» richiamabile dal footer — visibile quando
+ * serve, invisibile quando si lavora.
  */
 export function Sidebar({
   mode,
@@ -33,21 +28,21 @@ export function Sidebar({
   mode: ChatMode;
   onSelectMode: (mode: ChatMode) => void;
 }) {
+  const [fontiOpen, setFontiOpen] = useState(false);
+
   return (
-    <aside className="flex h-full w-[272px] shrink-0 flex-col border-r border-paper-border bg-paper-panel">
-      <div className="flex items-center gap-2 px-4 pb-3 pt-5">
+    <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-paper-border bg-paper-panel">
+      <div className="flex items-center gap-2 px-4 pb-4 pt-5">
         <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-paper">
           <ScrollText size={15} strokeWidth={2.2} />
         </div>
         <span className="font-serif text-[17px] tracking-tight text-ink">Caucus</span>
       </div>
 
-      <div className="px-3 pb-3 pt-1">
+      <div className="px-3 pb-4">
         <button
           type="button"
-          className={cn(
-            "flex w-full items-center gap-2 rounded-lg border border-paper-border bg-paper px-3 py-2 text-[13.5px] font-medium text-ink transition hover:bg-paper-hover",
-          )}
+          className="flex w-full items-center gap-2 rounded-lg border border-paper-border bg-paper px-3 py-2 text-[13.5px] font-medium text-ink transition hover:bg-paper-hover"
           onClick={() => {
             if (typeof window !== "undefined") window.location.reload();
           }}
@@ -57,8 +52,7 @@ export function Sidebar({
         </button>
       </div>
 
-      {/* Moduli (attivi / presto) */}
-      <div className="px-4 pt-2 text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
+      <div className="px-4 text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
         Moduli
       </div>
       <nav className="flex flex-col gap-0.5 px-3 pb-3 pt-1">
@@ -83,24 +77,18 @@ export function Sidebar({
         <SidebarLink icon={<Scale size={14} />} label="Giurisprudenza" soon />
       </nav>
 
-      {/* Corpora indicizzati */}
-      <div className="px-4 pt-2 text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
-        Corpus normativo
-      </div>
-      <div className="flex-1 overflow-y-auto px-3 pb-2 pt-1">
-        <CorpusGroup label="Codici" items={CORPUS_CODICI} />
-        <CorpusGroup label="Testi Unici" items={CORPUS_TU} />
-        <CorpusGroup label="Leggi" items={CORPUS_LEGGI} />
-        <CorpusGroup label="Compliance" items={CORPUS_COMPLIANCE} />
-        <CorpusGroup label="Diritto UE" items={CORPUS_UE} />
-        <CorpusGroup label="Giurisprudenza" items={CORPUS_GIURISPRUDENZA} />
-        <p className="mt-3 px-2 text-[11px] leading-relaxed text-ink-subtle">
-          Fonti aggiornate a vigenti al 17/04/2026. Cassazione e altre
-          leggi speciali in arrivo.
-        </p>
-      </div>
+      <div className="flex-1" />
 
       <div className="border-t border-paper-border/70 px-3 py-3">
+        <button
+          type="button"
+          onClick={() => setFontiOpen(true)}
+          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-[13.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
+        >
+          <BookOpen size={14} />
+          <span className="flex-1 text-left">Fonti del corpus</span>
+          <span className="font-mono text-[10.5px] text-ink-subtle">65</span>
+        </button>
         <button
           type="button"
           className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-[13.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
@@ -109,119 +97,151 @@ export function Sidebar({
           Impostazioni
         </button>
       </div>
+
+      {fontiOpen ? <FontiPanel onClose={() => setFontiOpen(false)} /> : null}
     </aside>
   );
 }
 
 // ---------------------------------------------------------------------------
 
-type CorpusItem = {
-  short: string;
-  label: string;
-  icon?: ReactNode;
-};
-
-const CORPUS_CODICI: CorpusItem[] = [
-  { short: "cc", label: "Codice Civile", icon: <Scale size={12} /> },
-  { short: "cp", label: "Codice Penale", icon: <Gavel size={12} /> },
-  { short: "cpc", label: "Procedura Civile" },
-  { short: "cpp", label: "Procedura Penale" },
-  { short: "cost", label: "Costituzione", icon: <Landmark size={12} /> },
-  { short: "cds", label: "Codice della Strada", icon: <Car size={12} /> },
-  { short: "cdc", label: "Codice del Consumo" },
-  { short: "ccii", label: "Crisi d'Impresa" },
-  { short: "ccp", label: "Contratti Pubblici" },
-  { short: "cad", label: "Amm. Digitale" },
-  { short: "cts", label: "Terzo Settore" },
-  { short: "cpriv", label: "Privacy", icon: <ShieldCheck size={12} /> },
+const FONTI: { label: string; items: string[] }[] = [
+  {
+    label: "Codici",
+    items: [
+      "Codice Civile",
+      "Codice Penale",
+      "Procedura Civile",
+      "Procedura Penale",
+      "Costituzione",
+      "Codice della Strada",
+      "Codice del Consumo",
+      "Crisi d'Impresa",
+      "Contratti Pubblici",
+      "Amministrazione Digitale",
+      "Terzo Settore",
+      "Codice Privacy",
+      "Codice Antimafia",
+      "Codice Assicurazioni",
+      "Beni Culturali",
+      "Codice della Navigazione",
+      "Processo Amministrativo",
+      "Processo Tributario",
+    ],
+  },
+  {
+    label: "Testi Unici",
+    items: [
+      "Stupefacenti",
+      "Immigrazione",
+      "Edilizia",
+      "Sicurezza sul Lavoro",
+      "Bancario (TUB)",
+      "Finanza (TUF)",
+      "Imposte sui Redditi (TUIR)",
+      "Ambiente",
+      "Pubblico Impiego",
+      "Enti Locali",
+      "Maternità e Paternità",
+      "Documentazione Amministrativa",
+    ],
+  },
+  {
+    label: "Leggi e compliance",
+    items: [
+      "Procedimento amministrativo (241/1990)",
+      "Statuto dei Lavoratori",
+      "Licenziamenti (604/1966)",
+      "Locazioni (392/1978)",
+      "Divorzio (898/1970)",
+      "Unioni civili (76/2016)",
+      "Cittadinanza (91/1992)",
+      "Depenalizzazione (689/1981)",
+      "Professione forense (247/2012)",
+      "Responsabilità enti (231/2001)",
+      "Antiriciclaggio (231/2007)",
+      "Anticorruzione (190/2012)",
+      "Trasparenza (33/2013)",
+      "Whistleblowing (24/2023)",
+      "Contratti di lavoro (81/2015)",
+      "IVA e accertamento",
+    ],
+  },
+  {
+    label: "Diritto UE",
+    items: [
+      "GDPR",
+      "AI Act",
+      "NIS2",
+      "DORA",
+      "MiCA",
+      "DSA / DMA",
+      "eIDAS",
+      "PSD2 / MiFID II",
+      "Direttive consumatori, whistleblowing, AML, ePrivacy",
+    ],
+  },
 ];
 
-const CORPUS_TU: CorpusItem[] = [
-  { short: "tus", label: "TU Stupefacenti" },
-  { short: "tui", label: "TU Immigrazione" },
-  { short: "tue", label: "TU Edilizia", icon: <Building2 size={12} /> },
-  { short: "tusl", label: "TU Sicurezza Lavoro" },
-  { short: "tub", label: "TU Bancario" },
-  { short: "tuf", label: "TU Finanza" },
-  { short: "tuir", label: "TU Imposte Redditi" },
-];
+function FontiPanel({ onClose }: { onClose: () => void }) {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
-const CORPUS_LEGGI: CorpusItem[] = [
-  { short: "l241", label: "L. 241/1990 proc. amm." },
-  { short: "stat", label: "Statuto Lavoratori", icon: <Briefcase size={12} /> },
-  { short: "l689", label: "L. 689/1981 depen." },
-  { short: "lpf", label: "L. 247/2012 forense" },
-  { short: "l604", label: "L. 604/1966 licenziamenti" },
-  { short: "l392", label: "L. 392/1978 locazioni" },
-  { short: "l898", label: "L. 898/1970 divorzio" },
-  { short: "l76", label: "L. 76/2016 unioni civili" },
-  { short: "l91", label: "L. 91/1992 cittadinanza" },
-];
-
-const CORPUS_COMPLIANCE: CorpusItem[] = [
-  { short: "dlgs231", label: "D.Lgs. 231/2001 enti" },
-  { short: "aml", label: "Antiriciclaggio 231/2007" },
-  { short: "l190", label: "Anticorruzione 190/2012" },
-  { short: "dlgs33", label: "Trasparenza 33/2013" },
-  { short: "cam", label: "Codice Antimafia" },
-  { short: "wb", label: "Whistleblowing 24/2023" },
-  { short: "tua", label: "TU Ambiente" },
-  { short: "tupi", label: "TU Pubblico Impiego" },
-  { short: "cpa", label: "Processo Amministrativo" },
-  { short: "cpt", label: "Processo Tributario" },
-  { short: "tuel", label: "TU Enti Locali" },
-  { short: "cap", label: "Codice Assicurazioni" },
-  { short: "iva", label: "IVA 633/1972" },
-  { short: "tumat", label: "TU Maternità" },
-  { short: "lav81", label: "Contratti Lavoro 81/2015" },
-];
-
-const CORPUS_UE: CorpusItem[] = [
-  { short: "gdpr", label: "GDPR", icon: <ShieldCheck size={12} /> },
-  { short: "aiact", label: "AI Act" },
-  { short: "nis2", label: "NIS2" },
-  { short: "dora", label: "DORA" },
-  { short: "mica", label: "MiCA" },
-  { short: "dsa", label: "DSA / DMA" },
-  { short: "eidas", label: "eIDAS" },
-  { short: "psd2", label: "PSD2 / MiFID II" },
-];
-
-const CORPUS_GIURISPRUDENZA: CorpusItem[] = [
-  { short: "cass-civ", label: "Cassazione Civile", icon: <Gavel size={12} /> },
-  { short: "cass-pen", label: "Cassazione Penale", icon: <Gavel size={12} /> },
-];
-
-function CorpusGroup({ label, items }: { label: string; items: CorpusItem[] }) {
-  const [open, setOpen] = useState(true);
   return (
-    <div className="mb-1">
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center justify-between rounded px-2 py-1 text-left text-[12px] font-medium text-ink-muted hover:bg-paper-hover/50"
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/20 p-6"
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="max-h-[80vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-paper-border bg-paper p-6 shadow-xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Fonti del corpus"
       >
-        <span>{label}</span>
-        <span className="font-mono text-[10px] text-ink-subtle">{items.length}</span>
-      </button>
-      {open ? (
-        <ul className="mt-0.5 flex flex-col gap-px">
-          {items.map((it) => (
-            <li
-              key={it.short}
-              className="flex items-center gap-1.5 rounded px-2 py-1 text-[12.5px] text-ink-muted"
-              title={it.label}
-            >
-              {it.icon ? (
-                <span className="text-ink-subtle">{it.icon}</span>
-              ) : (
-                <span className="inline-block h-[4px] w-[4px] rounded-full bg-ink-subtle" />
-              )}
-              <span className="truncate">{it.label}</span>
-            </li>
+        <div className="mb-1 flex items-start justify-between">
+          <h2 className="font-serif text-xl text-ink">Fonti del corpus</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Chiudi"
+            className="rounded-full p-1.5 text-ink-subtle transition hover:bg-paper-hover hover:text-ink"
+          >
+            <X size={16} />
+          </button>
+        </div>
+        <p className="mb-5 text-[13px] leading-relaxed text-ink-muted">
+          Testi consolidati Normattiva e atti EUR-Lex, con filtro di vigenza; ogni
+          citazione nelle risposte è verificata contro queste fonti. In più,
+          giurisprudenza di Cassazione civile e penale (testo integrale
+          anonimizzato, corpus in crescita).
+        </p>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          {FONTI.map((group) => (
+            <div key={group.label}>
+              <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
+                {group.label}
+              </div>
+              <ul className="flex flex-col gap-0.5">
+                {group.items.map((it) => (
+                  <li key={it} className="text-[13px] leading-relaxed text-ink-muted">
+                    {it}
+                  </li>
+                ))}
+              </ul>
+            </div>
           ))}
-        </ul>
-      ) : null}
+        </div>
+        <p className="mt-5 border-t border-paper-border/70 pt-3 text-[11.5px] text-ink-subtle">
+          Fonti normative aggiornate ai testi vigenti al 17/04/2026.
+        </p>
+      </div>
     </div>
   );
 }
