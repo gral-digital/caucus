@@ -66,6 +66,7 @@ class SearchService:
             embedder=_get_embedder(),
             vectorstore=vectorstore,
             corpus_collection_map=corpus_map,
+            case_law_ratio=get_settings().case_law_candidate_ratio,
         )
         return cls(
             retriever=retriever,
@@ -85,6 +86,7 @@ class SearchService:
                 embedder=_get_embedder(),
                 vectorstore=get_vectorstore(),
                 corpus_collection_map=get_corpus_map(),
+                case_law_ratio=get_settings().case_law_candidate_ratio,
             ),
             reranker=_get_reranker(),
             fts=FtsRetriever(session),
@@ -124,6 +126,10 @@ class SearchService:
             effective_at=effective_query.effective_at,
         )
 
+        # I suggerimenti euristici del router (regole di materia) entrano come
+        # candidati NON pinnati, allo stesso rango dei riferimenti proposti
+        # dall'espansione LLM: sono ipotesi, non certezze.
+        suggested_refs: tuple[ArticleRef, ...] = routed.suggested_articles[:4]
         expansion_refs: tuple[ArticleRef, ...] = ()
         if expansion_task is not None:
             expansion = await expansion_task
@@ -145,7 +151,10 @@ class SearchService:
         # parallelo al lookup DB dei candidati dell'espansione.
         vector_task = asyncio.create_task(self._retriever.retrieve(effective_query))
         expansion_hits = []
-        if expansion_refs:
+        candidate_refs = tuple(
+            dict.fromkeys((*expansion_refs, *suggested_refs))
+        )  # dedup preservando l'ordine
+        if candidate_refs:
             expansion_hits = [
                 h.model_copy(
                     update={
@@ -154,7 +163,7 @@ class SearchService:
                     }
                 )
                 for h in await self._fts.direct_articles(
-                    expansion_refs, effective_at=effective_query.effective_at
+                    candidate_refs, effective_at=effective_query.effective_at
                 )
             ]
         vector_result = await vector_task

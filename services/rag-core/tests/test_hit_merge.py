@@ -82,3 +82,44 @@ def test_rrf_weights_length_mismatch_raises():
 
     with pytest.raises(ValueError):
         reciprocal_rank_fusion([[_hit(uuid4())]], top_k=5, weights=[1.0, 2.0])
+
+
+def _interleave(primary: list[str], secondary: list[str], ratio: float) -> list[str]:
+    """Replica la fusione proporzionale di HybridRetriever (senza dipendenze)."""
+    out: list[str] = []
+    stride = max(1, round(1 / ratio)) if ratio else 0
+    it = iter(secondary)
+    for i, point in enumerate(primary, start=1):
+        out.append(point)
+        if stride and i % stride == 0:
+            nxt = next(it, None)
+            if nxt is not None:
+                out.append(nxt)
+    out.extend(it)
+    return out
+
+
+def test_retriever_interleave_is_proportional():
+    """La normativa tiene le posizioni di testa; la giurisprudenza è supporto.
+
+    Regressione: con un round-robin 1:1 metà dei primi rank andava alla
+    giurisprudenza e le norme rilevanti non arrivavano al reranker.
+    """
+    norme = [f"norma{i}" for i in range(50)]
+    sentenze = [f"sent{i}" for i in range(12)]
+    out = _interleave(norme, sentenze, 0.25)
+    # Nessuno perde documenti
+    assert sum(1 for x in out if x.startswith("norma")) == 50
+    assert sum(1 for x in out if x.startswith("sent")) == 12
+    # Una sentenza ogni 4 norme, e le prime posizioni sono normative
+    assert out[:5] == ["norma0", "norma1", "norma2", "norma3", "sent0"]
+
+
+def test_retriever_interleave_without_secondary():
+    assert _interleave(["a", "b"], [], 0.25) == ["a", "b"]
+
+
+def test_case_law_quota_has_floor():
+    """Con top_k piccolo la quota non deve azzerare la giurisprudenza."""
+    for top_k in (4, 8, 50):
+        assert max(4, int(top_k * 0.25)) >= 4

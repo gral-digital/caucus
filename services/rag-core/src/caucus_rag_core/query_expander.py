@@ -28,7 +28,7 @@ _SYSTEM = (
     "ed europei: aggiungi gli istituti giuridici tecnici pertinenti, i sinonimi "
     "normativi e, se li conosci con certezza, i riferimenti (es. 'art. 2043 "
     "codice civile'). NON rispondere alla domanda. Output: SOLO la query "
-    "arricchita, una riga, max 40 parole, senza premesse."
+    "arricchita, una riga, max 40 parole, senza premesse. Metti i riferimenti normativi (es. 'art. 2043 codice civile') SUBITO DOPO i primi termini, mai in fondo."
 )
 
 
@@ -54,7 +54,7 @@ class LLMQueryExpander:
                         LLMMessage(role="user", content=question),
                     ],
                     model=self._model,
-                    max_tokens=80,
+                    max_tokens=160,
                     temperature=0.0,
                 ),
                 timeout=self._timeout,

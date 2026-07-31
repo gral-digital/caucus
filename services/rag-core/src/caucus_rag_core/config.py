@@ -86,6 +86,9 @@ class Settings(BaseSettings):
     # Candidati passati al reranker (dal top del merge RRF): il cross-encoder
     # costa ~lineare nel numero di coppie.
     rerank_candidates: int = 30
+    # Frazione del budget candidati assegnata alla giurisprudenza (il resto
+    # va alla normativa, fonte primaria). 0.25 = 1 sentenza ogni 4 norme.
+    case_law_candidate_ratio: float = 0.25
     # auto | keyword | cohere | local | noop
     reranker_backend: str = "auto"
     cohere_api_key: str | None = None

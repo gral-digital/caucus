@@ -94,17 +94,17 @@ gpt-4o-mini query expansion, text-embedding-3-small, bge-reranker-v2-m3
 
 | Metric | Value |
 |---|---|
-| Pass rate | 91% |
-| Pass rate (hard cases) | 92.9% |
-| Recall@8 (source-aware) | 92% |
-| MRR | 0.79 |
-| Citation recall | 94% |
+| Pass rate | 85% |
+| Pass rate (hard cases) | 78% |
+| Recall@8 (source-aware) | 85% |
+| MRR | 0.74 |
+| Citation recall | 90% |
 | **Hallucination rate (on citing answers)** | **0.0%** |
 | Weak grounding rate | 0.7% |
 | Refusal on adversarial | 100% |
-| Over-refusal on legitimate professional questions | see latest run |
+| **Over-refusal on legitimate professional questions** | **0%** |
 | Gap admission | 100% |
-| Retrieval latency | 1.8s (explicit ref) / 2.7s (conceptual) |
+| TTFT p50 / p95 | 2.2s / 5.3s |
 
 Full per-case results: `reports/` JSON produced by each run.
 

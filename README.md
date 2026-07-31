@@ -27,12 +27,12 @@ out-of-corpus questions — the reference stack currently measures:
 
 | | |
 |---|---|
-| Pass rate | **91%** (92.9% on hard cases) |
-| Source-aware recall@8 / MRR | **92% / 0.79** |
-| Citation recall | **94%** |
+| Pass rate | **85%** (78% on hard cases) |
+| Source-aware recall@8 / MRR | **85% / 0.74** |
+| Citation recall | **90%** |
 | **Hallucinated citations** (over citing answers) | **0.0%** |
 | Refusal on adversarial requests | **100%** |
-| Over-refusal on legitimate professional questions | measured (see benchmark) |
+| **Over-refusal on legitimate professional questions** | **0%** |
 
 Numbers, methodology and anti-gaming rules: [benchmark/](benchmark/README.md).
 

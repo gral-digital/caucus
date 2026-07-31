@@ -5,6 +5,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Guardrail bidirezionale**: policy che distingue analisi giuridica (sempre
+  ammessa, anche su reati e clienti colpevoli) da assistenza operativa a un
+  illecito (rifiutata per chiunque, avvocati inclusi: artt. 377-378 c.p.), e
+  metrica **over-refusal** nel benchmark — nessun benchmark legale la misura.
+- **Route `/norma/{source}/art/{num}`**: destinazione dei link delle citazioni
+  (API + pagina), con filtro di vigenza e banner per gli articoli abrogati.
 - **Corpus**: 50 fonti Normattiva (codici, testi unici, compliance: 231/2001,
   AML, anticorruzione, trasparenza, antimafia, whistleblowing, ambiente,
   processo amministrativo/tributario…), 14 atti UE via EUR-Lex (GDPR, AI Act,
@@ -23,6 +29,12 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   cap sull'history, container non-root.
 
 ### Changed
+- Fusione inter-collection proporzionale con quota per corpus: con la crescita
+  della giurisprudenza (285k chunk vs 64k di norme) il corpus secondario
+  sottraeva slot alla normativa prima del reranking.
+- Query router: riconoscimento dei riferimenti con la fonte prima del numero
+  ("Costituzione italiana art. 3") e separazione tra riferimenti espliciti
+  (pinnati) e suggerimenti euristici delle regole di materia (candidati).
 - Parser Akoma Ntoso riscritto nei punti critici: euristica body/allegati,
   commi `<list>`, numerazioni oltre-decies e forme slash, date di
   consolidamento reali (FRBRdate + dataVigenza).

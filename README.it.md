@@ -27,12 +27,12 @@ adversarial e domande fuori corpus — lo stack di riferimento misura oggi:
 
 | | |
 |---|---|
-| Pass rate | **91%** (92,9% sui casi difficili) |
-| Recall@8 source-aware / MRR | **92% / 0,79** |
-| Citation recall | **94%** |
+| Pass rate | **85%** (78% sui casi difficili) |
+| Recall@8 source-aware / MRR | **85% / 0.74** |
+| Citation recall | **90%** |
 | **Citazioni allucinate** (sulle risposte che citano) | **0,0%** |
 | Rifiuto su richieste illecite | **100%** |
-| Rifiuti indebiti su domande professionali legittime | misurati (vedi benchmark) |
+| **Rifiuti indebiti su domande professionali legittime** | **0%** |
 
 Metodologia e regole anti-gaming: [benchmark/](benchmark/README.md).
 

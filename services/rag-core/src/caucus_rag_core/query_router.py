@@ -73,6 +73,11 @@ _SUFFIX_TO_SHORT: dict[str, str] = {
     "codicediprocedurapenale": "cpp",
     "delcodicediprocedurapenale": "cpp",
     "costituzione": "cost",
+    "costituzioneitaliana": "cost",
+    "codcivile": "cc",
+    "codpenale": "cp",
+    "coddellastrada": "cds",
+    "coddelconsumo": "cdc",
     "dellacostituzione": "cost",
     "codicedellastrada": "cds",
     "delcodicedellastrada": "cds",
@@ -108,6 +113,27 @@ _ACT_REF_RE = re.compile(
     r"(?:n\.?\s*)?(\d+)\s*(?:/|\s+del\s+)\s*(\d{2,4})",
     re.IGNORECASE,
 )
+
+# Ordine invertito: fonte PRIMA del numero ("Costituzione italiana art. 3",
+# "codice civile art. 1470"). È la forma che produce spontaneamente la query
+# expansion LLM: senza questo pattern il riferimento andava perso.
+_SOURCE_FIRST_RE = re.compile(
+    r"\b("
+    r"cod(?:ice)?\.?\s*civile|cod(?:ice)?\.?\s*penale|"
+    r"cod(?:ice)?\.?\s*di\s+procedura\s+civile|cod(?:ice)?\.?\s*di\s+procedura\s+penale|"
+    r"costituzione(?:\s+italiana)?|cod(?:ice)?\.?\s*della\s+strada|"
+    r"cod(?:ice)?\.?\s*del\s+consumo|gdpr|ai\s+act|"
+    r"d\.?\s*lgs\.?\s*(?:n\.?\s*)?\d+\s*/\s*\d{2,4}|"
+    r"d\.?\s*p\.?\s*r\.?\s*(?:n\.?\s*)?\d+\s*/\s*\d{2,4}|"
+    r"legge\s*(?:n\.?\s*)?\d+\s*/\s*\d{2,4}|"
+    r"c\.?\s*p\.?\s*c\.?|c\.?\s*p\.?\s*p\.?|c\.?\s*c\.?|c\.?\s*p\.?"
+    # tolleranza per gli aggettivi che l'LLM aggiunge ("codice civile
+    # italiano art. 1470", "Costituzione italiana art. 3")
+    r")(?:\s+(?:italian[oa]|vigente|attuale))?[,\s]+art(?:icolo)?\.?\s*"
+    r"(\d+(?:\s*[-]?\s*(?:bis|ter|quater|quinquies|sexies|septies|octies|novies|decies))?)",
+    re.IGNORECASE,
+)
+
 
 _ACT_TYPE_NORM = {
     "decretolegislativo": "dlgs",
@@ -263,7 +289,13 @@ class RoutedQuery:
     original_text: str
     retrieval_text: str
     sources: list[str] | None = None
+    # Riferimenti ESPLICITI nella query dell'utente: chiave di retrieval
+    # deterministica, pinnata e pesata al massimo.
     direct_articles: tuple[ArticleRef, ...] = ()
+    # Articoli suggeriti dalle regole di materia (euristica per keyword):
+    # utili come candidati, ma NON pinnati — una regola che scatta su
+    # "contratto" non deve imporre l'art. 1218 a una domanda sulla vendita.
+    suggested_articles: tuple[ArticleRef, ...] = ()
     fts_extra_terms: tuple[str, ...] = ()
     intent: str = "general"
     hints: tuple[str, ...] = ()
@@ -275,10 +307,20 @@ def route_query(text: str, *, base_sources: list[str] | None = None) -> RoutedQu
     q_lower = q.lower()
 
     direct: list[ArticleRef] = []
+    suggested: list[ArticleRef] = []
     for m in _ARTICLE_RE.finditer(q):
         suffix = _normalize_suffix(m.group(3))
         if suffix:
             direct.append(ArticleRef(source=suffix, num=_normalize_art_num(m.group(1))))
+
+    # Stessa estrazione con la fonte PRIMA del numero ("Costituzione art. 3"):
+    # è la forma che produce spontaneamente la query expansion LLM.
+    for m in _SOURCE_FIRST_RE.finditer(q):
+        suffix = _normalize_suffix(m.group(1))
+        if suffix:
+            ref = ArticleRef(source=suffix, num=_normalize_art_num(m.group(2)))
+            if ref not in direct:
+                direct.append(ref)
 
     sources: list[str] = list(base_sources) if base_sources else []
     fts_terms: list[str] = []
@@ -297,14 +339,16 @@ def route_query(text: str, *, base_sources: list[str] | None = None) -> RoutedQu
                 sources.append(s)
         fts_terms.extend(rule.fts_terms)
         for ref in rule.direct_articles:
-            if ref not in direct:
-                direct.append(ref)
+            if ref not in direct and ref not in suggested:
+                suggested.append(ref)
         hints.append(rule.intent)
 
     # Omicidio volontario vs colposo: disambiguazione esplicita
     if "omicidio" in q_lower and any(w in q_lower for w in ("volontario", "volontaria", "dolo")):
-        if not any(a.num == "575" for a in direct):
-            direct.append(ArticleRef(source="cp", num="575"))
+        if not any(a.num == "575" for a in direct) and not any(
+            a.source == "cp" and a.num == "575" for a in suggested
+        ):
+            suggested.append(ArticleRef(source="cp", num="575"))
         fts_terms.extend(["omicidio", "575"])
         retrieval_extra.append("omicidio art 575")
     elif "omicidio" in q_lower and "colposo" in q_lower:
@@ -314,7 +358,7 @@ def route_query(text: str, *, base_sources: list[str] | None = None) -> RoutedQu
     # Scenario etilometro: enfatizza norma sostanziale, non solo difesa processuale
     if intent == "traffic":
         if not any(a.source == "cds" and a.num == "186" for a in direct):
-            direct.append(ArticleRef(source="cds", num="186"))
+            suggested.append(ArticleRef(source="cds", num="186"))
         retrieval_extra.extend(["guida stato ebbrezza alcool art 186 codice strada"])
 
     retrieval_text = q
@@ -326,6 +370,7 @@ def route_query(text: str, *, base_sources: list[str] | None = None) -> RoutedQu
         retrieval_text=retrieval_text,
         sources=sources or None,
         direct_articles=tuple(direct),
+        suggested_articles=tuple(suggested),
         fts_extra_terms=tuple(dict.fromkeys(fts_terms)),
         intent=intent,
         hints=tuple(hints),

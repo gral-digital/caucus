@@ -39,17 +39,21 @@ class HybridRetriever:
         embedder: EmbeddingProvider,
         vectorstore: QdrantStore,
         corpus_collection_map: dict[CorpusFilter, str],
+        case_law_ratio: float = 0.25,
     ) -> None:
         self._embedder = embedder
         self._store = vectorstore
         self._corpus_map = corpus_collection_map
+        # Frazione del budget candidati riservata alla giurisprudenza.
+        self._case_law_ratio = case_law_ratio
 
     async def retrieve(self, query: RetrievalQuery) -> RetrievalResult:
         t0 = perf_counter()
         [query_vec] = await self._embedder.embed([query.text], kind="query")
 
         used_corpora: list[CorpusFilter] = []
-        all_points: list[tuple[CorpusFilter, qm.ScoredPoint]] = []
+        per_corpus: list[list[qm.ScoredPoint]] = []
+        total_points = 0
 
         for corpus in query.corpora:
             collection = self._corpus_map.get(corpus)
@@ -61,24 +65,48 @@ class HybridRetriever:
             # ogni volta che il router pinna una fonte normativa.
             skip_sources = corpus == CorpusFilter.CASSAZIONE
             filters = list(self._build_filters(query, skip_sources=skip_sources))
+            # Quota per corpus: la normativa è la fonte primaria, la
+            # giurisprudenza è interpretativa e riceve una frazione del budget.
+            # Senza quota il corpus più grande (oggi Cassazione: 285k chunk vs
+            # 64k di norme) si mangia gli slot e le norme rilevanti non
+            # arrivano nemmeno al reranker.
+            limit = query.top_k_retrieve
+            if corpus == CorpusFilter.CASSAZIONE:
+                limit = max(4, int(query.top_k_retrieve * self._case_law_ratio))
             points = await self._store.hybrid_search(
                 collection,
                 query=query_vec,
-                limit=query.top_k_retrieve,
+                limit=limit,
                 filters=filters,
             )
             used_corpora.append(corpus)
-            all_points.extend((corpus, p) for p in points)
+            per_corpus.append(points)
+            total_points += len(points)
 
-        # NB: con più collection gli score RRF non sono direttamente comparabili
-        # (dipendono dalla profondità delle liste): questo sort è un'approssimazione
-        # accettabile finché in pratica si interroga una sola collection. Quando
-        # le collection `leggi`/`cassazione` saranno popolate, sostituire con un
-        # interleave round-robin o una vera fusione RRF inter-collection.
-        all_points.sort(key=lambda cp: cp[1].score or 0.0, reverse=True)
-        top = all_points[: query.top_k_retrieve]
+        # Fusione inter-collection PROPORZIONALE: gli score RRF di collection
+        # diverse non sono comparabili (dipendono dalla profondità della
+        # lista), quindi si fonde per posizione. Un round-robin 1:1 però
+        # sprecherebbe metà dei primi rank per la giurisprudenza: si inserisce
+        # invece una voce secondaria ogni `stride` voci primarie, così la
+        # normativa mantiene le posizioni di testa e la giurisprudenza resta
+        # presente come supporto.
+        interleaved: list[qm.ScoredPoint] = []
+        if per_corpus:
+            primary, *secondary = per_corpus
+            stride = max(1, round(1 / self._case_law_ratio)) if self._case_law_ratio else 0
+            sec_queue = [iter(lst) for lst in secondary]
+            for i, point in enumerate(primary, start=1):
+                interleaved.append(point)
+                if stride and i % stride == 0:
+                    for it in sec_queue:
+                        nxt = next(it, None)
+                        if nxt is not None:
+                            interleaved.append(nxt)
+            # Coda: eventuali secondari rimasti
+            for it in sec_queue:
+                interleaved.extend(it)
 
-        hits = [self._to_hit(p) for _, p in top]
+        hits = [self._to_hit(p) for p in interleaved]
         latency_ms = int((perf_counter() - t0) * 1000)
         logger.info(
             "retrieval_completed",
@@ -89,7 +117,7 @@ class HybridRetriever:
         return RetrievalResult(
             query=query,
             hits=hits,
-            total_retrieved=len(all_points),
+            total_retrieved=total_points,
             latency_ms=latency_ms,
             used_corpora=used_corpora,
         )
