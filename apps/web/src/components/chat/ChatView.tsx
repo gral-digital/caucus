@@ -55,7 +55,7 @@ const MODE_COPY: Record<
   giurisprudenza: {
     title: "Giurisprudenza",
     subtitle:
-      "Ricerca negli orientamenti della Cassazione (civile e penale, testo integrale): la risposta cita le decisioni con gli estremi e le norme di riferimento.",
+      "Ricerca negli orientamenti di Cassazione, Consiglio di Stato e TAR (testo integrale): la risposta cita le decisioni con gli estremi e le norme di riferimento.",
     examples: [
       "Qual è l'orientamento della Cassazione sul licenziamento ritorsivo?",
       "Come valuta la Cassazione la guida in stato di ebbrezza con tasso vicino alla soglia?",

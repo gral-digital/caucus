@@ -254,8 +254,8 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
 
         <div className="flex items-center justify-between rounded-b-2xl border-t border-paper-border/70 bg-paper-panel px-8 py-3.5">
           <span className="text-[12px] text-ink-muted">
-            + Giurisprudenza di Cassazione civile e penale — testo integrale
-            anonimizzato, corpus in crescita
+            + Giurisprudenza: Cassazione civile e penale, Consiglio di Stato e
+            TAR — testo integrale, corpus in crescita
           </span>
           <span className="text-[11.5px] text-ink-subtle">
             Testi vigenti al 17/04/2026

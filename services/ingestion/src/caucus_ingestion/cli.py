@@ -399,3 +399,78 @@ async def _run_ingest_cassazione(kind: str, max_docs: int, start: int, rows: int
                 break
     await vectorstore.close()
     typer.echo(f"✓ Cassazione {kind}: {loaded} sentenze indicizzate.")
+
+
+@app.command("ingest-ga")
+def cmd_ingest_ga(
+    sede: Annotated[
+        str, typer.Option("--sede", help='"Consiglio di Stato" o città TAR (es. "Roma")')
+    ] = "Consiglio di Stato",
+    anno: Annotated[int, typer.Option("--anno", help="Anno dei provvedimenti")] = 2026,
+    tipo: Annotated[str, typer.Option("--tipo", help="Sentenza | Ordinanza | Decreto")] = "Sentenza",
+    max_docs: Annotated[int, typer.Option("--max", help="Numero massimo di provvedimenti")] = 200,
+    page_size: Annotated[int, typer.Option("--page-size")] = 60,
+) -> None:
+    """Harvest giustizia amministrativa (TAR/CdS) → Postgres + Qdrant.
+
+    Idempotente per external_id (ECLI): rilanciare riprende senza duplicare.
+    I provvedimenti disponibili solo in PDF vengono scartati (v1).
+    """
+    asyncio.run(_run_ingest_ga(sede, anno, tipo, max_docs, page_size))
+
+
+async def _run_ingest_ga(sede: str, anno: int, tipo: str, max_docs: int, page_size: int) -> None:
+    from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+
+    from caucus_ingestion.fetchers.giustizia_amministrativa import GiustiziaAmministrativaFetcher
+    from caucus_ingestion.ga_loader import GALoader
+    from caucus_rag_core.embeddings.factory import create_embedding_provider
+    from caucus_rag_core.vectorstore.qdrant_store import QdrantStore
+
+    settings = get_settings()
+    engine = create_async_engine(settings.database_url)
+    session_maker = async_sessionmaker(engine, expire_on_commit=False)
+    vectorstore = QdrantStore(
+        url=settings.qdrant_url,
+        api_key=settings.qdrant_api_key,
+        dense_dim=settings.embedding_dim,
+    )
+    embedder = create_embedding_provider(settings)
+
+    loaded = skipped = no_text = 0
+    page = 1
+    async with (
+        GiustiziaAmministrativaFetcher(user_agent=settings.normattiva_user_agent) as fetcher,
+        session_maker() as session,
+    ):
+        loader = GALoader(
+            session=session,
+            embedder=embedder,
+            vectorstore=vectorstore,
+            collection=settings.qdrant_collection_cassazione,
+        )
+        while loaded < max_docs:
+            docs = await fetcher.search(
+                sede=sede, anno=anno, tipo=tipo, page=page, page_size=page_size
+            )
+            if not docs:
+                break
+            known = await loader.existing_ids([d.external_id for d in docs])
+            for doc in docs:
+                if loaded >= max_docs:
+                    break
+                if doc.external_id in known:
+                    skipped += 1
+                    continue
+                text = await fetcher.fetch_text(doc)
+                if not text:
+                    no_text += 1
+                    continue
+                if await loader.load_one(doc, text):
+                    loaded += 1
+            typer.echo(
+                f"  {sede} {anno}: +{loaded} nuovi (pag. {page}, saltati {skipped}, senza testo {no_text})"
+            )
+            page += 1
+    await vectorstore.close()
+    typer.echo(f"✓ GA {sede} {anno} ({tipo}): {loaded} provvedimenti indicizzati.")
