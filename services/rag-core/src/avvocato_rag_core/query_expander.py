@@ -33,8 +33,15 @@ _SYSTEM = (
 
 
 class LLMQueryExpander:
-    def __init__(self, llm: LLMRouter, *, timeout_seconds: float = 6.0) -> None:
+    def __init__(
+        self,
+        llm: LLMRouter,
+        *,
+        model: str | None = None,
+        timeout_seconds: float = 6.0,
+    ) -> None:
         self._llm = llm
+        self._model = model
         self._timeout = timeout_seconds
 
     async def expand(self, question: str) -> str | None:
@@ -46,6 +53,7 @@ class LLMQueryExpander:
                         LLMMessage(role="system", content=_SYSTEM),
                         LLMMessage(role="user", content=question),
                     ],
+                    model=self._model,
                     max_tokens=120,
                     temperature=0.0,
                 ),

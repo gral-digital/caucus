@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import asyncio
-from dataclasses import replace
 from functools import lru_cache
 from time import perf_counter
 
@@ -18,7 +17,7 @@ from avvocato_rag_core.embeddings.base import EmbeddingProvider
 from avvocato_rag_core.embeddings.factory import create_embedding_provider
 from avvocato_rag_core.hit_merge import ensure_direct_articles_first, reciprocal_rank_fusion
 from avvocato_rag_core.query_expander import LLMQueryExpander
-from avvocato_rag_core.query_router import apply_routing, route_query
+from avvocato_rag_core.query_router import ArticleRef, apply_routing, route_query
 from avvocato_rag_core.reranker import Reranker
 from avvocato_rag_core.reranker_factory import create_reranker
 from avvocato_rag_core.retriever import HybridRetriever
@@ -42,7 +41,9 @@ def _get_reranker() -> Reranker:
 def _get_expander() -> LLMQueryExpander | None:
     if not get_settings().query_expansion_enabled:
         return None
-    return LLMQueryExpander(get_llm_router())
+    return LLMQueryExpander(
+        get_llm_router(), model=get_settings().query_expansion_model
+    )
 
 
 class SearchService:
@@ -96,32 +97,6 @@ class SearchService:
         routed = route_query(query.text, base_sources=query.sources)
         effective_query = apply_routing(query, routed)
 
-        # Query expansion LLM: arricchisce il testo per embedding e FTS con la
-        # terminologia giuridica tecnica. Mai per il lookup diretto (i numeri
-        # suggeriti dal modello potrebbero essere sbagliati).
-        expander = _get_expander()
-        expansion_refs: tuple = ()
-        if expander is not None:
-            expansion = await expander.expand(routed.original_text)
-            if expansion:
-                effective_query = effective_query.model_copy(
-                    update={"text": f"{effective_query.text}\n{expansion}"}
-                )
-                # L'espansione alimenta anche il ramo FTS...
-                routed = replace(
-                    routed, fts_extra_terms=(*routed.fts_extra_terms, expansion)
-                )
-                # ...e i riferimenti espliciti che contiene ("art. 2043 codice
-                # civile") diventano candidati di lookup NON pinnati: se il
-                # modello ha suggerito l'articolo giusto è un hit esatto, se ha
-                # sbagliato il reranker lo affossa.
-                exp_routed = route_query(expansion)
-                user_refs = {(a.source, a.num) for a in routed.direct_articles}
-                expansion_refs = tuple(
-                    a for a in exp_routed.direct_articles
-                    if (a.source, a.num) not in user_refs
-                )[:4]
-
         logger.info(
             "search.route",
             intent=routed.intent,
@@ -129,26 +104,64 @@ class SearchService:
             direct=[(a.source, a.num) for a in routed.direct_articles],
         )
 
-        # Stessa vigenza su tutti e tre i rami (None = oggi, come da contratto
-        # di RetrievalQuery).
-        vector_task = asyncio.create_task(self._retriever.retrieve(effective_query))
-        direct_hits = await self._fts.direct_articles(
-            routed.direct_articles, effective_at=effective_query.effective_at
+        # L'espansione LLM (la parte lenta, ~1-2s) parte SUBITO e in parallelo
+        # con i rami che non ne dipendono: lookup diretto e FTS sul testo
+        # originale. Solo il ramo vettoriale attende l'espansione (il testo
+        # arricchito è ciò che chiude il gap lessicale del dense embedding).
+        expander = _get_expander()
+        expansion_task = (
+            asyncio.create_task(expander.expand(routed.original_text))
+            if expander is not None
+            else None
         )
-        fts_hits = await self._fts.search(
-            routed,
-            limit=effective_query.top_k_retrieve,
-            effective_at=effective_query.effective_at,
-        )
-        vector_result = await vector_task
-
-        # Candidati dall'espansione LLM: lookup esatto ma senza pin, score
-        # moderato e marcatura dedicata.
-        expansion_hits = []
-        if expansion_refs:
-            raw_exp = await self._fts.direct_articles(
-                expansion_refs, effective_at=effective_query.effective_at
+        direct_task = asyncio.create_task(
+            self._fts.direct_articles(
+                routed.direct_articles, effective_at=effective_query.effective_at
             )
+        )
+        fts_task = asyncio.create_task(
+            self._fts.search(
+                routed,
+                limit=effective_query.top_k_retrieve,
+                effective_at=effective_query.effective_at,
+            )
+        )
+
+        expansion_refs: tuple[ArticleRef, ...] = ()
+        if expansion_task is not None:
+            expansion = await expansion_task
+            if expansion:
+                effective_query = effective_query.model_copy(
+                    update={"text": f"{effective_query.text}\n{expansion}"}
+                )
+                # I riferimenti espliciti nell'espansione ("art. 2043 codice
+                # civile") diventano candidati di lookup NON pinnati: se il
+                # modello ha suggerito l'articolo giusto è un hit esatto, se ha
+                # sbagliato il reranker lo affossa.
+                exp_routed = route_query(expansion)
+                user_refs = {(a.source, a.num) for a in routed.direct_articles}
+                expansion_refs = tuple(
+                    a
+                    for a in exp_routed.direct_articles
+                    if (a.source, a.num) not in user_refs
+                )[:4]
+
+        vector_task = asyncio.create_task(self._retriever.retrieve(effective_query))
+        exp_lookup_task = (
+            asyncio.create_task(
+                self._fts.direct_articles(
+                    expansion_refs, effective_at=effective_query.effective_at
+                )
+            )
+            if expansion_refs
+            else None
+        )
+
+        direct_hits = await direct_task
+        fts_hits = await fts_task
+        vector_result = await vector_task
+        expansion_hits = []
+        if exp_lookup_task is not None:
             expansion_hits = [
                 h.model_copy(
                     update={
@@ -156,7 +169,7 @@ class SearchService:
                         "metadata": {**h.metadata, "lookup": "expansion"},
                     }
                 )
-                for h in raw_exp
+                for h in await exp_lookup_task
             ]
 
         pin_ids = [h.chunk_id for h in direct_hits]
@@ -170,9 +183,13 @@ class SearchService:
             weights=[3.0, 1.5, 1.0, 1.0],
         )
 
+        # Il reranker riceve la query ESPANSA: il cross-encoder è debole sul
+        # gap dottrina↔testo normativo ("responsabilità extracontrattuale" vs
+        # art. 2043: 0.0002), fortissimo quando la query contiene la
+        # terminologia della norma (0.98). Misurato, non teorico.
         reranked = await self._reranker.rerank(
-            routed.original_text,
-            merged,
+            effective_query.text,
+            merged[: get_settings().rerank_candidates],
             top_k=effective_query.top_k_rerank,
         )
         direct_keys = [(a.source, a.num) for a in routed.direct_articles]

@@ -29,6 +29,17 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:  # noqa: ARG001
         primary_llm=settings.llm_primary_model,
         fallback_llm=settings.llm_fallback_model,
     )
+    # Warm-up del reranker locale: il caricamento del cross-encoder (~5s)
+    # non deve pagarlo la prima query utente.
+    from avvocato_api.services.search_service import _get_reranker
+    from avvocato_rag_core.reranker import CrossEncoderReranker
+
+    reranker = _get_reranker()
+    if isinstance(reranker, CrossEncoderReranker):
+        import asyncio as _asyncio
+
+        await _asyncio.to_thread(reranker.warm_up)
+        logger.info("reranker.warmed_up")
     yield
     logger.info("avvocato_api.stop")
 

@@ -150,6 +150,73 @@ class KeywordBoostReranker(Reranker):
         return [h for _, h in scored[:top_k]]
 
 
+class CrossEncoderReranker(Reranker):
+    """bge-reranker-v2-m3 via sentence-transformers CrossEncoder.
+
+    Preferito a FlagEmbedding (API tokenizer incompatibile con transformers
+    recenti). Su Apple Silicon usare device="mps": ~1.5-3s per 30 coppie.
+    """
+
+    def __init__(
+        self,
+        model_name: str = "BAAI/bge-reranker-v2-m3",
+        *,
+        device: str = "cpu",
+        batch_size: int = 16,
+        max_length: int = 512,
+    ) -> None:
+        self._model_name = model_name
+        self._device = device
+        self._batch_size = batch_size
+        self._max_length = max_length
+        self._model: Any = None
+
+    def warm_up(self) -> None:
+        """Carica il modello e fa una predict di riscaldamento (bloccante)."""
+        model = self._lazy_load()
+        model.predict([("warm", "up")], batch_size=1)
+
+    def _lazy_load(self) -> Any:
+        if self._model is None:
+            from sentence_transformers import CrossEncoder
+
+            self._model = CrossEncoder(
+                self._model_name,
+                device=self._device,
+                max_length=self._max_length,
+            )
+        return self._model
+
+    async def rerank(
+        self, query: str, hits: Sequence[RetrievalHit], top_k: int
+    ) -> list[RetrievalHit]:
+        if not hits:
+            return []
+        import asyncio
+
+        model = self._lazy_load()
+        pairs = [(query, h.text) for h in hits]
+
+        def _score() -> list[float]:
+            raw = model.predict(pairs, batch_size=self._batch_size)
+            return [float(x) for x in raw]
+
+        scores = await asyncio.to_thread(_score)
+        reranked = []
+        for h, score in zip(hits, scores, strict=True):
+            # Il cross-encoder giudica solo il testo: i segnali deterministici
+            # (lookup diretto per numero, abrogazione) restano dei correttivi.
+            adj = score
+            if h.metadata.get("lookup") == "direct":
+                adj += 1.0
+            if h.metadata.get("abrogato"):
+                adj -= 0.5
+            reranked.append(h.model_copy(update={"score_rerank": score, "score_final": adj}))
+        reranked.sort(key=lambda h: h.score_final, reverse=True)
+        logger.info("cross_encoder_rerank.done", total=len(reranked), kept=top_k)
+        return reranked[:top_k]
+
+
 class CohereReranker(Reranker):
     """Cross-encoder Cohere rerank-multilingual-v3.0 (SaaS, no GPU locale)."""
 

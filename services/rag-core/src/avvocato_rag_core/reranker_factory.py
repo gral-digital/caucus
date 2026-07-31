@@ -7,6 +7,7 @@ import importlib.util
 from avvocato_rag_core.config import Settings, get_settings
 from avvocato_rag_core.reranker import (
     CohereReranker,
+    CrossEncoderReranker,
     KeywordBoostReranker,
     LocalBGEReranker,
     NoopReranker,
@@ -27,12 +28,21 @@ def create_reranker(settings: Settings | None = None) -> Reranker:
         return CohereReranker(api_key=cfg.cohere_api_key, model=cfg.cohere_rerank_model)
 
     if backend == "local":
-        # LocalBGEReranker importa FlagEmbedding solo al primo rerank (lazy):
-        # un try/except sul costruttore non protegge nulla — verifichiamo la
-        # disponibilità del modulo QUI, così il fallback avviene alla factory
-        # e non con un crash alla prima query utente.
+        # Verifica di disponibilità QUI (i loader dei modelli sono lazy: un
+        # try/except sul costruttore non proteggerebbe nulla). Preferenza:
+        # sentence-transformers (CrossEncoder, compatibile con transformers
+        # recenti) > FlagEmbedding > keyword.
+        if importlib.util.find_spec("sentence_transformers") is not None:
+            return CrossEncoderReranker(
+                model_name=cfg.reranker_model,
+                device=cfg.reranker_device,
+            )
         if importlib.util.find_spec("FlagEmbedding") is not None:
-            return LocalBGEReranker(model_name=cfg.reranker_model)
+            return LocalBGEReranker(
+                model_name=cfg.reranker_model,
+                device=cfg.reranker_device,
+                use_fp16=cfg.reranker_device != "cpu",
+            )
         return KeywordBoostReranker()
 
     if backend == "keyword":

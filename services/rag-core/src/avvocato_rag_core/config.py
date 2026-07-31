@@ -35,6 +35,8 @@ class Settings(BaseSettings):
     # Query expansion LLM prima del retrieval (chiude il gap lessicale
     # linguaggio utente ↔ testo normativo; +0.3-1s di latenza, 1 chiamata LLM).
     query_expansion_enabled: bool = True
+    # Modello per l'espansione (piccolo e veloce, separato dalla generazione)
+    query_expansion_model: str = "openai/gpt-4o-mini"
 
     # Richieste per minuto per IP su /chat e /search (0 = disabilitato).
     # NB: limiter in-memory per processo; con più istanze passare a Redis.
@@ -79,6 +81,11 @@ class Settings(BaseSettings):
     embedding_model: str = "BAAI/bge-m3"
     embedding_dim: int = 1536
     reranker_model: str = "BAAI/bge-reranker-v2-m3"
+    # Device per il reranker locale: "cpu" | "mps" | "cuda"
+    reranker_device: str = "cpu"
+    # Candidati passati al reranker (dal top del merge RRF): il cross-encoder
+    # costa ~lineare nel numero di coppie.
+    rerank_candidates: int = 30
     # auto | keyword | cohere | local | noop
     reranker_backend: str = "auto"
     cohere_api_key: str | None = None
