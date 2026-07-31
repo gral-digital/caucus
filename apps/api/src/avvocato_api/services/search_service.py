@@ -104,27 +104,24 @@ class SearchService:
             direct=[(a.source, a.num) for a in routed.direct_articles],
         )
 
-        # L'espansione LLM (la parte lenta, ~1-2s) parte SUBITO e in parallelo
-        # con i rami che non ne dipendono: lookup diretto e FTS sul testo
-        # originale. Solo il ramo vettoriale attende l'espansione (il testo
-        # arricchito è ciò che chiude il gap lessicale del dense embedding).
+        # L'espansione LLM (la parte lenta, ~1-2s) parte SUBITO; in parallelo
+        # girano i rami DB sul testo originale. ATTENZIONE: le chiamate che
+        # usano la AsyncSession (direct, fts, exp_lookup) devono restare
+        # SEQUENZIALI tra loro — la sessione SQLAlchemy non ammette operazioni
+        # concorrenti ("This session is provisioning a new connection...").
         expander = _get_expander()
         expansion_task = (
             asyncio.create_task(expander.expand(routed.original_text))
             if expander is not None
             else None
         )
-        direct_task = asyncio.create_task(
-            self._fts.direct_articles(
-                routed.direct_articles, effective_at=effective_query.effective_at
-            )
+        direct_hits = await self._fts.direct_articles(
+            routed.direct_articles, effective_at=effective_query.effective_at
         )
-        fts_task = asyncio.create_task(
-            self._fts.search(
-                routed,
-                limit=effective_query.top_k_retrieve,
-                effective_at=effective_query.effective_at,
-            )
+        fts_hits = await self._fts.search(
+            routed,
+            limit=effective_query.top_k_retrieve,
+            effective_at=effective_query.effective_at,
         )
 
         expansion_refs: tuple[ArticleRef, ...] = ()
@@ -146,22 +143,11 @@ class SearchService:
                     if (a.source, a.num) not in user_refs
                 )[:4]
 
+        # Il ramo vettoriale (embedder+Qdrant, niente sessione DB) gira in
+        # parallelo al lookup DB dei candidati dell'espansione.
         vector_task = asyncio.create_task(self._retriever.retrieve(effective_query))
-        exp_lookup_task = (
-            asyncio.create_task(
-                self._fts.direct_articles(
-                    expansion_refs, effective_at=effective_query.effective_at
-                )
-            )
-            if expansion_refs
-            else None
-        )
-
-        direct_hits = await direct_task
-        fts_hits = await fts_task
-        vector_result = await vector_task
         expansion_hits = []
-        if exp_lookup_task is not None:
+        if expansion_refs:
             expansion_hits = [
                 h.model_copy(
                     update={
@@ -169,8 +155,11 @@ class SearchService:
                         "metadata": {**h.metadata, "lookup": "expansion"},
                     }
                 )
-                for h in await exp_lookup_task
+                for h in await self._fts.direct_articles(
+                    expansion_refs, effective_at=effective_query.effective_at
+                )
             ]
+        vector_result = await vector_task
 
         pin_ids = [h.chunk_id for h in direct_hits]
         merged = reciprocal_rank_fusion(
