@@ -29,6 +29,21 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   cap sull'history, container non-root.
 
 ### Changed
+- **Query expansion strutturata**: l'espansione LLM restituisce, oltre alla
+  query arricchita, fino a 6 articoli candidati in formato `sigla numero`
+  validati contro il catalogo delle fonti (SOURCE_CATALOG); i candidati
+  entrano nel merge come lookup non pinnato. Chiude il gap sulle query
+  concettuali (fonti senza forma canonica: cts, cnav, cpriv, wb, tub…) e sui
+  quesiti su articoli abrogati ("l'ingiuria è ancora reato?" → cp 594).
+  Modello di espansione di riferimento: gpt-4o (misurato 8/14 vs 5/14 articoli
+  attesi rispetto a gpt-4o-mini sui casi difficili). Con FTS ristretto alle
+  fonti dei candidati e riparazione citazioni: pass 85%→96%, recall@8
+  85%→97%, MRR 0.74→0.87-0.89 sul gold v2.3.
+- **Trust layer auto-correttivo**: se la validazione post-generazione trova
+  citazioni inesistenti, una singola passata di riparazione riscrive la
+  risposta correggendo o rimuovendo i riferimenti non verificabili (prima:
+  solo warning). Hallucination rate resta 0% anche nei run in cui la bozza
+  ne conteneva.
 - Fusione inter-collection proporzionale con quota per corpus: con la crescita
   della giurisprudenza (285k chunk vs 64k di norme) il corpus secondario
   sottraeva slot alla normativa prima del reranking.
@@ -39,6 +54,20 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   commi `<list>`, numerazioni oltre-decies e forme slash, date di
   consolidamento reali (FRBRdate + dataVigenza).
 - Loader idempotente (delete-and-replace per fonte).
+
+### Fixed
+- **Fallback silenzioso del reranker**: con `RERANKER_BACKEND=local` ma
+  `sentence-transformers` assente dal venv, la factory ripiegava sul keyword
+  reranker senza segnalarlo, degradando il ranking (parte del calo di recall
+  attribuito alla crescita del corpus era questo). Ora l'extra
+  `reranker-local` è installato di default (`caucus-rag-core[reranker-local]`
+  in apps/api) e il fallback emette un warning esplicito.
+- Parser dei riferimenti d'espansione: scarto degli intervalli («wb 1-21»)
+  e della punteggiatura di coda («cpp 369-bis.»), che producevano lookup
+  mai risolvibili.
+- Router: riconoscimento guida in stato alterato da stupefacenti (art. 187
+  CdS, prima suggeriva sempre il 186) e forme verbali colloquiali
+  ("guido", "ubriaco", "bevuto").
 
 ### Security
 - Endpoint chiusi di default fuori da `app_env=local`; errori interni mai

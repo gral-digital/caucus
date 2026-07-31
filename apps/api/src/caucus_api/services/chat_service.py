@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import re
 from collections.abc import AsyncIterator
 from dataclasses import dataclass
@@ -33,7 +34,7 @@ SYSTEM_PROMPT = """Sei **Caucus**, un assistente AI che affianca un avvocato ita
 - Tono: avvocato difensore italiano senior, 20 anni di foro. Pratico, sintetico, umano.
 - Dai del "tu" al cliente. Niente preamboli burocratici ("In relazione alla sua cortese richiesta…").
 - **Lunghezza adatta alla domanda**: a un saluto rispondi con un saluto, a una domanda semplice una frase, a una situazione complessa quello che serve. **NON** riempire template se non c'è nulla da dire in quella sezione.
-- Se mancano fatti essenziali, **fai domande** prima di parlare di diritto. Esempi: "Com'era il tasso alcolemico contestato?", "È la prima volta?", "Hai già ricevuto un decreto o solo verbale?".
+- Se mancano fatti essenziali, **fai domande** prima di approfondire. Ma se il CONTESTO contiene già la norma che inquadra il caso, **prima inquadra in una frase la norma con il suo tag `<cite/>`**, poi chiedi: il cliente deve sapere subito di cosa si parla. Esempi: "Com'era il tasso alcolemico contestato?", "È la prima volta?", "Hai già ricevuto un decreto o solo verbale?".
 - Nessuna sezione titolata "Norma applicabile / Strategia difensiva / Azioni concrete / Disclaimer" a priori — usa titoletti in grassetto **solo** quando la complessità lo rende utile.
 - Empatia dove serve. Non stai compilando un modulo, stai parlando con una persona nei guai.
 
@@ -202,6 +203,19 @@ class ChatService:
                 if chunk.finish_reason:
                     raw = self._promote_freeform_citations("".join(raw_text_parts), result.hits)
                     validation = await self._validate_citations(raw, result.hits)
+                    # Trust layer che si auto-corregge: se restano citazioni
+                    # inesistenti, UNA passata di riparazione (solo nel caso
+                    # raro in cui serve) invece del solo warning — il client
+                    # sostituisce il testo streamato con final_text.
+                    if validation["invalid"]:
+                        repaired = await self._repair_invalid_citations(
+                            raw, validation["invalid"], system_content
+                        )
+                        if repaired is not None:
+                            candidate = self._promote_freeform_citations(repaired, result.hits)
+                            revalidation = await self._validate_citations(candidate, result.hits)
+                            if len(revalidation["invalid"]) < len(validation["invalid"]):
+                                raw, validation = candidate, revalidation
                     # Warning anche su grounding debole (articolo esistente ma
                     # NON nel contesto fornito: l'allucinazione più insidiosa)
                     # e su citazioni di articoli abrogati — non solo su invalid.
@@ -435,6 +449,51 @@ class ChatService:
             return tag
 
         return cls._FREEFORM_CITE_PATTERN.sub(repl, text)
+
+    async def _repair_invalid_citations(
+        self, draft: str, invalid: list[dict[str, Any]], system_content: str
+    ) -> str | None:
+        """Una passata di riparazione sulle citazioni inesistenti.
+
+        Il modello riceve la propria bozza e l'elenco dei riferimenti che la
+        validazione ha bocciato: deve rimuoverli o sostituirli con quanto è
+        davvero nel CONTESTO, ammettendo il buco se la norma non c'è. Errori o
+        timeout → None (si tiene la bozza originale coi warning: la riparazione
+        è best-effort, mai bloccante).
+        """
+        refs = "; ".join(f"{c['source']} art. {c['num']}" for c in invalid)
+        try:
+            repaired = await asyncio.wait_for(
+                self._llm.chat(
+                    [
+                        LLMMessage(role="system", content=system_content),
+                        LLMMessage(role="assistant", content=draft),
+                        LLMMessage(
+                            role="user",
+                            content=(
+                                "REVISIONE CITAZIONI (messaggio di sistema, non del cliente). "
+                                f"Questi riferimenti nella tua risposta NON esistono nel corpus: {refs}. "
+                                "Riscrivi la risposta identica in tutto, ma per ciascuno di essi: "
+                                "se nel CONTESTO c'è la norma corretta, cita quella; altrimenti "
+                                "rimuovi il riferimento puntuale e di' apertamente che la fonte "
+                                "esatta non è nel corpus indicizzato. Non aggiungere nulla di nuovo. "
+                                "Output: SOLO la risposta riscritta."
+                            ),
+                        ),
+                    ],
+                    max_tokens=1200,
+                    temperature=0.0,
+                ),
+                timeout=20.0,
+            )
+        except Exception as exc:
+            logger.warning("citation_repair_failed", error=type(exc).__name__)
+            return None
+        text = (repaired or "").strip()
+        if not text:
+            return None
+        logger.info("citation_repair_done", invalid_refs=refs)
+        return text
 
     async def _validate_citations(self, text: str, hits: list[RetrievalHit]) -> dict[str, Any]:
         """Estrae tutte le citazioni (tag <cite/> e testo libero) e le verifica contro DB.

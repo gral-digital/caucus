@@ -183,7 +183,19 @@ class MatterRule:
 # Regole materia: keyword → source preferite, termini FTS, lookup diretto articoli chiave
 _MATTER_RULES: tuple[MatterRule, ...] = (
     MatterRule(
-        ("etilometro", "alcool", "alcolem", "ebbrezza", "guida", "guidare", "g/l", "guidato"),
+        (
+            "etilometro",
+            "alcool",
+            "alcolem",
+            "ebbrezza",
+            "guida",
+            "guidare",
+            "g/l",
+            "guidato",
+            "guido",
+            "ubriaco",
+            "bevuto",
+        ),
         ("cds",),
         ("guida", "ebbrezza", "alcool", "etilometro", "186"),
         "traffic",
@@ -357,9 +369,20 @@ def route_query(text: str, *, base_sources: list[str] | None = None) -> RoutedQu
 
     # Scenario etilometro: enfatizza norma sostanziale, non solo difesa processuale
     if intent == "traffic":
-        if not any(a.source == "cds" and a.num == "186" for a in direct):
-            suggested.append(ArticleRef(source="cds", num="186"))
-        retrieval_extra.extend(["guida stato ebbrezza alcool art 186 codice strada"])
+        under_drugs = any(w in q_lower for w in ("drog", "stupefacent", "sostanze psicotrope"))
+        if under_drugs:
+            # Guida sotto effetto di droghe: la norma è l'art. 187, non il 186
+            # (che la regola di materia suggerisce comunque: va rimosso).
+            suggested = [a for a in suggested if not (a.source == "cds" and a.num == "186")]
+            if not any(a.source == "cds" and a.num == "187" for a in direct):
+                suggested.append(ArticleRef(source="cds", num="187"))
+            retrieval_extra.extend(
+                ["guida alterazione psico-fisica sostanze stupefacenti art 187 codice strada"]
+            )
+        else:
+            if not any(a.source == "cds" and a.num == "186" for a in direct):
+                suggested.append(ArticleRef(source="cds", num="186"))
+            retrieval_extra.extend(["guida stato ebbrezza alcool art 186 codice strada"])
 
     retrieval_text = q
     if retrieval_extra:

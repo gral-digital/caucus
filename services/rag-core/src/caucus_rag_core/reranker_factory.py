@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import importlib.util
 
+import structlog
+
 from caucus_rag_core.config import Settings, get_settings
 from caucus_rag_core.reranker import (
     CohereReranker,
@@ -43,6 +45,13 @@ def create_reranker(settings: Settings | None = None) -> Reranker:
                 device=cfg.reranker_device,
                 use_fp16=cfg.reranker_device != "cpu",
             )
+        # Fallback RUMOROSO: il keyword reranker è molto più debole del
+        # cross-encoder richiesto. Un degrado silenzioso ha già falsato una
+        # sessione di eval (recall giù di punti senza che nulla lo segnalasse).
+        structlog.get_logger(__name__).warning(
+            "reranker_local_deps_missing_fallback_keyword",
+            hint="uv sync --all-packages installa caucus-rag-core[reranker-local]",
+        )
         return KeywordBoostReranker()
 
     if backend == "keyword":

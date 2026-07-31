@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+from dataclasses import replace
 from functools import lru_cache
 from time import perf_counter
 
@@ -21,7 +22,12 @@ from caucus_rag_core.query_router import ArticleRef, apply_routing, route_query
 from caucus_rag_core.reranker import Reranker
 from caucus_rag_core.reranker_factory import create_reranker
 from caucus_rag_core.retriever import HybridRetriever
-from caucus_rag_core.schemas.retrieval import CorpusFilter, RetrievalQuery, RetrievalResult
+from caucus_rag_core.schemas.retrieval import (
+    CorpusFilter,
+    RetrievalHit,
+    RetrievalQuery,
+    RetrievalResult,
+)
 from caucus_rag_core.vectorstore.qdrant_store import QdrantStore
 
 logger = structlog.get_logger(__name__)
@@ -131,21 +137,40 @@ class SearchService:
         # dall'espansione LLM: sono ipotesi, non certezze.
         suggested_refs: tuple[ArticleRef, ...] = routed.suggested_articles[:4]
         expansion_refs: tuple[ArticleRef, ...] = ()
+        fts_scoped_hits: list[RetrievalHit] = []
         if expansion_task is not None:
             expansion = await expansion_task
             if expansion:
                 effective_query = effective_query.model_copy(
-                    update={"text": f"{effective_query.text}\n{expansion}"}
+                    update={"text": f"{effective_query.text}\n{expansion.text}"}
                 )
-                # I riferimenti espliciti nell'espansione ("art. 2043 codice
-                # civile") diventano candidati di lookup NON pinnati: se il
-                # modello ha suggerito l'articolo giusto è un hit esatto, se ha
-                # sbagliato il reranker lo affossa.
-                exp_routed = route_query(expansion)
+                # Candidati di lookup NON pinnati: prima i riferimenti
+                # strutturati della riga RIF (validati contro il catalogo
+                # fonti), poi quelli scritti in prosa nella query arricchita
+                # ("art. 2043 codice civile"). Se il modello ha suggerito
+                # l'articolo giusto è un hit esatto, se ha sbagliato il
+                # reranker lo affossa.
+                exp_routed = route_query(expansion.text)
                 user_refs = {(a.source, a.num) for a in routed.direct_articles}
                 expansion_refs = tuple(
-                    a for a in exp_routed.direct_articles if (a.source, a.num) not in user_refs
-                )[:4]
+                    a
+                    for a in dict.fromkeys((*expansion.refs, *exp_routed.direct_articles))
+                    if (a.source, a.num) not in user_refs
+                )[:6]
+                # FTS RISTRETTO alle fonti individuate dall'espansione, con la
+                # terminologia normativa espansa: quando il modello riconosce
+                # la fonte giusta ma sbaglia il numero d'articolo (tipico sui
+                # decreti recenti, es. whistleblowing), il testo trova
+                # l'articolo che il numero manca. Limite basso e ambito
+                # ristretto: un ramo FTS globale sul testo espanso è già stato
+                # misurato dannoso (diluizione del merge, recall 96%→92%).
+                scoped_sources = list(dict.fromkeys(a.source for a in expansion_refs))[:3]
+                if scoped_sources:
+                    fts_scoped_hits = await self._fts.search(
+                        replace(exp_routed, sources=scoped_sources),
+                        limit=8,
+                        effective_at=effective_query.effective_at,
+                    )
 
         # Il ramo vettoriale (embedder+Qdrant, niente sessione DB) gira in
         # parallelo al lookup DB dei candidati dell'espansione.
@@ -162,21 +187,31 @@ class SearchService:
                         "metadata": {**h.metadata, "lookup": "expansion"},
                     }
                 )
+                # 2 chunk per articolo (articolo-full + primo comma): con 6+
+                # candidati, 8 chunk ciascuno inonderebbero il merge RRF
+                # spingendo i rami FTS/vettoriale fuori dai rerank_candidates.
                 for h in await self._fts.direct_articles(
-                    candidate_refs, effective_at=effective_query.effective_at
+                    candidate_refs,
+                    effective_at=effective_query.effective_at,
+                    per_ref_limit=2,
                 )
             ]
         vector_result = await vector_task
 
         pin_ids = [h.chunk_id for h in direct_hits]
         merged = reciprocal_rank_fusion(
-            [direct_hits, expansion_hits, fts_hits, vector_result.hits],
+            [direct_hits, expansion_hits, fts_scoped_hits, fts_hits, vector_result.hits],
             top_k=effective_query.top_k_retrieve,
             pin_first=pin_ids or None,
             # Il lookup per numero di articolo è deterministico: pesa il triplo
             # dei rami probabilistici. I candidati dell'espansione LLM pesano
             # più del probabilistico ma meno del lookup utente.
-            weights=[3.0, 1.5, 1.0, 1.0],
+            # NB (misurato): un ramo FTS GLOBALE sul testo espanso NON va
+            # aggiunto — i chunk contati due volte nei rami probabilistici
+            # superano i candidati d'espansione nel merge e li spingono fuori
+            # dai rerank_candidates (recall 96%→92%, MRR 0.89→0.77). Il ramo
+            # scoped (max 8 hit, max 3 fonti) non ha lo stesso effetto.
+            weights=[3.0, 1.5, 1.2, 1.0, 1.0],
         )
 
         # Il reranker riceve la query ESPANSA: il cross-encoder è debole sul

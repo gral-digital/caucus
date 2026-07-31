@@ -102,8 +102,14 @@ class FtsRetriever:
         articles: tuple[ArticleRef, ...],
         *,
         effective_at: date | None = None,
+        per_ref_limit: int = 8,
     ) -> list[RetrievalHit]:
-        """Lookup esatto per (source, numero articolo), filtrato per vigenza."""
+        """Lookup esatto per (source, numero articolo), filtrato per vigenza.
+
+        ``per_ref_limit`` limita i chunk per articolo: i candidati suggeriti
+        (espansione/regole di materia) sono ipotesi e non devono occupare più
+        slot del merge di quanto serva a rappresentare l'articolo.
+        """
         if not articles:
             return []
 
@@ -132,7 +138,10 @@ class FtsRetriever:
                         NormPartition.effective_to > eff,
                     )
                 )
-                .limit(8)
+                # "articolo-full" < "comma" < "window": col limite basso il
+                # chunk rappresentativo dell'articolo intero entra per primo.
+                .order_by(NormChunk.chunk_kind, NormChunk.id)
+                .limit(per_ref_limit)
             )
             rows = (await self._session.execute(stmt)).all()
             for i, row in enumerate(rows):

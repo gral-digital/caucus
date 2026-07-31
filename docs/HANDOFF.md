@@ -20,10 +20,12 @@ documentare aspirazioni come feature, sempre misurare sul benchmark.**
 
 ## 2. Stato in una riga
 
-Funzionante e verificato. Eval 171 casi (gold v2.3): **pass 85%, recall@8 85%,
-MRR 0.74, citation recall 90%, hallucination 0%, over-refusal 0%, refusal
-adversarial 100%, gap admission 100%, TTFT p50 2.2s**. 78 test Python + 9 TS
-verdi, ruff+mypy strict+tsc+eslint puliti, CI bloccante.
+Funzionante e verificato. Eval 171 casi (gold v2.3): **pass 96%, pass(hard)
+95%, recall@8 97%, MRR 0.87, citation recall 97%, hallucination 0%,
+over-refusal 0%, refusal adversarial 100%, gap admission 100%, TTFT p50 8.7s
+(macchina NON idle: harvest attivo; ~6s idle)**. Varianza tra run della stessa
+config: pass 95.3–95.9%. 93 test Python + 9 TS verdi, ruff+mypy strict+tsc+
+eslint puliti, CI bloccante.
 
 ## 3. Architettura (dove sta cosa)
 
@@ -57,8 +59,11 @@ cd apps/api && RATE_LIMIT_PER_MINUTE=0 uv run uvicorn caucus_api.main:app --port
 ```
 
 Env chiave in `.env` (gitignorato, NON committato): `OPENAI_API_KEY` presente,
-`LLM_PRIMARY_MODEL=openai/gpt-4o`, `RERANKER_BACKEND=local`,
-`RERANKER_DEVICE=mps`. Budget OpenAI usato nella sessione ~15€, autorizzato 30€.
+`LLM_PRIMARY_MODEL=openai/gpt-4o`, `QUERY_EXPANSION_MODEL=openai/gpt-4o`
+(aggiunto: il default in config resta gpt-4o-mini, ma la config di riferimento
+usa 4o — misurato molto più preciso sugli articoli), `RERANKER_BACKEND=local`,
+`RERANKER_DEVICE=mps`. Budget OpenAI: ~15€ prima sessione + ~8-10€ sessione
+espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
 
 ## 5. Regole di lavoro apprese (non ripetere gli errori)
 
@@ -75,27 +80,46 @@ Env chiave in `.env` (gitignorato, NON committato): `OPENAI_API_KEY` presente,
   (misurato: 0.98 vs 0.0002 sull'articolo giusto).
 - **FlagEmbedding è rotto** con transformers recenti → si usa
   `sentence_transformers.CrossEncoder`.
+- **Verifica nei log QUALE reranker è attivo prima di ogni eval**
+  (`cross_encoder_rerank.done` vs `keyword_rerank.done`): un venv senza
+  `sentence-transformers` degradava in silenzio al keyword reranker e ha
+  falsato una sessione di misure. Ora l'extra è di default e il fallback
+  logga `reranker_local_deps_missing_fallback_keyword`.
+- **Niente ramo FTS globale sul testo espanso**: misurato dannoso (chunk
+  contati due volte diluiscono il merge RRF: recall 96→92, MRR 0.89→0.77).
+  Il ramo FTS *ristretto alle fonti dei candidati d'espansione* (max 8 hit,
+  max 3 fonti) invece aiuta ed è in produzione.
+- **L'espansione è sul percorso critico del TTFT**: output oltre ~150 token
+  con gpt-4o causava timeout (6s) intermittenti → retrieval senza espansione
+  → recall 0 su casi random. Budget attuale: 150 token, due righe.
 - **Fusione inter-collection**: score RRF di collection diverse NON sono
   comparabili → si fonde per rank con quota per corpus, mai per score.
 
 ## 6. Lavori aperti, in ordine di priorità
 
-1. **Recall 85% non è tornato ai 92%** pre-crescita Cassazione. È il difetto
-   n.1 aperto, documentato onestamente in `benchmark/RESULTS.md`. I casi
-   residui (vedi `reports/eval_CURRENT_*.json`, campo `failures`) sono query
-   concettuali la cui espansione non fa emergere il numero d'articolo giusto
-   (es. cc-2946 prescrizione, cc-316, ccii-2, ccp-2/17, cad-20, cts-4). Piste:
-   migliorare il prompt d'espansione, o un secondo giro di retrieval sui hit
-   deboli, o multi-query.
-2. **Harvest Cassazione** verso 200k: gira in background
+1. ~~Recall 85%~~ **RISOLTO** (sessione 2026-07-31 sera): espansione
+   strutturata multi-candidato (query_expander.py, riga RIF `sigla numero`
+   validata su SOURCE_CATALOG) + cross-encoder ripristinato + riparazione
+   citazioni. Recall@8 97%, pass 96%. Tail residuo (~5-7 casi, in parte
+   flaky per nondeterminismo OpenAI): wb-12 (il modello non conosce i numeri
+   interni del d.lgs. 24/2023: servono wb 4+12+17 TUTTI in top-8),
+   cds-multi-2054, cpp-335, cpp-438/cost-* ("risposta senza citazioni",
+   generazione). NON tentare di nuovo il ramo FTS globale sul testo espanso
+   (vedi §5).
+2. **Latenza**: TTFT p50 ~6s idle (~8.7s con harvest attivo) vs 2.2s
+   pre-espansione-4o. Piste oneste: espansione con modello più veloce di pari
+   qualità, streaming parallelo espansione/vector, ridurre rerank_candidates
+   misurando il costo in recall. Da NON fare: tornare a mini senza misurare
+   (mini perde 3/14 articoli sui casi difficili, A/B in sessione).
+3. **Harvest Cassazione** verso 200k: gira in background
    (`scripts/harvest_cassazione_full.sh`, log `/tmp/harvest_cassazione.log`,
    ~50k fatte). Resumabile e idempotente. Il completo (~430k) sfora il budget
    (~12€ oltre) → decisione dell'owner. **Attenzione**: più cresce, più può
    ri-abbassare il recall normativo → ri-valutare la `case_law_candidate_ratio`.
-3. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
+4. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.
-4. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
+5. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
    self-hosted BGE-M3 (azzera costi/dipendenza US, il codice c'è già),
    structured output per le citazioni, conversazioni server-side + audit log.
 

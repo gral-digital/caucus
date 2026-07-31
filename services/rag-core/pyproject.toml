@@ -23,7 +23,10 @@ embeddings-local = [
     "torch>=2.5",
 ]
 reranker-local = [
-    "FlagEmbedding>=1.3",
+    # CrossEncoder via sentence-transformers è l'implementazione preferita
+    # (FlagEmbedding è incompatibile con transformers recenti; resta come
+    # fallback in reranker_factory ma non viene più installato di default).
+    "sentence-transformers>=3.3",
     "torch>=2.5",
 ]
 

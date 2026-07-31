@@ -4,7 +4,10 @@ version = "0.0.1"
 description = "FastAPI backend per Caucus"
 requires-python = ">=3.12"
 dependencies = [
-    "caucus-rag-core",
+    # L'extra reranker-local è nel default: la configurazione di riferimento
+    # (RERANKER_BACKEND=local) dipende dal cross-encoder, e senza il pacchetto
+    # la factory ripiegherebbe sul keyword reranker degradando il ranking.
+    "caucus-rag-core[reranker-local]",
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "starlette>=0.41",
