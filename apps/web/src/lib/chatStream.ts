@@ -11,6 +11,8 @@ export interface ChatMessage {
   content: string;
 }
 
+export type ChatMode = "ricerca" | "analisi" | "redazione";
+
 export interface ChatRequest {
   question: string;
   history?: ChatMessage[];
@@ -18,6 +20,7 @@ export interface ChatRequest {
   sources?: string[];
   effective_at?: string;
   document_ids?: string[];
+  mode?: ChatMode;
 }
 
 export interface UploadedDocument {

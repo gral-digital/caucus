@@ -5,6 +5,7 @@ import {
   deleteDocument,
   streamChat,
   uploadDocument,
+  type ChatMode,
   type CitationWarnings,
   type RetrievalHitSummary,
   type UploadedDocument,
@@ -25,14 +26,46 @@ type Turn = {
   citationWarnings?: CitationWarnings;
 };
 
-const EXAMPLES = [
-  "Mi hanno fermato e sono risultato positivo all'etilometro con 1.1 g/l. Come mi difendo?",
-  "Ho firmato un contratto e mi sono accorto di un vizio. Cosa posso fare?",
-  "Qual è la differenza tra dolo e colpa?",
-  "Il mio datore di lavoro mi ha licenziato senza giusta causa. Cosa posso chiedere?",
-];
+const MODE_COPY: Record<
+  ChatMode,
+  { title: string; subtitle: string; examples: string[] }
+> = {
+  ricerca: {
+    title: "Ciao, come posso aiutarti?",
+    subtitle:
+      "Ricerca giuridica sul diritto italiano ed europeo, con citazioni verificate (articolo e comma).",
+    examples: [
+      "Mi hanno fermato e sono risultato positivo all'etilometro con 1.1 g/l. Come mi difendo?",
+      "Ho firmato un contratto e mi sono accorto di un vizio. Cosa posso fare?",
+      "Qual è la differenza tra dolo e colpa?",
+      "Il mio datore di lavoro mi ha licenziato senza giusta causa. Cosa posso chiedere?",
+    ],
+  },
+  analisi: {
+    title: "Analisi documenti",
+    subtitle:
+      "Allega un contratto o un atto (.docx o .pdf) con la graffetta qui sotto, poi fai la tua domanda: l'analisi collega ogni rilievo alla norma.",
+    examples: [
+      "Quali clausole di questo contratto sono rischiose per il mio cliente?",
+      "Riassumi obblighi, scadenze e penali previsti dal documento",
+      "Ci sono clausole vessatorie ai sensi del Codice del Consumo?",
+      "La clausola di recesso è conforme alla disciplina legale?",
+    ],
+  },
+  redazione: {
+    title: "Redazione",
+    subtitle:
+      "Descrivi l'atto che ti serve: ricevi una bozza completa con citazioni verificate, pronta per l'export in Word.",
+    examples: [
+      "Prepara una bozza di parere sulla riducibilità di una clausola penale",
+      "Redigi una diffida ad adempiere ex art. 1454 c.c. per una fornitura non consegnata",
+      "Scrivi una clausola di riservatezza bilaterale per un contratto di collaborazione",
+      "Bozza di lettera di contestazione disciplinare a un dipendente",
+    ],
+  },
+};
 
-export function ChatView() {
+export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
   const [turns, setTurns] = useState<Turn[]>([]);
   const [documents, setDocuments] = useState<UploadedDocument[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -83,7 +116,7 @@ export function ChatView() {
 
     const document_ids = documentsRef.current.map((d) => d.id);
     try {
-      await streamChat({ question, history, document_ids }, (ev) => {
+      await streamChat({ question, history, document_ids, mode }, (ev) => {
         setTurns((prev) =>
           prev.map((turn) => {
             if (turn.id !== id) return turn;
@@ -115,7 +148,7 @@ export function ChatView() {
         );
       }
     }
-  }, []);
+  }, [mode]);
 
   // Mantieni ref aggiornato ai turn per leggere lo storico senza dipendenze stale
   const turnsRef = useRef<Turn[]>([]);
@@ -136,7 +169,7 @@ export function ChatView() {
     <div className="flex h-full flex-col">
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
         <div className="mx-auto flex max-w-3xl flex-col gap-8 px-6 pb-8 pt-10">
-          {empty ? <WelcomeScreen onPick={ask} examples={EXAMPLES} /> : null}
+          {empty ? <WelcomeScreen onPick={ask} copy={MODE_COPY[mode]} /> : null}
 
           {turns.map((turn) => (
             <div key={turn.id} className="flex flex-col gap-3">
@@ -266,22 +299,19 @@ function turnsToHistory(
 
 function WelcomeScreen({
   onPick,
-  examples,
+  copy,
 }: {
   onPick: (q: string) => void;
-  examples: string[];
+  copy: { title: string; subtitle: string; examples: string[] };
 }) {
   return (
     <div className="flex flex-col items-center gap-6 pt-16 text-center">
       <div>
-        <h2 className="font-serif text-3xl text-ink">Ciao, come posso aiutarti?</h2>
-        <p className="mt-2 text-sm text-ink-muted">
-          Assistente legale italiano. Rispondo su Codice Civile e Codice Penale con
-          citazioni precise (articolo e comma).
-        </p>
+        <h2 className="font-serif text-3xl text-ink">{copy.title}</h2>
+        <p className="mx-auto mt-2 max-w-xl text-sm text-ink-muted">{copy.subtitle}</p>
       </div>
       <div className="grid w-full max-w-2xl grid-cols-1 gap-2 sm:grid-cols-2">
-        {examples.map((q) => (
+        {copy.examples.map((q) => (
           <button
             key={q}
             type="button"

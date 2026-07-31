@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { type ReactNode, useState } from "react";
 import { cn } from "@/lib/cn";
+import type { ChatMode } from "@/lib/chatStream";
 
 /**
  * Sidebar in stile Claude. Fissa a sinistra, sfondo beige chiarissimo,
@@ -25,7 +26,13 @@ import { cn } from "@/lib/cn";
  * non seleziona un filtro (quello sarà M2). Il retriever cerca di default
  * su tutti i corpora.
  */
-export function Sidebar() {
+export function Sidebar({
+  mode,
+  onSelectMode,
+}: {
+  mode: ChatMode;
+  onSelectMode: (mode: ChatMode) => void;
+}) {
   return (
     <aside className="flex h-full w-[272px] shrink-0 flex-col border-r border-paper-border bg-paper-panel">
       <div className="flex items-center gap-2 px-4 pb-3 pt-5">
@@ -55,9 +62,24 @@ export function Sidebar() {
         Moduli
       </div>
       <nav className="flex flex-col gap-0.5 px-3 pb-3 pt-1">
-        <SidebarLink active icon={<ScrollText size={14} />} label="Chiedi al Codice" />
-        <SidebarLink icon={<FileText size={14} />} label="Analisi documenti" soon />
-        <SidebarLink icon={<Gavel size={14} />} label="Drafting atti" soon />
+        <SidebarLink
+          active={mode === "ricerca"}
+          icon={<ScrollText size={14} />}
+          label="Ricerca giuridica"
+          onClick={() => onSelectMode("ricerca")}
+        />
+        <SidebarLink
+          active={mode === "analisi"}
+          icon={<FileText size={14} />}
+          label="Analisi documenti"
+          onClick={() => onSelectMode("analisi")}
+        />
+        <SidebarLink
+          active={mode === "redazione"}
+          icon={<Gavel size={14} />}
+          label="Redazione"
+          onClick={() => onSelectMode("redazione")}
+        />
         <SidebarLink icon={<Scale size={14} />} label="Giurisprudenza" soon />
       </nav>
 
@@ -209,16 +231,19 @@ function SidebarLink({
   label,
   active,
   soon,
+  onClick,
 }: {
   icon: ReactNode;
   label: string;
   active?: boolean;
   soon?: boolean;
+  onClick?: () => void;
 }) {
   return (
     <button
       type="button"
       disabled={soon}
+      onClick={onClick}
       className={cn(
         "group flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[13.5px] transition",
         active

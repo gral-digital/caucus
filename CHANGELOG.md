@@ -5,6 +5,14 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Workspace a tre moduli** (Ricerca giuridica / Analisi documenti /
+  Redazione): sidebar navigabile, welcome ed esempi dedicati per modulo,
+  conversazioni indipendenti che sopravvivono al cambio modulo.
+  `ChatRequest.mode` orienta il comportamento: in analisi l'assistente
+  richiede il documento e struttura i rilievi per rischio con norme citate;
+  in redazione produce subito una bozza d'atto completa (premesse/diritto/
+  conclusioni, campi mancanti segnalati come [DA COMPLETARE]) pronta per
+  l'export Word.
 - **Analisi documentale (v1)**: upload di .docx/.pdf (`POST /documents`,
   testo estratto all'upload, file originale non conservato; PDF scansionati
   rifiutati con errore chiaro — niente OCR silenzioso), allegato alla chat

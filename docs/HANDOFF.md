@@ -126,10 +126,13 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    `services/docx_export.py` + bottone in ChatView; python-docx); (b) analisi
    documentale v1 (`routes/documents.py` + `services/document_extract.py` +
    tabella `user_document` migrazione 0004 + `ChatRequest.document_ids` +
-   graffetta/chip in UI). Scoperto durante i test: manca la L. 431/1998
-   (locazioni abitative) dal corpus — task segnalato. Prossimi, in ordine:
-   UI a tre moduli (Ricerca/Analisi/Redazione), retrieval FTS sui documenti
-   lunghi (oggi: cap 30k char nel prompt), Word add-in per ultimo.
+   graffetta/chip in UI); (c) workspace a tre moduli con
+   `ChatRequest.mode` e prompt dedicati per analisi/redazione
+   (`Workspace.tsx`, Sidebar navigabile, conversazioni per modulo).
+   Scoperto durante i test: manca la L. 431/1998 (locazioni abitative) dal
+   corpus — task separato avviato dall'owner. Prossimi, in ordine:
+   retrieval FTS sui documenti lunghi (oggi: cap 30k char nel prompt),
+   modulo Giurisprudenza (ricerca diretta in Cassazione), Word add-in.
 5. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.

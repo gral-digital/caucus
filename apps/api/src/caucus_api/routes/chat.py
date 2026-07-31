@@ -54,6 +54,10 @@ class ChatRequest(BaseModel):
         max_length=3,
         description="Documenti caricati (POST /documents) da usare come contesto del turno.",
     )
+    mode: Literal["ricerca", "analisi", "redazione"] = Field(
+        "ricerca",
+        description="Modulo attivo: orienta il comportamento (ricerca, analisi documenti, redazione).",
+    )
 
 
 @router.post("/chat")

@@ -184,6 +184,30 @@ class ChatService:
             "di volersi basare SOLO su di te per una decisione con conseguenze legali, "
             "ricordaglielo in una frase."
         )
+        mode = getattr(request, "mode", "ricerca")
+        if mode == "analisi":
+            system_content += (
+                "\n\n# MODALITÀ: ANALISI DOCUMENTI\n"
+                "Il cliente è qui per far analizzare documenti. Se non c'è nessun "
+                "documento allegato, invitalo ad allegarlo (icona graffetta) invece "
+                "di rispondere in astratto. Nell'analisi: individua le clausole "
+                "critiche o vessatorie, i rischi concreti per il cliente e le "
+                "scadenze; collega ogni rilievo alla norma pertinente del CONTESTO "
+                "con il tag <cite/>. Struttura per punti, dal rischio più grave."
+            )
+        elif mode == "redazione":
+            system_content += (
+                "\n\n# MODALITÀ: REDAZIONE\n"
+                "Il cliente vuole una bozza (parere, diffida, clausola, lettera, "
+                "atto). Se i fatti indispensabili ci sono, redigi SUBITO un "
+                "documento completo e strutturato in markdown — titolo, premesse/"
+                "fatto, diritto con citazioni <cite/> dal CONTESTO, conclusioni — "
+                "pronto per l'export in Word. I dati mancanti non bloccano la "
+                "bozza: segnali come [DA COMPLETARE: descrizione] al posto giusto. "
+                "Fai domande PRIMA di redigere solo se senza quelle risposte la "
+                "struttura stessa dell'atto cambierebbe."
+            )
+
         # Documenti allegati dall'utente (analisi documentale): entrano nel
         # contesto PRIMA del blocco normativo — sono i fatti del caso.
         if doc_rows:
