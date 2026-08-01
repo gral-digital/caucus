@@ -15,13 +15,8 @@ body {
   border-bottom: 1px solid #e7e3da;
   background: #f5f3ee;
 }
-.logo {
-  width: 28px; height: 28px; border-radius: 7px;
-  background: #8d2a1e; color: #faf9f6;
-  display: flex; align-items: center; justify-content: center;
-  font: 600 15px Georgia, serif;
-}
-.brand { font: 600 15px Georgia, serif; color: #1a1a1a; }
+.brand { font: 500 19px Georgia, serif; color: #1a1a1a; letter-spacing: -0.03em; text-transform: lowercase; }
+.brand-dot { color: #8d2a1e; }
 .tagline { font-size: 11px; color: #6b7280; }
 
 .notice {

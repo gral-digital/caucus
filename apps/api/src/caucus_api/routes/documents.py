@@ -10,14 +10,16 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, Header, HTTPException, UploadFile, status
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from caucus_api.db.models import UserDocument
 from caucus_api.deps import get_db_session, rate_limit, require_api_auth
+from caucus_api.services import auth_service
 from caucus_api.services.document_extract import DocumentExtractionError, extract_text
+from caucus_rag_core.config import get_settings
 
 router = APIRouter(dependencies=[Depends(require_api_auth), Depends(rate_limit)])
 
@@ -40,6 +42,7 @@ class DocumentOut(BaseModel):
 async def upload_document(
     file: UploadFile,
     session: AsyncSession = Depends(get_db_session),
+    authorization: str | None = Header(None),
 ) -> DocumentOut:
     data = await file.read(MAX_UPLOAD_BYTES + 1)
     if len(data) > MAX_UPLOAD_BYTES:
@@ -55,12 +58,21 @@ async def upload_document(
             status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail=str(exc)
         ) from exc
 
+    # Free tier con account: il documento appartiene all'utente della
+    # sessione (best-effort: senza sessione resta anonimo come nel self-host).
+    user_id = None
+    if get_settings().accounts_enabled and authorization:
+        token = authorization[7:].strip() if authorization.lower().startswith("bearer ") else ""
+        user = await auth_service.resolve_session(session, token)
+        user_id = user.id if user else None
+
     row = UserDocument(
         filename=filename[:255],
         media_type=extracted.media_type,
         text=extracted.text,
         char_count=len(extracted.text),
         truncated=extracted.truncated,
+        user_id=user_id,
     )
     session.add(row)
     await session.commit()

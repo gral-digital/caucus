@@ -13,6 +13,7 @@ import {
 import { type ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { ChatMode } from "@/lib/chatStream";
+import { Wordmark } from "./Wordmark";
 
 /**
  * Sidebar minimale: logo, nuova conversazione, moduli, footer.
@@ -34,11 +35,8 @@ export function Sidebar({
 
   return (
     <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-paper-border bg-paper-panel">
-      <div className="flex items-center gap-2 px-4 pb-4 pt-5">
-        <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-paper">
-          <ScrollText size={15} strokeWidth={2.2} />
-        </div>
-        <span className="font-serif text-[17px] tracking-tight text-ink">Caucus</span>
+      <div className="px-4 pb-4 pt-5">
+        <Wordmark />
       </div>
 
       <div className="px-3 pb-4">

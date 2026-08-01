@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  // La compressione bufferizza lo streaming SSE proxato (/api/v1/chat): il
+  // browser riceveva l'intera risposta in un colpo solo invece dei token
+  // progressivi. Gli asset statici li comprime comunque il reverse proxy
+  // davanti (nginx/CDN) in produzione.
+  compress: false,
   async rewrites() {
     return [
       {

@@ -5,6 +5,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Account per il free tier hosted** (feature flag `ACCOUNTS_ENABLED`,
+  default off — il self-hosting resta senza registrazione): tabelle
+  `user_account` (Argon2id) e `auth_session` (nel DB solo lo SHA-256 del
+  token opaco), endpoint `/auth/register|login|logout|me` con difese base
+  (no oracolo sull'esistenza email, rate limit condiviso, sessioni con
+  scadenza revocabili), documenti caricati legati all'account quando la
+  sessione è presente. Migrazione 0005.
 - **Landing page** a `/` (l'app vive su `/app`): hero «L'accuratezza legale
   non si dichiara. Si dimostra.», banda numeri onesti con varianza
   dichiarata, quattro moduli, sezione trust layer e self-hosting, CTA
@@ -108,6 +115,15 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 - Loader idempotente (delete-and-replace per fonte).
 
 ### Fixed
+- **Streaming SSE finalmente visibile in UI**: la compressione applicata
+  dal dev server Next alla risposta proxata bufferizzava l'intero stream —
+  il browser riceveva la risposta in un colpo solo, senza token progressivi
+  né fasi di thinking (i probe da terminale, senza Accept-Encoding, non lo
+  mostravano). Fix su entrambi i lati: `compress: false` in next.config e
+  `Cache-Control: no-transform` + `X-Accel-Buffering: no` sull'SSE.
+  Verificato nel browser: token visibili a ~1s dal click.
+- Brand: wordmark tipografico «caucus.» (serif minuscolo, punto in accent)
+  al posto di icona + testo, ovunque (sidebar, landing, taskpane Word).
 - UX chat: campo input allineato in verticale (l'auto-grow misurava
   l'altezza durante il primo layout e bloccava il campo a 2-3 righe
   fantasma), focus ripristinato dopo l'invio, «Nuova conversazione» azzera

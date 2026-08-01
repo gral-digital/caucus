@@ -85,4 +85,13 @@ async def chat_stream(body: ChatRequest) -> EventSourceResponse:
                     "data": orjson.dumps(evt.data).decode(),
                 }
 
-    return EventSourceResponse(events())
+    # no-transform: vieta a proxy intermedi di comprimere/bufferizzare lo
+    # stream (la compressione del dev server Next consegnava tutti i token
+    # in un colpo solo); X-Accel-Buffering copre nginx in produzione.
+    return EventSourceResponse(
+        events(),
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "X-Accel-Buffering": "no",
+        },
+    )

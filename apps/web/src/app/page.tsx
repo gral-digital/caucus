@@ -9,6 +9,7 @@ import {
   Server,
 } from "lucide-react";
 import Link from "next/link";
+import { Wordmark } from "@/components/layout/Wordmark";
 
 /**
  * Landing pubblica. Tono: numeri onesti, zero marketing non verificabile.
@@ -19,12 +20,7 @@ export default function Landing() {
     <div className="min-h-screen bg-paper text-ink">
       {/* Nav */}
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
-        <div className="flex items-center gap-2">
-          <div className="flex h-7 w-7 items-center justify-center rounded-md bg-accent text-paper">
-            <ScrollText size={15} strokeWidth={2.2} />
-          </div>
-          <span className="font-serif text-[17px] tracking-tight">Caucus</span>
-        </div>
+        <Wordmark size="lg" />
         <nav className="flex items-center gap-2">
           <a
             href="https://github.com/caucus-legal"

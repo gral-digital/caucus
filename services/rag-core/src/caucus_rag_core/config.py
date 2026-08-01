@@ -44,6 +44,11 @@ class Settings(BaseSettings):
     # Richieste per minuto per IP su /chat e /search (0 = disabilitato).
     # NB: limiter in-memory per processo; con più istanze passare a Redis.
     rate_limit_per_minute: int = 30
+    # Account utente (free tier hosted). False = self-hosting single-tenant:
+    # gli endpoint /auth/* rispondono 404 e nessuna risorsa è legata a utenti.
+    accounts_enabled: bool = False
+    # Durata delle sessioni bearer create da /auth/login.
+    auth_session_days: int = 30
 
     # Postgres
     database_url: str = Field(

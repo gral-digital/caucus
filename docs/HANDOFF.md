@@ -170,8 +170,18 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    quattro moduli, trust layer; l'app è su `/app`), thinking onesto in chat
    (eventi SSE `status` con le fasi reali della pipeline, collassati a fine
    risposta), fix UX (input allineato, focus, nuova conversazione senza
-   reload). Gli URL GitHub in landing puntano a github.com/caucus-legal:
-   allinearli quando l'org esiste.
+   reload). Wordmark tipografico «caucus.» ovunque (niente icona). Gli URL
+   GitHub in landing puntano a github.com/caucus-legal: allinearli quando
+   l'org esiste. **Streaming**: la compressione del proxy Next bufferizzava
+   l'SSE (risposta consegnata in blocco) — risolto con compress:false +
+   Cache-Control no-transform; se cambi reverse proxy in prod, NON
+   comprimere /api/v1/chat (X-Accel-Buffering: no già impostato). **Account
+   free tier**: fondamenta pronte dietro `ACCOUNTS_ENABLED` (default off):
+   user_account Argon2id + auth_session (solo SHA-256 del token),
+   /auth/register|login|logout|me testati E2E, documenti legati all'utente.
+   Mancano per il free hosted: UI di login/registrazione nella web app,
+   enforcement dell'auth su /chat (oggi solo associazione best-effort),
+   quote per utente, verifica email.
 7. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.

@@ -303,6 +303,56 @@ class UserDocument(Base):
     truncated: Mapped[bool] = mapped_column(nullable=False, default=False)
     # Attributo di sicurezza per la tenancy futura: popolato server-side.
     tenant_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    # Proprietario (free tier con account): NULL nel self-hosting single-tenant.
+    user_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user_account.id", ondelete="SET NULL"), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), nullable=False
     )
+
+
+class UserAccount(Base):
+    """Account utente per il free tier hosted.
+
+    Nel self-hosting single-tenant gli account restano disattivati
+    (``ACCOUNTS_ENABLED=false``, default): l'API funziona come oggi.
+    """
+
+    __tablename__ = "user_account"
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    # Sempre lowercase (normalizzata alla registrazione): l'unicità è
+    # case-insensitive di fatto.
+    email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
+    # Argon2id — mai altri schemi: niente password in chiaro da nessuna parte.
+    password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
+    display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    sessions: Mapped[list[AuthSession]] = relationship(
+        back_populates="user", cascade="all, delete-orphan"
+    )
+
+
+class AuthSession(Base):
+    """Sessione bearer: nel DB vive SOLO l'hash SHA-256 del token opaco."""
+
+    __tablename__ = "auth_session"
+    __table_args__ = (Index("ix_auth_session_user", "user_id"),)
+
+    id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("user_account.id", ondelete="CASCADE"), nullable=False
+    )
+    token_hash: Mapped[str] = mapped_column(String(64), nullable=False, unique=True)
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), nullable=False
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    user_agent: Mapped[str | None] = mapped_column(String(255), nullable=True)
+
+    user: Mapped[UserAccount] = relationship(back_populates="sessions")
