@@ -22,9 +22,15 @@ export default function Landing() {
       <header className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
         <Wordmark size="lg" />
         <nav className="flex items-center gap-2">
+          <Link
+            href="/docs"
+            className="rounded-lg px-3 py-2 text-[13.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
+          >
+            Docs
+          </Link>
           <a
-            href="https://github.com/caucus-legal"
-            className="flex items-center gap-1.5 rounded-lg px-3 py-2 text-[13.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
+            href="https://github.com/gral-digital/caucus"
+            className="hidden items-center gap-1.5 rounded-lg px-3 py-2 text-[13.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink sm:flex"
           >
             <Github size={15} />
             GitHub
@@ -63,7 +69,7 @@ export default function Landing() {
             <ArrowRight size={16} />
           </Link>
           <a
-            href="https://github.com/caucus-legal"
+            href="https://github.com/gral-digital/caucus"
             className="flex items-center gap-2 rounded-xl border border-paper-border bg-paper px-6 py-3 text-[15px] text-ink transition hover:bg-paper-hover"
           >
             <Github size={16} />
@@ -164,10 +170,15 @@ export default function Landing() {
           Tuo, davvero
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-[14.5px] leading-relaxed text-ink-muted">
-          Codice AGPL-3.0, corpus ricostruibile da fonti pubbliche, backend LLM
-          ed embedding intercambiabili. Lo studio che non può usare il cloud fa
+          Codice AGPL-3.0, corpus ricostruibile da fonti pubbliche — o
+          scaricabile già indicizzato, embedding inclusi — backend LLM ed
+          embedding intercambiabili. Lo studio che non può usare il cloud fa
           girare tutto on-premise. Nessun piano a pagamento, nessun contratto
-          pluriennale: è software libero.
+          pluriennale: è software libero. La{" "}
+          <Link href="/docs" className="text-accent underline decoration-accent/40 underline-offset-2">
+            documentazione
+          </Link>{" "}
+          copre self-hosting, corpus, API e benchmark.
         </p>
         <div className="mt-7 flex items-center justify-center gap-3">
           <Link

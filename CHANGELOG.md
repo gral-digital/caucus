@@ -5,6 +5,29 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Pacchetto corpus ridistribuibile**: `make corpus-export` produce dump
+  Postgres data-only (conteggi sullo stesso snapshot MVCC del dump) +
+  snapshot Qdrant + manifest con checksum SHA-256 e revisione dello schema;
+  `make corpus-import SRC=<dir|url>` scarica (con resume), verifica e
+  ripristina tutto — il self-hosting parte in minuti senza ingestione né
+  costi di embedding.
+- **Documentazione in-app** a `/docs`: otto pagine (panoramica, self-hosting
+  con deploy Vercel, corpus, trust layer, guida ai moduli, API reference con
+  contratto SSE, benchmark, FAQ), navigazione responsive, linkata da landing
+  e sidebar.
+- **Pannello Impostazioni** nella sidebar: data di vigenza per il retrieval
+  (persistita, passata come `effective_at` a ogni domanda), gestione account,
+  info istanza.
+- **Layout mobile dell'app**: sidebar a drawer con top bar dedicata, modali
+  scrollabili a colonna singola, input senza zoom iOS né tastiera automatica,
+  altezze in `dvh` e safe-area.
+
+### Fixed
+- I modali della sidebar (Fonti, Impostazioni) sono renderizzati in portal:
+  la transform del drawer li confinava dentro la sidebar.
+- README allineati ai numeri correnti del benchmark (98% / 171 casi, con
+  varianza dichiarata); la tabella «Current results» era rimasta al run
+  superseded con il reranker in fallback.
 - **Free tier hosted completo** (feature flag `ACCOUNTS_ENABLED`, default
   off — il self-hosting resta senza registrazione): tabelle `user_account`
   (Argon2id) e `auth_session` (nel DB solo lo SHA-256 del token opaco),

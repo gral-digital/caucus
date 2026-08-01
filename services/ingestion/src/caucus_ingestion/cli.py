@@ -407,7 +407,9 @@ def cmd_ingest_ga(
         str, typer.Option("--sede", help='"Consiglio di Stato" o città TAR (es. "Roma")')
     ] = "Consiglio di Stato",
     anno: Annotated[int, typer.Option("--anno", help="Anno dei provvedimenti")] = 2026,
-    tipo: Annotated[str, typer.Option("--tipo", help="Sentenza | Ordinanza | Decreto")] = "Sentenza",
+    tipo: Annotated[
+        str, typer.Option("--tipo", help="Sentenza | Ordinanza | Decreto")
+    ] = "Sentenza",
     max_docs: Annotated[int, typer.Option("--max", help="Numero massimo di provvedimenti")] = 200,
     page_size: Annotated[int, typer.Option("--page-size")] = 60,
 ) -> None:

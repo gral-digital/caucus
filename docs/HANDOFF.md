@@ -2,8 +2,8 @@
 
 > Passaggio di consegne (2026-07-31). Questo documento porta un nuovo agente/
 > sviluppatore da zero contesto a operativo. Leggilo tutto prima di toccare
-> il codice. La directory di lavoro è `/Users/albertomincato/avvocato`
-> (il progetto si chiama **Caucus**; la cartella ha ancora il vecchio nome).
+> il codice. (Il progetto si chiama **Caucus**; la directory di lavoro locale
+> può avere ancora il vecchio nome `avvocato`.)
 
 ## 1. Cos'è
 
@@ -68,8 +68,8 @@ Env chiave in `.env` (gitignorato, NON committato): `OPENAI_API_KEY` presente,
 `LLM_PRIMARY_MODEL=openai/gpt-4o`, `QUERY_EXPANSION_MODEL=openai/gpt-4o`
 (aggiunto: il default in config resta gpt-4o-mini, ma la config di riferimento
 usa 4o — misurato molto più preciso sugli articoli), `RERANKER_BACKEND=local`,
-`RERANKER_DEVICE=mps`. Budget OpenAI: ~15€ prima sessione + ~8-10€ sessione
-espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
+`RERANKER_DEVICE=mps`. Un eval completo (171 casi) costa nell'ordine di 1-2€
+di API OpenAI: misurare con criterio, non a raffica.
 
 ## 5. Regole di lavoro apprese (non ripetere gli errori)
 
@@ -123,8 +123,8 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    reattivo, o espansione adattiva), da misurare.
 3. **Harvest Cassazione** verso 200k: gira in background
    (`scripts/harvest_cassazione_full.sh`, log `/tmp/harvest_cassazione.log`,
-   ~50k fatte). Resumabile e idempotente. Il completo (~430k) sfora il budget
-   (~12€ oltre) → decisione dell'owner. **Attenzione**: più cresce, più può
+   ~50k fatte). Resumabile e idempotente. Il completo (~430k) costa ~12€ di
+   embedding in più → decisione dell'owner. **Attenzione**: più cresce, più può
    ri-abbassare il recall normativo → ri-valutare la `case_law_candidate_ratio`.
 4. **Prodotto (fase avviata 2026-07-31, decisione owner: prodotto prima
    delle metriche; si pubblica tutto insieme)**. Fatto: (a) export .docx del
@@ -171,8 +171,8 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    (eventi SSE `status` con le fasi reali della pipeline, collassati a fine
    risposta), fix UX (input allineato, focus, nuova conversazione senza
    reload). Wordmark tipografico «caucus.» ovunque (niente icona). Gli URL
-   GitHub in landing puntano a github.com/caucus-legal: allinearli quando
-   l'org esiste. **Streaming**: la compressione del proxy Next bufferizzava
+   GitHub in landing e docs puntano a github.com/gral-digital/caucus (l'org
+   caucus-legal non esiste; un eventuale transfer futuro mantiene i redirect). **Streaming**: la compressione del proxy Next bufferizzava
    l'SSE (risposta consegnata in blocco) — risolto con compress:false +
    Cache-Control no-transform; se cambi reverse proxy in prod, NON
    comprimere /api/v1/chat (X-Accel-Buffering: no già impostato). **Account
@@ -191,6 +191,17 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
 7. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.
+   **Corpus scaricabile (2026-08-01)**: `make corpus-export` produce il
+   pacchetto ridistribuibile (pg dump data-only con snapshot MVCC coerente +
+   snapshot Qdrant + manifest con checksum; ~3.9 GB) e `make corpus-import
+   SRC=<dir|url>` lo ripristina con verifica integrale — testato end-to-end
+   in locale (DB temporaneo + collection di test). Azione owner al publish:
+   scegliere l'hosting (i singoli file superano il limite 2 GB dei release
+   asset GitHub per la collection cassazione → serve hosting statico tipo
+   HuggingFace/R2, o split) e sostituire `SRC=<url>` nei README con l'URL
+   reale. **Docs in-app (2026-08-01)**: sezione `/docs` completa nel frontend
+   (8 pagine: panoramica, self-hosting, corpus, trust layer, moduli, API,
+   benchmark, FAQ), linkata da landing e sidebar.
 8. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
    self-hosted BGE-M3 (azzera costi/dipendenza US, il codice c'è già),
    structured output per le citazioni, conversazioni server-side + audit log.
@@ -202,12 +213,3 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
 - `benchmark/README.md` + `benchmark/RESULTS.md` — cosa si misura e come.
 - `docs/ARCHITECTURE.md` — il sistema com'è.
 - `git log --oneline` — la storia ha i numeri prima/dopo in ogni commit.
-
-## 8. Memoria persistente dell'assistente
-
-C'è una memoria di progetto in
-`~/.claude/projects/-Users-albertomincato-avvocato/memory/` (caricata a ogni
-sessione). Contiene: profilo owner, feedback ricorrenti (assistente orientato
-alla difesa; non scaricare modelli >1GB senza conferma; controllo
-allucinazioni), e lo stato del progetto. Aggiornala quando cambia qualcosa di
-non derivabile dal codice.

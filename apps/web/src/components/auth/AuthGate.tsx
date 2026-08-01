@@ -65,7 +65,7 @@ export function AuthGate({ children }: { children: React.ReactNode }) {
   }, [accountsEnabled]);
 
   if (phase === "loading") {
-    return <div className="flex h-screen items-center justify-center bg-paper" />;
+    return <div className="flex h-dvh items-center justify-center bg-paper" />;
   }
   if (phase === "gate") {
     return (
@@ -109,7 +109,7 @@ function AuthScreen({ onDone }: { onDone: (user: AuthUser) => void }) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-paper px-6">
+    <div className="flex min-h-dvh items-center justify-center bg-paper px-6">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
           <Wordmark size="lg" />
@@ -117,7 +117,7 @@ function AuthScreen({ onDone }: { onDone: (user: AuthUser) => void }) {
             Accedi per usare il piano gratuito. Preferisci non registrarti?
             Caucus è software libero:{" "}
             <a
-              href="https://github.com/caucus-legal"
+              href="https://github.com/gral-digital/caucus"
               className="text-accent underline decoration-accent/40 underline-offset-2"
             >
               self-hosting senza account

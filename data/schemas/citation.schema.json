@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://avvocato.it/schemas/citation.schema.json",
+  "$id": "https://github.com/gral-digital/caucus/blob/main/data/schemas/citation.schema.json",
   "title": "Citation",
   "description": "Citazione machine-readable a una norma o sentenza italiana. Formato canonico usato da LLM, API e UI.",
   "type": "object",

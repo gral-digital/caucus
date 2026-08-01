@@ -12,6 +12,7 @@ import {
   type UploadedDocument,
 } from "@/lib/chatStream";
 import { authHeaders } from "@/lib/auth";
+import { loadSettings } from "@/lib/settings";
 import { ThinkingSteps } from "./ThinkingSteps";
 import { CitationsPanel } from "./CitationsPanel";
 import { MessageBubble } from "./MessageBubble";
@@ -133,8 +134,10 @@ export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
     ]);
 
     const document_ids = documentsRef.current.map((d) => d.id);
+    // Data di vigenza dalle impostazioni (null = oggi, il default del server).
+    const effective_at = loadSettings().effectiveAt ?? undefined;
     try {
-      await streamChat({ question, history, document_ids, mode }, (ev) => {
+      await streamChat({ question, history, document_ids, mode, effective_at }, (ev) => {
         setTurns((prev) =>
           prev.map((turn) => {
             if (turn.id !== id) return turn;
@@ -194,7 +197,7 @@ export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
   return (
     <div className="flex h-full flex-col">
       <div ref={scrollRef} className="flex-1 overflow-y-auto">
-        <div className="mx-auto flex max-w-3xl flex-col gap-8 px-6 pb-8 pt-10">
+        <div className="mx-auto flex max-w-3xl flex-col gap-8 px-4 pb-8 pt-6 sm:px-6 sm:pt-10">
           {empty ? <WelcomeScreen onPick={ask} copy={MODE_COPY[mode]} /> : null}
 
           {turns.map((turn) => (
@@ -227,7 +230,7 @@ export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
       </div>
 
       <div className="border-t border-paper-divider/60 bg-paper">
-        <div className="mx-auto max-w-3xl px-6 pb-6 pt-3">
+        <div className="mx-auto max-w-3xl px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 sm:px-6 sm:pb-6">
           <QuestionInput
             onAsk={ask}
             disabled={isBusy}
@@ -360,7 +363,7 @@ function WelcomeScreen({
   copy: { title: string; subtitle: string; examples: string[] };
 }) {
   return (
-    <div className="flex flex-col items-center gap-6 pt-16 text-center">
+    <div className="flex flex-col items-center gap-6 pt-8 text-center sm:pt-16">
       <div>
         <h2 className="font-serif text-3xl text-ink">{copy.title}</h2>
         <p className="mx-auto mt-2 max-w-xl text-sm text-ink-muted">{copy.subtitle}</p>

@@ -391,11 +391,7 @@ class ChatService:
         from caucus_api.db.models import UserDocument
 
         rows = (
-            (
-                await self._session.execute(
-                    select(UserDocument).where(UserDocument.id.in_(doc_ids))
-                )
-            )
+            (await self._session.execute(select(UserDocument).where(UserDocument.id.in_(doc_ids))))
             .scalars()
             .all()
         )

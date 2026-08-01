@@ -5,6 +5,14 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 import { cn } from "@/lib/cn";
 import type { UploadedDocument } from "@/lib/chatStream";
 
+/** Breakpoint md di Tailwind: sotto, il focus programmatico apre la tastiera. */
+function isDesktop(): boolean {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(min-width: 768px)").matches
+  );
+}
+
 type Props = {
   onAsk: (q: string) => void;
   disabled?: boolean;
@@ -44,9 +52,11 @@ export function QuestionInput({
   }, [value]);
 
   // Riprendi il focus quando l'input torna attivo (dopo l'invio il campo
-  // viene disabilitato durante lo streaming e perdeva il focus).
+  // viene disabilitato durante lo streaming e perdeva il focus). Solo su
+  // desktop: su mobile il focus automatico apre la tastiera e copre la
+  // risposta appena arrivata.
   useEffect(() => {
-    if (!disabled) textareaRef.current?.focus();
+    if (!disabled && isDesktop()) textareaRef.current?.focus();
   }, [disabled]);
 
   const submit = (e: FormEvent) => {
@@ -130,18 +140,20 @@ export function QuestionInput({
         <textarea
           ref={textareaRef}
           value={value}
-          autoFocus
           onChange={(e) => setValue(e.target.value)}
+          // Corti: su mobile (~20 caratteri utili) un placeholder lungo va a
+          // capo e la textarea a riga singola lo taglia.
           placeholder={
             documents.length > 0
-              ? "Chiedi qualcosa sul documento allegato…"
-              : "Chiedi al Codice Civile o Penale…"
+              ? "Chiedi sul documento…"
+              : "Chiedi al Codice Civile…"
           }
           rows={1}
           disabled={disabled}
           // py-[7px]: con line-height 22px la riga singola fa 36px = altezza
           // dei bottoni (h-9), così testo e icone sono allineati in verticale.
-          className="max-h-[176px] flex-1 resize-none bg-transparent px-2 py-[7px] text-[15px] leading-[22px] outline-none placeholder:text-ink-subtle disabled:opacity-60"
+          // text-[16px] su mobile: sotto i 16px iOS Safari zooma la pagina al focus.
+          className="max-h-[176px] flex-1 resize-none bg-transparent px-2 py-[7px] text-[16px] leading-[22px] outline-none placeholder:text-ink-subtle disabled:opacity-60 sm:text-[15px]"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
@@ -164,8 +176,10 @@ export function QuestionInput({
         </button>
       </div>
       <p className="mt-2 px-2 text-[11px] text-ink-subtle">
-        Invio per inviare · Shift+Invio per andare a capo. L&apos;assistente non sostituisce
-        il parere di un avvocato.
+        <span className="hidden sm:inline">
+          Invio per inviare · Shift+Invio per andare a capo.{" "}
+        </span>
+        L&apos;assistente non sostituisce il parere di un avvocato.
       </p>
     </form>
   );

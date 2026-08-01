@@ -1,5 +1,7 @@
 # Caucus
 
+[![CI](https://github.com/gral-digital/caucus/actions/workflows/ci.yml/badge.svg)](https://github.com/gral-digital/caucus/actions/workflows/ci.yml)
+
 **AI open source per il diritto e la compliance italiana — con un trust layer
 verificabile e il primo benchmark legale italiano aperto.**
 
@@ -21,20 +23,23 @@ vigenza temporale — e segnalata all'utente quando non è verificabile.
 
 I vendor di AI legale dichiarano accuratezze non riproducibili. Caucus fa la
 scommessa opposta: **codice aperto (AGPL-3.0), benchmark aperto (MIT), numeri
-onesti**. Su [Caucus Bench](benchmark/README.md) — 162 casi su tutte le aree
+onesti**. Su [Caucus Bench](benchmark/README.md) — 171 casi su tutte le aree
 principali del diritto italiano, inclusi articoli abrogati, richieste
 adversarial e domande fuori corpus — lo stack di riferimento misura oggi:
 
 | | |
 |---|---|
-| Pass rate | **85%** (78% sui casi difficili) |
-| Recall@8 source-aware / MRR | **85% / 0.74** |
-| Citation recall | **90%** |
+| Pass rate | **98%** (100% sui casi difficili) |
+| Recall@8 source-aware / MRR | **99% / 0.86** |
+| Citation recall | **99%** |
 | **Citazioni allucinate** (sulle risposte che citano) | **0,0%** |
 | Rifiuto su richieste illecite | **100%** |
 | **Rifiuti indebiti su domande professionali legittime** | **0%** |
 
-Metodologia e regole anti-gaming: [benchmark/](benchmark/README.md).
+La varianza tra run della stessa configurazione è reale (pass 95–98%,
+recall@8 96–99%, per il nondeterminismo di OpenAI): il numero onesto è
+l'intervallo, non il picco. Metodologia e regole anti-gaming:
+[benchmark/](benchmark/README.md).
 
 ## Cosa c'è dentro
 
@@ -70,17 +75,24 @@ cp .env.example .env          # poi imposta OPENAI_API_KEY
 make install
 make up                       # Postgres :55432, Qdrant :6333, Redis, Langfuse
 make migrate
-make seed-all                 # ingest delle 50 fonti (≈ centesimi di embedding)
+make corpus-import SRC=<url>  # corpus completo già indicizzato, embedding inclusi
 make dev                      # API :8000, web :3000
 ```
 
-Opzionale:
+**Il pacchetto corpus** (pubblicato con ogni release) ripristina in un solo
+comando l'intero corpus indicizzato — tabelle Postgres e vettori Qdrant:
+niente ingestione, niente costi di embedding. Checksum e revisione dello
+schema sono verificati prima di scrivere. In alternativa, la ricostruzione
+dalle fonti pubbliche:
 
 ```bash
-uv run caucus-ingest ingest-eu --atto gdpr --from-fixture       # atti UE
-uv run caucus-ingest ingest-cassazione --kind snpen --max 2000  # sentenze
+make seed-all                 # 50 fonti Normattiva + atti UE (≈ centesimi di embedding)
+make harvest-cassazione       # giurisprudenza, incrementale e riprendibile
 make eval                     # Caucus Bench sulla tua istanza
 ```
+
+Le guide dettagliate (self-hosting, corpus, trust layer, API, benchmark)
+sono nell'app stessa, alla pagina `/docs`.
 
 ## Licenze
 

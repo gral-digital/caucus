@@ -38,6 +38,4 @@ async def validate_citations(
     result = await service._validate_citations(body.text, hits=[])
     for c in result["valid"]:
         c.pop("grounding", None)
-    return ValidateResponse(
-        valid=result["valid"], invalid=result["invalid"], total=result["total"]
-    )
+    return ValidateResponse(valid=result["valid"], invalid=result["invalid"], total=result["total"])

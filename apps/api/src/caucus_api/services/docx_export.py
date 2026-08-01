@@ -40,8 +40,18 @@ _MUTED = RGBColor(0x6B, 0x72, 0x80)
 _WARN = RGBColor(0x9A, 0x3B, 0x12)
 
 _MONTHS_IT = (
-    "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
-    "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre",
+    "gennaio",
+    "febbraio",
+    "marzo",
+    "aprile",
+    "maggio",
+    "giugno",
+    "luglio",
+    "agosto",
+    "settembre",
+    "ottobre",
+    "novembre",
+    "dicembre",
 )
 
 
@@ -140,6 +150,7 @@ def _render_markdown(doc: DocumentObject, text: str) -> None:
 
 # ---------------------------------------------------------------- styles
 
+
 def _base_style(doc: DocumentObject, name: str, *, size: float, bold: bool = False) -> Any:
     style = doc.styles.add_style(name, 1)  # WD_STYLE_TYPE.PARAGRAPH
     style.font.name = "Times New Roman"
@@ -224,6 +235,7 @@ def _hr(doc: DocumentObject) -> None:
 
 
 # ---------------------------------------------------------------- documento
+
 
 def render_parere_docx(
     *,

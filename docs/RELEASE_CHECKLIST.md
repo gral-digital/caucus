@@ -37,15 +37,21 @@ Aggiornata al 2026-07-31. Preparato tutto, **non pubblicato**.
 
 ## Da fare AL momento del publish (richiede il repo remoto)
 
-- [ ] Creare l'org GitHub (`caucus` o `caucus-legal`) e pushare; visibilità
-      public; branch protection su `main` (CI verde obbligatoria, no
-      force-push).
+- [x] **Pubblicato su `github.com/gral-digital/caucus`** (2026-08-01):
+      l'org non è creabile via API, quindi si è partiti sotto l'account
+      owner; un transfer futuro a un'org mantiene i redirect. Branch
+      protection su `main` (CI obbligatoria, no force-push) attivata.
 - [ ] Attivare **GitHub private vulnerability reporting** (Security tab) —
       `.github/SECURITY.md` già lo indica come canale.
 - [ ] Badge CI nel README dopo il primo run di GitHub Actions.
 - [ ] Tag `v0.1.0` + GitHub Release con il CHANGELOG.
 - [ ] Registrare scope npm `@caucus` e (se si pubblicherà) i nomi PyPI
       `caucus-*`.
+- [ ] **Pubblicare il pacchetto corpus** (`make corpus-export`, ~3.9 GB) su
+      hosting statico: lo snapshot `cassazione` (3 GB) supera il limite di
+      2 GB dei release asset GitHub → HuggingFace datasets / R2 / split.
+      Poi sostituire `SRC=<url>` nei README e in /docs con l'URL reale.
+      Rifare l'export con l'harvest FERMO per conteggi Qdrant esatti.
 - [ ] Aprire Discussions; creare 3-5 issue "good first issue" (candidati:
       nuove fonti dal catalogo, casi benchmark per materie scoperte,
       consolidato EUR-Lex).

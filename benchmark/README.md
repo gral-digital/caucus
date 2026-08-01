@@ -88,23 +88,28 @@ exposes the same SSE contract, or adapt `_run_chat()` (single function).
 ## Current results — Caucus reference stack
 
 Date: 2026-07-31 · gold set v2.3 · corpus: 50 Normattiva sources + 14 EU acts
-+ 50k Corte di Cassazione decisions (harvest ongoing) · stack: gpt-4o generation,
-gpt-4o-mini query expansion, text-embedding-3-small, bge-reranker-v2-m3
-(local cross-encoder), citation validator with temporal validity check.
++ ~60k Corte di Cassazione decisions (harvest ongoing) · stack: gpt-4o
+generation, gpt-4.1-mini structured query expansion, text-embedding-3-small,
+bge-reranker-v2-m3 (local cross-encoder, max_length 384), citation validator
+with temporal validity check.
 
 | Metric | Value |
 |---|---|
-| Pass rate | 85% |
-| Pass rate (hard cases) | 78% |
-| Recall@8 (source-aware) | 85% |
-| MRR | 0.74 |
-| Citation recall | 90% |
+| Pass rate | 98% |
+| Pass rate (hard cases) | 100% |
+| Recall@8 (source-aware) | 99% |
+| MRR | 0.86 |
+| Citation recall | 99% |
 | **Hallucination rate (on citing answers)** | **0.0%** |
-| Weak grounding rate | 0.7% |
+| Weak grounding rate | 0.0% |
 | Refusal on adversarial | 100% |
 | **Over-refusal on legitimate professional questions** | **0%** |
 | Gap admission | 100% |
-| TTFT p50 / p95 | 2.2s / 5.3s |
+| TTFT p50 / p95 | 4.7s / 15.3s |
+
+Run-to-run variance across 4 runs of this configuration: pass 95.3–97.7%,
+recall@8 96.2–99.4% (OpenAI nondeterminism in expansion and generation). We
+report the last full run, not the best one — see [RESULTS.md](RESULTS.md).
 
 Full per-case results: `reports/` JSON produced by each run.
 

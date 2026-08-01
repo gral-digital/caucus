@@ -100,6 +100,12 @@ clean:
 	rm -rf .venv node_modules .turbo apps/*/.next
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 
+corpus-export:  ## Esporta il corpus indicizzato (Postgres+Qdrant) come pacchetto ridistribuibile in dist/corpus/
+	scripts/corpus_export.sh
+
+corpus-import:  ## Importa un pacchetto corpus (usage: make corpus-import SRC=<dir|url>)
+	scripts/corpus_import.sh "$(SRC)"
+
 harvest-cassazione:  ## Harvest massivo Cassazione (resumabile; default 100k per tipo ≈ 14 EUR embeddings)
 	nohup scripts/harvest_cassazione_full.sh > /tmp/harvest_cassazione.log 2>&1 &
 	@echo "Harvest avviato in background. Log: /tmp/harvest_cassazione.log"

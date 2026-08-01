@@ -36,9 +36,7 @@ class ExportDocxRequest(BaseModel):
     effective_at: date | None = Field(None, description="Vigenza di riferimento (default oggi).")
 
 
-async def _resolve_ref(
-    session: AsyncSession, source: str, num: str, eff: date
-) -> ResolvedRef:
+async def _resolve_ref(session: AsyncSession, source: str, num: str, eff: date) -> ResolvedRef:
     display = cite_display(source, num)
     row = (
         await session.execute(

@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BookMarked,
   BookOpen,
   FileText,
   Gavel,
@@ -11,10 +12,13 @@ import {
   Settings,
   X,
 } from "lucide-react";
+import Link from "next/link";
 import { useAuth } from "@/components/auth/AuthGate";
 import { type ReactNode, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { cn } from "@/lib/cn";
 import type { ChatMode } from "@/lib/chatStream";
+import { loadSettings, saveSettings } from "@/lib/settings";
 import { Wordmark } from "./Wordmark";
 
 /**
@@ -23,20 +27,41 @@ import { Wordmark } from "./Wordmark";
  * Il catalogo delle fonti NON vive più qui (era un elenco di 50+ voci sempre
  * aperto): sta nel pannello «Fonti» richiamabile dal footer — visibile quando
  * serve, invisibile quando si lavora.
+ *
+ * Su mobile (<md) è un drawer a scomparsa controllato da `open`/`onClose`;
+ * su desktop è sempre visibile e le due prop sono ininfluenti.
  */
 export function Sidebar({
   mode,
+  open = false,
+  onClose,
   onSelectMode,
   onNewConversation,
 }: {
   mode: ChatMode;
+  open?: boolean;
+  onClose?: () => void;
   onSelectMode: (mode: ChatMode) => void;
   onNewConversation?: () => void;
 }) {
   const [fontiOpen, setFontiOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-paper-border bg-paper-panel">
+    <>
+      {open ? (
+        <div
+          className="fixed inset-0 z-30 bg-ink/25 backdrop-blur-[1px] md:hidden"
+          onClick={onClose}
+          role="presentation"
+        />
+      ) : null}
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-40 flex h-full w-[280px] max-w-[85vw] shrink-0 flex-col border-r border-paper-border bg-paper-panel transition-transform duration-200 ease-out md:static md:z-auto md:w-[248px] md:max-w-none md:translate-x-0 md:transition-none",
+          open ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
       <div className="px-4 pb-4 pt-5">
         <Wordmark />
       </div>
@@ -95,8 +120,16 @@ export function Sidebar({
           <span className="flex-1 text-left">Fonti del corpus</span>
           <span className="font-mono text-[10.5px] text-ink-subtle">65</span>
         </button>
+        <Link
+          href="/docs"
+          className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-[13.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
+        >
+          <BookMarked size={14} />
+          Documentazione
+        </Link>
         <button
           type="button"
+          onClick={() => setSettingsOpen(true)}
           className="flex w-full items-center gap-2 rounded-lg px-2 py-2 text-[13.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
         >
           <Settings size={14} />
@@ -104,8 +137,170 @@ export function Sidebar({
         </button>
       </div>
 
-      {fontiOpen ? <FontiPanel onClose={() => setFontiOpen(false)} /> : null}
-    </aside>
+        {fontiOpen ? <FontiPanel onClose={() => setFontiOpen(false)} /> : null}
+        {settingsOpen ? (
+          <SettingsPanel onClose={() => setSettingsOpen(false)} />
+        ) : null}
+      </aside>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+
+function SettingsPanel({ onClose }: { onClose: () => void }) {
+  const { user, accountsEnabled, logout } = useAuth();
+  const [settings, setSettings] = useState(loadSettings);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const setEffectiveAt = (value: string | null) => {
+    const next = { ...settings, effectiveAt: value };
+    setSettings(next);
+    saveSettings(next);
+  };
+
+  // Portal su body: vedi FontiPanel.
+  return createPortal(
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/25 p-4 backdrop-blur-[2px] sm:p-8"
+      onClick={onClose}
+      role="presentation"
+    >
+      <div
+        className="flex max-h-[88dvh] w-full max-w-lg flex-col rounded-2xl border border-paper-border bg-paper shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Impostazioni"
+      >
+        <div className="flex items-center justify-between border-b border-paper-border/70 px-5 pb-4 pt-5 sm:px-6">
+          <h2 className="font-serif text-[22px] tracking-tight text-ink">
+            Impostazioni
+          </h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Chiudi"
+            className="-mr-2 rounded-full p-1.5 text-ink-subtle transition hover:bg-paper-hover hover:text-ink"
+          >
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-6 overflow-y-auto px-5 py-5 sm:px-6">
+          <section>
+            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
+              Ricerca
+            </h3>
+            <div className="mt-2 rounded-xl border border-paper-border bg-paper-panel/60 p-4">
+              <label
+                htmlFor="effective-at"
+                className="text-[13.5px] font-medium text-ink"
+              >
+                Data di vigenza
+              </label>
+              <p className="mt-1 text-[12.5px] leading-relaxed text-ink-muted">
+                Le risposte si basano sui testi vigenti a questa data: gli
+                articoli entrati in vigore dopo non vengono considerati.
+                Lascia vuoto per usare la data odierna.
+              </p>
+              <div className="mt-2.5 flex items-center gap-2">
+                <input
+                  id="effective-at"
+                  type="date"
+                  value={settings.effectiveAt ?? ""}
+                  onChange={(e) => setEffectiveAt(e.target.value || null)}
+                  className="rounded-lg border border-paper-border bg-paper px-3 py-1.5 text-[13.5px] text-ink outline-none transition focus:border-ink-subtle/60"
+                />
+                {settings.effectiveAt ? (
+                  <button
+                    type="button"
+                    onClick={() => setEffectiveAt(null)}
+                    className="rounded-lg px-2.5 py-1.5 text-[12.5px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
+                  >
+                    Torna a oggi
+                  </button>
+                ) : (
+                  <span className="text-[12.5px] text-ink-subtle">oggi</span>
+                )}
+              </div>
+              {settings.effectiveAt ? (
+                <p className="mt-2 text-[12px] text-accent">
+                  Attiva: le prossime domande usano i testi vigenti al{" "}
+                  {new Date(settings.effectiveAt + "T00:00:00").toLocaleDateString("it-IT")}.
+                </p>
+              ) : null}
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
+              Account
+            </h3>
+            <div className="mt-2 rounded-xl border border-paper-border bg-paper-panel/60 p-4">
+              {accountsEnabled && user ? (
+                <div className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="truncate text-[13.5px] font-medium text-ink">
+                      {user.email}
+                    </div>
+                    <div className="mt-0.5 text-[12.5px] text-ink-muted">
+                      I documenti caricati sono legati a questo account.
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void logout()}
+                    className="flex shrink-0 items-center gap-1.5 rounded-lg border border-paper-border bg-paper px-3 py-1.5 text-[13px] text-ink-muted transition hover:bg-paper-hover hover:text-ink"
+                  >
+                    <LogOut size={13} />
+                    Esci
+                  </button>
+                </div>
+              ) : (
+                <p className="text-[13px] leading-relaxed text-ink-muted">
+                  Istanza self-hosted: nessun account necessario, i dati non
+                  lasciano questa macchina. Gli account si attivano con{" "}
+                  <code className="rounded bg-paper-hover px-1 py-0.5 font-mono text-[11.5px]">
+                    ACCOUNTS_ENABLED=true
+                  </code>
+                  .
+                </p>
+              )}
+            </div>
+          </section>
+
+          <section>
+            <h3 className="text-[11px] font-semibold uppercase tracking-wider text-ink-subtle">
+              Istanza
+            </h3>
+            <div className="mt-2 flex flex-col gap-1 rounded-xl border border-paper-border bg-paper-panel/60 p-4 text-[13px] text-ink-muted">
+              <a href="/docs" className="text-accent hover:underline">
+                Documentazione
+              </a>
+              <a
+                href="https://github.com/gral-digital/caucus"
+                className="text-accent hover:underline"
+              >
+                Codice sorgente e segnalazioni
+              </a>
+              <p className="mt-1.5 text-[12.5px] leading-relaxed">
+                Caucus è software libero (AGPL-3.0). L&apos;assistente non
+                sostituisce il parere di un avvocato.
+              </p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -198,21 +393,23 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [onClose]);
 
-  return (
+  // Portal su body: l'aside è transform-ata (drawer mobile) e diventerebbe
+  // il containing block del `fixed`, confinando il modale nella sidebar.
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/25 p-8 backdrop-blur-[2px]"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/25 p-4 backdrop-blur-[2px] sm:p-8"
       onClick={onClose}
       role="presentation"
     >
       <div
-        className="w-full max-w-4xl rounded-2xl border border-paper-border bg-paper shadow-2xl"
+        className="flex max-h-[88dvh] w-full max-w-4xl flex-col rounded-2xl border border-paper-border bg-paper shadow-2xl"
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
         aria-label="Fonti del corpus"
       >
-        <div className="flex items-baseline justify-between gap-6 border-b border-paper-border/70 px-8 pb-4 pt-6">
-          <div className="flex items-baseline gap-4">
+        <div className="flex items-start justify-between gap-4 border-b border-paper-border/70 px-5 pb-4 pt-5 sm:px-8 sm:pt-6">
+          <div className="flex flex-col gap-1 sm:flex-row sm:items-baseline sm:gap-4">
             <h2 className="font-serif text-[22px] tracking-tight text-ink">
               Fonti del corpus
             </h2>
@@ -231,7 +428,7 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-8 gap-y-6 px-8 py-6 md:grid-cols-4">
+        <div className="grid flex-1 grid-cols-1 gap-x-8 gap-y-6 overflow-y-auto px-5 py-5 sm:grid-cols-2 sm:px-8 sm:py-6 md:grid-cols-4">
           {FONTI.map((group) => (
             <div key={group.label}>
               <div className="mb-2 flex items-baseline justify-between border-b border-paper-border/60 pb-1.5">
@@ -253,7 +450,7 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
           ))}
         </div>
 
-        <div className="flex items-center justify-between rounded-b-2xl border-t border-paper-border/70 bg-paper-panel px-8 py-3.5">
+        <div className="flex flex-col gap-1.5 rounded-b-2xl border-t border-paper-border/70 bg-paper-panel px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <span className="text-[12px] text-ink-muted">
             + Giurisprudenza: Cassazione civile e penale, Consiglio di Stato e
             TAR — testo integrale, corpus in crescita
@@ -263,7 +460,8 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
           </span>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
 

@@ -106,4 +106,5 @@ Mitigazioni:
 
 ## 11. Responsible disclosure
 
-`security@avvocato.it` (da attivare prima del go-live). PGP key pubblicata. Risposta entro 48h.
+Canale: **GitHub private vulnerability reporting** sul repository (vedi
+`.github/SECURITY.md`). Risposta entro 48h.
