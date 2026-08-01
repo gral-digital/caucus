@@ -175,7 +175,7 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
 7. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.
-7. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
+8. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding
    self-hosted BGE-M3 (azzera costi/dipendenza US, il codice c'è già),
    structured output per le citazioni, conversazioni server-side + audit log.
 
