@@ -5,6 +5,7 @@
  */
 
 import { fetchEventSource } from "@microsoft/fetch-event-source";
+import { authHeaders } from "./auth";
 
 export interface ChatMessage {
   role: "user" | "assistant";
@@ -33,7 +34,11 @@ export interface UploadedDocument {
 export async function uploadDocument(file: File): Promise<UploadedDocument> {
   const form = new FormData();
   form.append("file", file);
-  const res = await fetch("/api/v1/documents", { method: "POST", body: form });
+  const res = await fetch("/api/v1/documents", {
+    method: "POST",
+    headers: authHeaders(),
+    body: form,
+  });
   if (!res.ok) {
     const detail = await res
       .json()
@@ -45,7 +50,7 @@ export async function uploadDocument(file: File): Promise<UploadedDocument> {
 }
 
 export async function deleteDocument(id: string): Promise<void> {
-  await fetch(`/api/v1/documents/${id}`, { method: "DELETE" });
+  await fetch(`/api/v1/documents/${id}`, { method: "DELETE", headers: authHeaders() });
 }
 
 export interface RetrievalHitSummary {
@@ -96,7 +101,7 @@ export async function streamChat(
   const url = "/api/v1/chat";
   await fetchEventSource(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...authHeaders() },
     body: JSON.stringify(req),
     signal,
     openWhenHidden: true,

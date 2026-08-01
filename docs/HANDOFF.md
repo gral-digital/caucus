@@ -179,9 +179,15 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    free tier**: fondamenta pronte dietro `ACCOUNTS_ENABLED` (default off):
    user_account Argon2id + auth_session (solo SHA-256 del token),
    /auth/register|login|logout|me testati E2E, documenti legati all'utente.
-   Mancano per il free hosted: UI di login/registrazione nella web app,
-   enforcement dell'auth su /chat (oggi solo associazione best-effort),
-   quote per utente, verifica email.
+   **COMPLETATO il free tier** (stessa notte): enforcement su tutti gli
+   endpoint applicativi (401 senza sessione; API_AUTH_TOKEN resta per
+   ops/benchmark), quota giornaliera per utente (FREE_DAILY_CHAT_LIMIT,
+   upsert atomico su usage_daily, 429 con invito al self-hosting),
+   /auth/config pubblico, UI: AuthGate con login/registrazione, badge
+   utente + logout in sidebar, Authorization su tutte le chiamate. E2E
+   verificato: gate nel browser, registrazione→app, quota 2/2 poi 429,
+   default off invariato. Resta SOLO la verifica email (serve un provider
+   SMTP: decisione di deployment, non di codice).
 7. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.

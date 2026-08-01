@@ -5,13 +5,17 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
-- **Account per il free tier hosted** (feature flag `ACCOUNTS_ENABLED`,
-  default off — il self-hosting resta senza registrazione): tabelle
-  `user_account` (Argon2id) e `auth_session` (nel DB solo lo SHA-256 del
-  token opaco), endpoint `/auth/register|login|logout|me` con difese base
-  (no oracolo sull'esistenza email, rate limit condiviso, sessioni con
-  scadenza revocabili), documenti caricati legati all'account quando la
-  sessione è presente. Migrazione 0005.
+- **Free tier hosted completo** (feature flag `ACCOUNTS_ENABLED`, default
+  off — il self-hosting resta senza registrazione): tabelle `user_account`
+  (Argon2id) e `auth_session` (nel DB solo lo SHA-256 del token opaco),
+  endpoint `/auth/register|login|logout|me|config`, **enforcement** su
+  tutti gli endpoint applicativi (senza sessione → 401; il token condiviso
+  resta per ops/benchmark), **quota giornaliera per utente**
+  (`FREE_DAILY_CHAT_LIMIT`, default 30 — upsert atomico su `usage_daily`,
+  messaggio 429 che rimanda al self-hosting), documenti legati all'account.
+  Web app: schermata di accesso/registrazione servita dal gate quando la
+  config del server lo richiede, badge utente + logout in sidebar, header
+  Authorization su tutte le chiamate. Migrazioni 0005-0006.
 - **Landing page** a `/` (l'app vive su `/app`): hero «L'accuratezza legale
   non si dichiara. Si dimostra.», banda numeri onesti con varianza
   dichiarata, quattro moduli, sezione trust layer e self-hosting, CTA

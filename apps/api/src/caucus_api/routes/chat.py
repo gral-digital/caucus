@@ -14,12 +14,14 @@ from collections.abc import AsyncIterator
 from typing import Literal
 
 import orjson
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel, Field
+from sqlalchemy import text
 from sse_starlette.sse import EventSourceResponse
 
 from caucus_api.deps import get_session_maker, rate_limit, require_api_auth
 from caucus_api.services.chat_service import ChatService
+from caucus_rag_core.config import get_settings
 from caucus_rag_core.schemas.retrieval import CorpusFilter
 
 router = APIRouter(dependencies=[Depends(require_api_auth), Depends(rate_limit)])
@@ -60,8 +62,44 @@ class ChatRequest(BaseModel):
     )
 
 
+async def _enforce_daily_quota(request: Request) -> None:
+    """Quota giornaliera del free tier (solo con account attivi e sessione utente).
+
+    Upsert atomico del contatore: una sola query, niente race check-then-set.
+    Il token condiviso (ops/benchmark) non ha user_id e non è soggetto a quota.
+    """
+    settings = get_settings()
+    user_id = getattr(request.state, "user_id", None)
+    if not settings.accounts_enabled or user_id is None or settings.free_daily_chat_limit <= 0:
+        return
+    async with get_session_maker()() as session:
+        count = (
+            await session.execute(
+                text(
+                    "INSERT INTO usage_daily (user_id, day, chat_count) "
+                    "VALUES (:uid, CURRENT_DATE, 1) "
+                    "ON CONFLICT (user_id, day) "
+                    "DO UPDATE SET chat_count = usage_daily.chat_count + 1 "
+                    "RETURNING chat_count"
+                ),
+                {"uid": str(user_id)},
+            )
+        ).scalar_one()
+        await session.commit()
+    if count > settings.free_daily_chat_limit:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=(
+                f"Hai raggiunto il limite giornaliero del piano gratuito "
+                f"({settings.free_daily_chat_limit} domande). Riprova domani, "
+                "oppure fai self-hosting: è software libero."
+            ),
+            headers={"Retry-After": "86400"},
+        )
+
+
 @router.post("/chat")
-async def chat_stream(body: ChatRequest) -> EventSourceResponse:
+async def chat_stream(body: ChatRequest, request: Request) -> EventSourceResponse:
     """Stream SSE. Eventi:
 
     - `retrieval`: {hits: [...]}  → inviato subito dopo il retrieval.
@@ -75,6 +113,7 @@ async def chat_stream(body: ChatRequest) -> EventSourceResponse:
     streamato venga prodotto, quindi una sessione iniettata sarebbe già chiusa
     durante lo streaming (leak di connessioni dal pool sotto carico).
     """
+    await _enforce_daily_quota(request)
 
     async def events() -> AsyncIterator[dict[str, str]]:
         async with get_session_maker()() as session:

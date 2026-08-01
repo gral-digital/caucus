@@ -356,3 +356,17 @@ class AuthSession(Base):
     user_agent: Mapped[str | None] = mapped_column(String(255), nullable=True)
 
     user: Mapped[UserAccount] = relationship(back_populates="sessions")
+
+
+class UsageDaily(Base):
+    """Contatore d'uso giornaliero per utente (quote del free tier)."""
+
+    __tablename__ = "usage_daily"
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True),
+        ForeignKey("user_account.id", ondelete="CASCADE"),
+        primary_key=True,
+    )
+    day: Mapped[date] = mapped_column(Date, primary_key=True)
+    chat_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

@@ -4,12 +4,14 @@ import {
   BookOpen,
   FileText,
   Gavel,
+  LogOut,
   PenSquare,
   Scale,
   ScrollText,
   Settings,
   X,
 } from "lucide-react";
+import { useAuth } from "@/components/auth/AuthGate";
 import { type ReactNode, useEffect, useState } from "react";
 import { cn } from "@/lib/cn";
 import type { ChatMode } from "@/lib/chatStream";
@@ -83,6 +85,7 @@ export function Sidebar({
       <div className="flex-1" />
 
       <div className="border-t border-paper-border/70 px-3 py-3">
+        <AccountBadge />
         <button
           type="button"
           onClick={() => setFontiOpen(true)}
@@ -260,6 +263,30 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
           </span>
         </div>
       </div>
+    </div>
+  );
+}
+
+function AccountBadge() {
+  const { user, accountsEnabled, logout } = useAuth();
+  if (!accountsEnabled || !user) return null;
+  return (
+    <div className="mb-1 flex items-center gap-2 rounded-lg px-2 py-2">
+      <span
+        className="min-w-0 flex-1 truncate text-[12.5px] text-ink-muted"
+        title={user.email}
+      >
+        {user.email}
+      </span>
+      <button
+        type="button"
+        onClick={() => void logout()}
+        className="flex items-center gap-1 rounded-md px-1.5 py-1 text-[12px] text-ink-subtle transition hover:bg-paper-hover hover:text-ink"
+        aria-label="Esci"
+      >
+        <LogOut size={12} />
+        Esci
+      </button>
     </div>
   );
 }

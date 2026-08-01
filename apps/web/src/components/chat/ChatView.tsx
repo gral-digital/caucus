@@ -11,6 +11,7 @@ import {
   type StatusStep,
   type UploadedDocument,
 } from "@/lib/chatStream";
+import { authHeaders } from "@/lib/auth";
 import { ThinkingSteps } from "./ThinkingSteps";
 import { CitationsPanel } from "./CitationsPanel";
 import { MessageBubble } from "./MessageBubble";
@@ -250,7 +251,7 @@ function ExportDocxButton({ turn }: { turn: Turn }) {
     try {
       const res = await fetch("/api/v1/export/docx", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({
           question: turn.question,
           // finalText ha le citazioni in prosa promosse a tag <cite/> ed è

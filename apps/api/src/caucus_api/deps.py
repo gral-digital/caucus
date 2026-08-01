@@ -42,13 +42,41 @@ def _extract_token(request: Request) -> str | None:
 
 
 async def require_api_auth(request: Request) -> None:
-    """Auth minima: token condiviso via ``Authorization: Bearer`` o ``X-API-Key``.
+    """Auth degli endpoint applicativi.
 
-    - Token configurato (API_AUTH_TOKEN): confronto constant-time.
-    - Token assente: consentito solo con app_env=local; in dev/prod fail-closed
-      (meglio un 503 esplicito che un endpoint LLM a pagamento aperto al mondo).
+    Con ``ACCOUNTS_ENABLED=true`` (free tier hosted): serve una sessione
+    utente valida (Bearer da /auth/login) — il token condiviso
+    ``API_AUTH_TOKEN`` resta accettato per ops e benchmark. L'utente
+    risolto finisce in ``request.state.user_id`` (per quote e ownership).
+
+    Altrimenti (self-hosting, default): token condiviso se configurato;
+    senza token consentito solo con app_env=local, fail-closed in dev/prod
+    (meglio un 503 esplicito che un endpoint LLM a pagamento aperto al mondo).
     """
     settings = get_settings()
+    provided = _extract_token(request)
+
+    if settings.accounts_enabled:
+        if (
+            settings.api_auth_token
+            and provided
+            and secrets.compare_digest(provided, settings.api_auth_token)
+        ):
+            return
+        if provided:
+            from caucus_api.services import auth_service
+
+            async with get_session_maker()() as session:
+                user = await auth_service.resolve_session(session, provided)
+            if user is not None:
+                request.state.user_id = user.id
+                return
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Accedi con il tuo account per usare Caucus.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     expected = settings.api_auth_token
     if not expected:
         if settings.app_env == "local":
@@ -57,7 +85,6 @@ async def require_api_auth(request: Request) -> None:
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="API_AUTH_TOKEN non configurato: endpoint disabilitato fuori da app_env=local.",
         )
-    provided = _extract_token(request)
     if not provided or not secrets.compare_digest(provided, expected):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

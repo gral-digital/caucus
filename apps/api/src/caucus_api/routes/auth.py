@@ -49,6 +49,21 @@ def _bearer(authorization: str | None) -> str:
     return authorization[7:].strip()
 
 
+class AuthConfigOut(BaseModel):
+    accounts_enabled: bool
+    free_daily_chat_limit: int
+
+
+@router.get("/auth/config", response_model=AuthConfigOut)
+async def auth_config() -> AuthConfigOut:
+    """Config pubblica per il client: dice alla web app se servono gli account."""
+    s = get_settings()
+    return AuthConfigOut(
+        accounts_enabled=s.accounts_enabled,
+        free_daily_chat_limit=s.free_daily_chat_limit,
+    )
+
+
 @router.post("/auth/register", response_model=UserOut, status_code=status.HTTP_201_CREATED)
 async def register(
     body: Credentials,

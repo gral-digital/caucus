@@ -49,6 +49,8 @@ class Settings(BaseSettings):
     accounts_enabled: bool = False
     # Durata delle sessioni bearer create da /auth/login.
     auth_session_days: int = 30
+    # Free tier: domande chat al giorno per utente (0 = illimitato).
+    free_daily_chat_limit: int = 30
 
     # Postgres
     database_url: str = Field(
