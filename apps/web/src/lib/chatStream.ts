@@ -69,11 +69,23 @@ export interface CitationWarnings {
   total: number;
 }
 
+export interface StatusStep {
+  stage: string;
+  detail: string;
+}
+
 export type ChatStreamEvent =
+  | { kind: "status"; step: StatusStep }
   | { kind: "retrieval"; hits: RetrievalHitSummary[]; latency_ms: number }
   | { kind: "token"; text: string }
   | { kind: "citation_warnings"; warnings: CitationWarnings }
-  | { kind: "done"; finish_reason: string; final_text?: string }
+  | {
+      kind: "done";
+      finish_reason: string;
+      final_text?: string;
+      citations_total?: number;
+      citations_valid?: number;
+    }
   | { kind: "error"; message: string };
 
 export async function streamChat(
@@ -92,6 +104,9 @@ export async function streamChat(
       if (!ev.data) return;
       const payload = JSON.parse(ev.data);
       switch (ev.event) {
+        case "status":
+          onEvent({ kind: "status", step: payload });
+          break;
         case "retrieval":
           onEvent({
             kind: "retrieval",
@@ -112,6 +127,8 @@ export async function streamChat(
             // Testo con le citazioni in prosa promosse a tag <cite/> (e
             // riparate dal trust layer): è la forma giusta per l'export.
             final_text: payload.final_text,
+            citations_total: payload.citations_total,
+            citations_valid: payload.citations_valid,
           });
           break;
         case "error":

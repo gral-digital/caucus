@@ -28,14 +28,26 @@ export function QuestionInput({
   const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
 
-  // Auto-grow: altezza dinamica fino a 8 righe
+  // Auto-grow: altezza dinamica fino a 8 righe. Con il campo vuoto si torna
+  // all'altezza naturale di una riga: misurare scrollHeight durante il primo
+  // layout (larghezza ancora 0) bloccava il campo a 2-3 righe fantasma.
   useEffect(() => {
     const el = textareaRef.current;
     if (!el) return;
+    if (!value) {
+      el.style.height = "";
+      return;
+    }
     el.style.height = "0px";
     const max = 22 * 8; // ~8 righe da 22px
     el.style.height = `${Math.min(el.scrollHeight, max)}px`;
   }, [value]);
+
+  // Riprendi il focus quando l'input torna attivo (dopo l'invio il campo
+  // viene disabilitato durante lo streaming e perdeva il focus).
+  useEffect(() => {
+    if (!disabled) textareaRef.current?.focus();
+  }, [disabled]);
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
@@ -118,6 +130,7 @@ export function QuestionInput({
         <textarea
           ref={textareaRef}
           value={value}
+          autoFocus
           onChange={(e) => setValue(e.target.value)}
           placeholder={
             documents.length > 0
@@ -126,7 +139,9 @@ export function QuestionInput({
           }
           rows={1}
           disabled={disabled}
-          className="max-h-[176px] flex-1 resize-none bg-transparent px-2 py-1 text-[15px] leading-[22px] outline-none placeholder:text-ink-subtle disabled:opacity-60"
+          // py-[7px]: con line-height 22px la riga singola fa 36px = altezza
+          // dei bottoni (h-9), così testo e icone sono allineati in verticale.
+          className="max-h-[176px] flex-1 resize-none bg-transparent px-2 py-[7px] text-[15px] leading-[22px] outline-none placeholder:text-ink-subtle disabled:opacity-60"
           onKeyDown={(e) => {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();

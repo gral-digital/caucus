@@ -156,6 +156,16 @@ class ChatService:
             ]
             if CorpusFilter.CODICI not in corpora:
                 corpora.append(CorpusFilter.CODICI)
+        # Eventi `status`: il lavoro della pipeline reso visibile alla UI
+        # (thinking onesto — fasi vere, non animazioni). I client che non li
+        # conoscono (benchmark incluso) li ignorano.
+        yield ChatEvent(
+            name="status",
+            data={
+                "stage": "analisi",
+                "detail": "Analizzo la domanda e la traduco in terminologia giuridica",
+            },
+        )
         query = RetrievalQuery(
             text=retrieval_query_text,
             corpora=corpora,
@@ -165,6 +175,13 @@ class ChatService:
             top_k_rerank=8,
         )
         result = await self._search.search(query)
+        yield ChatEvent(
+            name="status",
+            data={
+                "stage": "fonti",
+                "detail": f"{len(result.hits)} fonti selezionate e riordinate per pertinenza",
+            },
+        )
 
         yield ChatEvent(
             name="retrieval",
@@ -267,6 +284,13 @@ class ChatService:
                     raw_text_parts.append(chunk.content)
                     yield ChatEvent(name="token", data={"text": chunk.content})
                 if chunk.finish_reason:
+                    yield ChatEvent(
+                        name="status",
+                        data={
+                            "stage": "verifica",
+                            "detail": "Verifico le citazioni sul corpus (esistenza, vigenza, abrogazione)",
+                        },
+                    )
                     raw = self._promote_freeform_citations("".join(raw_text_parts), result.hits)
                     validation = await self._validate_citations(raw, result.hits)
                     # Trust layer che si auto-corregge: se restano citazioni
@@ -274,6 +298,16 @@ class ChatService:
                     # raro in cui serve) invece del solo warning — il client
                     # sostituisce il testo streamato con final_text.
                     if validation["invalid"]:
+                        yield ChatEvent(
+                            name="status",
+                            data={
+                                "stage": "riparazione",
+                                "detail": (
+                                    f"{len(validation['invalid'])} riferimenti non verificati: "
+                                    "riscrivo la risposta correggendoli"
+                                ),
+                            },
+                        )
                         repaired = await self._repair_invalid_citations(
                             raw, validation["invalid"], system_content
                         )
@@ -296,7 +330,12 @@ class ChatService:
                     # rendere linkabili anche le citazioni scritte in prosa.
                     yield ChatEvent(
                         name="done",
-                        data={"finish_reason": chunk.finish_reason, "final_text": raw},
+                        data={
+                            "finish_reason": chunk.finish_reason,
+                            "final_text": raw,
+                            "citations_total": validation["total"],
+                            "citations_valid": len(validation["valid"]),
+                        },
                     )
                     return
         except Exception:  # pragma: no cover - runtime-only

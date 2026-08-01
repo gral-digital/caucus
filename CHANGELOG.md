@@ -5,6 +5,16 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 ## [Unreleased] — verso la prima release pubblica come **Caucus**
 
 ### Added
+- **Landing page** a `/` (l'app vive su `/app`): hero «L'accuratezza legale
+  non si dichiara. Si dimostra.», banda numeri onesti con varianza
+  dichiarata, quattro moduli, sezione trust layer e self-hosting, CTA
+  GitHub. Zero claim non verificabili.
+- **Thinking onesto in chat**: eventi SSE `status` con le fasi REALI della
+  pipeline (analisi, fonti selezionate, verifica citazioni, eventuale
+  riparazione) mostrate live durante l'elaborazione — incluso il silenzio
+  post-streaming che prima sembrava un blocco — e collassate a fine
+  risposta in «N fonti consultate · N citazioni verificate», espandibili.
+  L'evento `done` riporta i conteggi di verifica.
 - **Add-in Word (v0, non ancora collaudato in Word reale)**: taskpane
   Office.js (`apps/word-addin/` + statici in `apps/web/public/word-addin/`)
   con ricerca giuridica via SSE, inserimento della risposta nel documento
@@ -98,6 +108,11 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 - Loader idempotente (delete-and-replace per fonte).
 
 ### Fixed
+- UX chat: campo input allineato in verticale (l'auto-grow misurava
+  l'altezza durante il primo layout e bloccava il campo a 2-3 righe
+  fantasma), focus ripristinato dopo l'invio, «Nuova conversazione» azzera
+  il modulo attivo senza ricaricare la pagina (gli altri moduli mantengono
+  lo stato).
 - **Fallback silenzioso del reranker**: con `RERANKER_BACKEND=local` ma
   `sentence-transformers` assente dal venv, la factory ripiegava sul keyword
   reranker senza segnalarlo, degradando il ranking (parte del calo di recall

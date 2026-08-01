@@ -8,8 +8,10 @@ import {
   type ChatMode,
   type CitationWarnings,
   type RetrievalHitSummary,
+  type StatusStep,
   type UploadedDocument,
 } from "@/lib/chatStream";
+import { ThinkingSteps } from "./ThinkingSteps";
 import { CitationsPanel } from "./CitationsPanel";
 import { MessageBubble } from "./MessageBubble";
 import { QuestionInput } from "./QuestionInput";
@@ -24,6 +26,10 @@ type Turn = {
   status: "retrieving" | "streaming" | "done" | "error";
   error?: string;
   citationWarnings?: CitationWarnings;
+  /** Fasi reali della pipeline (thinking onesto). */
+  steps: StatusStep[];
+  citationsTotal?: number;
+  citationsValid?: number;
 };
 
 const MODE_COPY: Record<
@@ -122,7 +128,7 @@ export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
 
     setTurns((t) => [
       ...t,
-      { id, question, answer: "", hits: [], status: "retrieving" },
+      { id, question, answer: "", hits: [], status: "retrieving", steps: [] },
     ]);
 
     const document_ids = documentsRef.current.map((d) => d.id);
@@ -132,6 +138,8 @@ export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
           prev.map((turn) => {
             if (turn.id !== id) return turn;
             switch (ev.kind) {
+              case "status":
+                return { ...turn, steps: [...turn.steps, ev.step] };
               case "retrieval":
                 return { ...turn, hits: ev.hits, status: "streaming" };
               case "token":
@@ -139,7 +147,13 @@ export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
               case "citation_warnings":
                 return { ...turn, citationWarnings: ev.warnings };
               case "done":
-                return { ...turn, status: "done", finalText: ev.final_text };
+                return {
+                  ...turn,
+                  status: "done",
+                  finalText: ev.final_text,
+                  citationsTotal: ev.citations_total,
+                  citationsValid: ev.citations_valid,
+                };
               case "error":
                 return { ...turn, status: "error", error: ev.message };
               default:
@@ -185,12 +199,19 @@ export function ChatView({ mode = "ricerca" }: { mode?: ChatMode }) {
           {turns.map((turn) => (
             <div key={turn.id} className="flex flex-col gap-3">
               <MessageBubble role="user" text={turn.question} />
-              <MessageBubble
-                role="assistant"
-                text={turn.answer}
-                status={turn.status}
-                error={turn.error}
+              <ThinkingSteps
+                steps={turn.steps}
+                running={isThinking(turn)}
+                summary={thinkingSummary(turn)}
               />
+              {turn.answer || turn.status === "error" ? (
+                <MessageBubble
+                  role="assistant"
+                  text={turn.answer}
+                  status={turn.status}
+                  error={turn.error}
+                />
+              ) : null}
               {turn.citationWarnings &&
               turn.citationWarnings.invalid.length > 0 ? (
                 <HallucinationBanner warnings={turn.citationWarnings} />
@@ -294,6 +315,28 @@ function HallucinationBanner({ warnings }: { warnings: CitationWarnings }) {
       </div>
     </div>
   );
+}
+
+function isThinking(turn: Turn): boolean {
+  if (turn.status === "done" || turn.status === "error") return false;
+  const last = turn.steps[turn.steps.length - 1]?.stage;
+  // Pulsa prima del primo token e durante la verifica/riparazione finale
+  // (il silenzio dopo lo streaming, che prima sembrava un blocco).
+  return !turn.answer || last === "verifica" || last === "riparazione";
+}
+
+function thinkingSummary(turn: Turn): string | undefined {
+  if (turn.status !== "done") return undefined;
+  const fonti = turn.hits.length;
+  const bits = [fonti === 1 ? "1 fonte consultata" : `${fonti} fonti consultate`];
+  if (turn.citationsTotal && turn.citationsTotal > 0) {
+    bits.push(
+      turn.citationsValid === turn.citationsTotal
+        ? `${turn.citationsTotal} citazion${turn.citationsTotal === 1 ? "e verificata" : "i verificate"}`
+        : `${turn.citationsValid ?? 0}/${turn.citationsTotal} citazioni verificate`,
+    );
+  }
+  return bits.join(" · ");
 }
 
 function turnsToHistory(

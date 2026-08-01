@@ -166,7 +166,13 @@ espansione (5 eval completi + A/B), autorizzato 30€ — siamo vicini al tetto.
    Ministero (3,5M sentenze) richiede SPID e non consente harvest — dopo
    la pubblicazione, richiesta formale di accesso programmatico come
    progetto open di interesse pubblico.
-6. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
+6. **Rilascio free (2026-07-31 notte)**: landing a `/` (numeri onesti,
+   quattro moduli, trust layer; l'app è su `/app`), thinking onesto in chat
+   (eventi SSE `status` con le fasi reali della pipeline, collassati a fine
+   risposta), fix UX (input allineato, focus, nuova conversazione senza
+   reload). Gli URL GitHub in landing puntano a github.com/caucus-legal:
+   allinearli quando l'org esiste.
+7. **Pubblicazione**: tutto pronto, checklist in `docs/RELEASE_CHECKLIST.md`.
    Restano solo azioni che richiedono il repo remoto (creare org GitHub,
    push, private vulnerability reporting, tag v0.1.0). Nome verificato libero.
 7. Roadmap qualità: multivigenza storica (Normattiva `dataVigenza`), embedding

@@ -24,9 +24,11 @@ import type { ChatMode } from "@/lib/chatStream";
 export function Sidebar({
   mode,
   onSelectMode,
+  onNewConversation,
 }: {
   mode: ChatMode;
   onSelectMode: (mode: ChatMode) => void;
+  onNewConversation?: () => void;
 }) {
   const [fontiOpen, setFontiOpen] = useState(false);
 
@@ -43,9 +45,7 @@ export function Sidebar({
         <button
           type="button"
           className="flex w-full items-center gap-2 rounded-lg border border-paper-border bg-paper px-3 py-2 text-[13.5px] font-medium text-ink transition hover:bg-paper-hover"
-          onClick={() => {
-            if (typeof window !== "undefined") window.location.reload();
-          }}
+          onClick={onNewConversation}
         >
           <PenSquare size={14} />
           Nuova conversazione
