@@ -1,1 +1,1 @@
-"""Caucus API — FastAPI backend."""
+"""Caucus API: FastAPI backend."""

@@ -12,7 +12,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from caucus_api.db import (
     Base,
-    models,  # noqa: F401 — registra i modelli
+    models,  # noqa: F401 (registra i modelli)
 )
 from caucus_rag_core.config import get_settings
 

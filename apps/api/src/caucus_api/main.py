@@ -48,7 +48,7 @@ app = FastAPI(
     title="Caucus API",
     version="0.0.1",
     description=(
-        "Backend per Caucus — AI open source per il diritto e la compliance italiana. "
+        "Backend per Caucus, AI open source per il diritto e la compliance italiana. "
         "Espone endpoint per chat RAG sui codici, ricerca diretta e ingestion control."
     ),
     lifespan=lifespan,

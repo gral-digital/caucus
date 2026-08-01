@@ -13,7 +13,7 @@ candidati NON vengono pinnati: entrano nel merge come lookup a peso
 intermedio, e se il modello ha sbagliato articolo il reranker li affossa.
 Prima i riferimenti si estraevano con regex dalla sola riga arricchita: le
 fonti senza forma canonica riconoscibile (cts, cnav, cpriv, wb, …) non
-emergevano mai — è la causa principale dei retrieval miss su query
+emergevano mai: è la causa principale dei retrieval miss su query
 concettuali misurati in eval.
 
 Robustezza: qualunque errore/timeout → si usa la query originale.

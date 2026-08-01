@@ -1,4 +1,4 @@
-# ADR 0002 — Normattiva AKN XML come fonte primaria per i Codici
+# ADR 0002: Normattiva AKN XML come fonte primaria per i Codici
 
 - **Data**: 2026-04-17
 - **Stato**: Accettato
@@ -52,7 +52,7 @@ Più "flat" dell'AKN canonico: ogni articolo è un `<attachment>` con `<doc name
   la struttura del link `caricaAKN`, il fetcher rompe. Mitigazione: fixture XML
   committati come snapshot; test di parsing su fixture (no live); monitoring mensile.
 - La gerarchia Libro/Titolo/Capo non è codificata a livello di articolo nell'XML
-  servito — va arricchita con una seconda pass. Mitigazione: fase 2.
+  servito: va arricchita con una seconda pass. Mitigazione: fase 2.
 - Download lento (richiede session cookie + responses sizable). Mitigazione:
   fixture cache + schedule settimanale.
 

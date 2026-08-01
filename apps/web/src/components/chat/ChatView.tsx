@@ -312,7 +312,7 @@ function HallucinationBanner({ warnings }: { warnings: CitationWarnings }) {
               <span className="font-mono">
                 art. {c.num} {c.source}
               </span>
-              {c.reason ? <span className="text-amber-700"> — {c.reason}</span> : null}
+              {c.reason ? <span className="text-amber-700"> ({c.reason})</span> : null}
             </li>
           ))}
         </ul>

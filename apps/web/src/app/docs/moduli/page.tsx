@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Guida ai moduli — Documentazione Caucus" };
+export const metadata: Metadata = { title: "Guida ai moduli | Documentazione Caucus" };
 
 export default function ModuliDocs() {
   return (
@@ -10,7 +10,7 @@ export default function ModuliDocs() {
       <p>
         L&apos;app (<code>/app</code>) è un workspace a quattro moduli. Le
         conversazioni dei moduli sono indipendenti e restano in memoria quando
-        passi dall&apos;uno all&apos;altro — puoi lasciare un&apos;analisi a
+        passi dall&apos;uno all&apos;altro: puoi lasciare un&apos;analisi a
         metà, fare una ricerca e tornare. Ogni modulo usa la stessa pipeline di
         retrieval e lo stesso <Link href="/docs/trust-layer">trust layer</Link>;
         cambiano il prompt di sistema e le priorità del retrieval.
@@ -69,8 +69,8 @@ export default function ModuliDocs() {
 
       <h2>Redazione</h2>
       <p>
-        Descrivi l&apos;atto che ti serve — parere, diffida, clausola, lettera
-        di contestazione — e ottieni una bozza strutturata con le citazioni
+        Descrivi l&apos;atto che ti serve (parere, diffida, clausola, lettera
+        di contestazione) e ottieni una bozza strutturata con le citazioni
         verificate e i campi da completare marcati chiaramente (mai compilati
         con dati inventati). Il bottone <em>Esporta in Word</em> produce un
         .docx con formattazione da studio; prima dell&apos;export il server
@@ -83,7 +83,7 @@ export default function ModuliDocs() {
         decisioni (non sulle sole massime). Le decisioni sono citate con gli
         estremi reali presi dal corpus; se il corpus non copre il tema, la
         risposta lo dice esplicitamente invece di improvvisare. Il corpus
-        cresce con l&apos;harvest — la copertura attuale è indicata nel
+        cresce con l&apos;harvest; la copertura attuale è indicata nel
         pannello fonti.
       </p>
 
@@ -93,7 +93,7 @@ export default function ModuliDocs() {
         dentro Microsoft Word: seleziona il testo di un atto e verifica in un
         click tutte le citazioni contenute, con gli stessi esiti della chat
         (valida / abrogata / inesistente / non verificabile). Utile come
-        controllo finale su atti scritti da chiunque — anche senza Caucus.
+        controllo finale su atti scritti da chiunque, anche senza Caucus.
         Richiede il sideload del manifest e l&apos;app web attiva; istruzioni
         nel README dell&apos;add-in.
       </p>
@@ -109,7 +109,7 @@ export default function ModuliDocs() {
         </li>
         <li>
           durante la risposta vedi le fasi reali della pipeline (instradamento,
-          espansione, retrieval, reranking, generazione, verifica) — non
+          espansione, retrieval, reranking, generazione, verifica), non
           un&apos;animazione di cortesia: sono gli eventi <code>status</code>{" "}
           dello stream;
         </li>

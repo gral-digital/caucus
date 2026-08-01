@@ -1,4 +1,4 @@
-# ADR 0001 — Stack iniziale
+# ADR 0001: Stack iniziale
 
 - **Data**: 2026-04-17
 - **Stato**: Accettato
@@ -27,7 +27,7 @@ roadmap multi-modulo (Q&A, analisi documenti, drafting, giurisprudenza).
 - **LLM gateway**: LiteLLM.
 - **Connectors enterprise**: Onyx (fase 2+).
 - **Observability LLM**: Langfuse self-hosted.
-- **Auth fase 1**: Clerk o Auth.js v5 (OPEN — decisione separata).
+- **Auth fase 1**: Clerk o Auth.js v5 (OPEN, decisione separata).
 
 ## Conseguenze
 

@@ -17,7 +17,7 @@ Aggiornata al 2026-07-31. Preparato tutto, **non pubblicato**.
       **libero** (`caucus` puro occupato → usare nomi `caucus-*`, già così);
       npm `caucus` occupato (irrilevante: scope `@caucus` da registrare
       creando l'org npm); domini: `caucus.it` registrato da terzi,
-      `caucuslegal.it` e `getcaucus.com` senza DNS (probabilmente liberi —
+      `caucuslegal.it` e `getcaucus.com` senza DNS (probabilmente liberi;
       verificare sul registrar al momento dell'acquisto).
       ⚠️ La verifica **marchio** (EUIPO/UIBM, classe software/servizi legali)
       è una verifica legale: farla fare prima del lancio commerciale.
@@ -41,7 +41,7 @@ Aggiornata al 2026-07-31. Preparato tutto, **non pubblicato**.
       l'org non è creabile via API, quindi si è partiti sotto l'account
       owner; un transfer futuro a un'org mantiene i redirect. Branch
       protection su `main` (CI obbligatoria, no force-push) attivata.
-- [ ] Attivare **GitHub private vulnerability reporting** (Security tab) —
+- [ ] Attivare **GitHub private vulnerability reporting** (Security tab):
       `.github/SECURITY.md` già lo indica come canale.
 - [ ] Badge CI nel README dopo il primo run di GitHub Actions.
 - [ ] Tag `v0.1.0` + GitHub Release con il CHANGELOG.
@@ -60,7 +60,7 @@ Aggiornata al 2026-07-31. Preparato tutto, **non pubblicato**.
 
 - [ ] Fixture AKN (~51 MB nel repo): valutare Git LFS o release asset; nel
       frattempo il peso è accettabile e documentato (le fixture rendono i
-      test del parser riproducibili offline — valore > costo).
+      test del parser riproducibili offline: valore > costo).
 - [ ] Screenshot/GIF della chat con pannello citazioni nel README.
 - [ ] Annuncio: il claim centrale è il benchmark aperto con hallucination 0%
-      misurato — non promettere oltre i numeri.
+      misurato: non promettere oltre i numeri.

@@ -1,7 +1,7 @@
 """Registro estremi ufficiali → short_id delle fonti indicizzate.
 
 La query expansion LLM (e gli utenti esperti) citano gli atti per estremi
-ufficiali — "art. 17 D.Lgs. 81/2008", "art. 5 L. 300/1970" — non con le sigle
+ufficiali ("art. 17 D.Lgs. 81/2008", "art. 5 L. 300/1970"), non con le sigle
 interne. Questo registro permette al query router di risolverli in short_id.
 
 Generato dagli URN di CODICI_CATALOG (services/ingestion); mantenere allineato

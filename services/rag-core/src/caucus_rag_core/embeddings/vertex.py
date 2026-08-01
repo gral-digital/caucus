@@ -17,7 +17,7 @@ from caucus_rag_core.embeddings.base import EmbeddingProvider, EmbeddingVector
 class VertexEmbeddingProvider(EmbeddingProvider):
     """Chiama un endpoint Vertex AI per dense embeddings.
 
-    Non produce sparse — per hybrid search in prod, o si usa LocalBGEM3Provider in
+    Non produce sparse: per hybrid search in prod, o si usa LocalBGEM3Provider in
     un worker offline, o si ospita bge-m3 come custom container su Vertex.
     """
 

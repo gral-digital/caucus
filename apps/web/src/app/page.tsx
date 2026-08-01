@@ -56,8 +56,8 @@ export default function Landing() {
           non si dichiara. Si dimostra.
         </h1>
         <p className="mx-auto mt-5 max-w-xl text-[16px] leading-relaxed text-ink-muted">
-          Ricerca, analisi documenti e redazione sul diritto italiano — con ogni
-          citazione verificata su testi consolidati, e un benchmark pubblico che
+          Ricerca, analisi documenti e redazione sul diritto italiano, con ogni
+          citazione verificata su testi consolidati e un benchmark pubblico che
           chiunque può rieseguire. Gratis, open source, self-hostable.
         </p>
         <div className="mt-8 flex items-center justify-center gap-3">
@@ -124,7 +124,7 @@ export default function Landing() {
           <Feature
             icon={<Scale size={17} />}
             title="Giurisprudenza"
-            text="Orientamenti di Cassazione, Consiglio di Stato e TAR sul testo integrale, citati con gli estremi — mai estrapolati da sentenze non lette."
+            text="Orientamenti di Cassazione, Consiglio di Stato e TAR sul testo integrale, citati con gli estremi: mai estrapolati da sentenze non lette."
           />
         </div>
       </section>
@@ -139,8 +139,8 @@ export default function Landing() {
             <p className="mt-4 text-[14.5px] leading-relaxed text-ink-muted">
               Un riferimento inventato in un atto è responsabilità professionale.
               Per questo ogni citazione generata viene verificata contro il
-              corpus — esistenza, fonte, <strong>vigenza temporale</strong> e{" "}
-              <strong>abrogazione</strong> — e se non regge, la risposta viene
+              corpus (esistenza, fonte, <strong>vigenza temporale</strong> e{" "}
+              <strong>abrogazione</strong>) e, se non regge, la risposta viene
               riscritta, non solo segnalata. Anche nei tuoi documenti Word:
               l&apos;add-in controlla le citazioni degli atti che hai già
               scritto.
@@ -170,8 +170,8 @@ export default function Landing() {
           Tuo, davvero
         </h2>
         <p className="mx-auto mt-3 max-w-xl text-[14.5px] leading-relaxed text-ink-muted">
-          Codice AGPL-3.0, corpus ricostruibile da fonti pubbliche — o
-          scaricabile già indicizzato, embedding inclusi — backend LLM ed
+          Codice AGPL-3.0, corpus ricostruibile da fonti pubbliche (o
+          scaricabile già indicizzato, embedding inclusi), backend LLM ed
           embedding intercambiabili. Lo studio che non può usare il cloud fa
           girare tutto on-premise. Nessun piano a pagamento, nessun contratto
           pluriennale: è software libero. La{" "}
@@ -193,7 +193,7 @@ export default function Landing() {
 
       <footer className="border-t border-paper-border/70">
         <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-3 px-6 py-8 text-[12.5px] text-ink-subtle sm:flex-row">
-          <span>Caucus — AI legale open source per il diritto italiano</span>
+          <span>Caucus: AI legale open source per il diritto italiano</span>
           <span>
             L&apos;assistente non sostituisce il parere di un avvocato. AGPL-3.0.
           </span>

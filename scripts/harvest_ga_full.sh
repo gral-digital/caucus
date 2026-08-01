@@ -8,7 +8,7 @@
 # Ordine: prima le sedi più citate, dall'anno corrente a ritroso fino a
 # ANNO_MIN (default 2022). Costi embedding: ~7 € / 100k provvedimenti.
 # Rate limit 0.5 req/s dentro al fetcher: un anno di una sede grande (~20k)
-# richiede ~12 ore — è un processo di giorni, per questo è resumabile.
+# richiede ~12 ore: è un processo di giorni, per questo è resumabile.
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
@@ -53,7 +53,7 @@ SEDI=(
 
 LOCKDIR=/tmp/harvest_ga.lock
 if ! mkdir "$LOCKDIR" 2>/dev/null; then
-  echo "harvest GA già in esecuzione (lock: $LOCKDIR) — esco. Lock orfano: rmdir $LOCKDIR"
+  echo "harvest GA già in esecuzione (lock: $LOCKDIR), esco. Lock orfano: rmdir $LOCKDIR"
   exit 1
 fi
 trap 'rmdir "$LOCKDIR" 2>/dev/null' EXIT
@@ -65,7 +65,7 @@ for anno in $(seq "$ANNO_MAX" -1 "$ANNO_MIN"); do
     until out=$(uv run caucus-ingest ingest-ga --sede "$sede" --anno "$anno" \
         --max "$MAX_PER_SEDE_ANNO" 2>&1 | tail -3); do
       failures=$((failures + 1))
-      echo "$sede $anno: batch fallito ($failures/$MAX_CONSECUTIVE_FAILURES) — $out"
+      echo "$sede $anno: batch fallito ($failures/$MAX_CONSECUTIVE_FAILURES): $out"
       if [ "$failures" -ge "$MAX_CONSECUTIVE_FAILURES" ]; then
         echo "$sede $anno: troppi fallimenti, passo oltre"
         break

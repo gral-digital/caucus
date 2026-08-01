@@ -45,7 +45,7 @@ async def require_api_auth(request: Request) -> None:
     """Auth degli endpoint applicativi.
 
     Con ``ACCOUNTS_ENABLED=true`` (free tier hosted): serve una sessione
-    utente valida (Bearer da /auth/login) — il token condiviso
+    utente valida (Bearer da /auth/login); il token condiviso
     ``API_AUTH_TOKEN`` resta accettato per ops e benchmark. L'utente
     risolto finisce in ``request.state.user_id`` (per quote e ownership).
 

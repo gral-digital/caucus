@@ -45,7 +45,7 @@ export default async function NormaPage({
         <p className="text-sm uppercase tracking-wide text-ink/50">{norma.source_title}</p>
         <h1 className="font-serif text-2xl text-ink">
           Art. {norma.articolo}
-          {norma.rubrica ? ` — ${norma.rubrica}` : ""}
+          {norma.rubrica ? ` (${norma.rubrica})` : ""}
         </h1>
         <p className="mt-1 text-xs text-ink/50">
           {norma.citation} · testo consolidato al{" "}

@@ -19,7 +19,7 @@ within 72 hours.
   their own DPIA.
 - The reference deployment sends queries to third-party LLM providers
   (OpenAI by default). Self-hosted backends are supported and recommended for
-  privileged content — see the configuration in `.env.example`.
+  privileged content; see the configuration in `.env.example`.
 - Cassazione decisions are ingested exclusively in the official anonymized
   form published by SentenzeWeb; the harvester discards documents still
   "in fase di oscuramento". Report any de-anonymization vector as a

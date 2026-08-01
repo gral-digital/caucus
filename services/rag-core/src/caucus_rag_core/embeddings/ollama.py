@@ -4,7 +4,7 @@ Per sviluppo locale (Mac, zero cloud, zero costi). Usa l'API REST nativa di
 Ollama, senza dipendenze Python pesanti (niente torch / FlagEmbedding).
 
 In produzione si sostituisce con :class:`VertexEmbeddingProvider` cambiando
-solo la factory — l'interfaccia :class:`EmbeddingProvider` è la stessa.
+solo la factory: l'interfaccia :class:`EmbeddingProvider` è la stessa.
 """
 
 from __future__ import annotations

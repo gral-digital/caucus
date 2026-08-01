@@ -2,14 +2,14 @@
 
 Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](https://semver.org/).
 
-## [Unreleased] — verso la prima release pubblica come **Caucus**
+## [Unreleased]: verso la prima release pubblica come **Caucus**
 
 ### Added
 - **Pacchetto corpus ridistribuibile**: `make corpus-export` produce dump
   Postgres data-only (conteggi sullo stesso snapshot MVCC del dump) +
   snapshot Qdrant + manifest con checksum SHA-256 e revisione dello schema;
   `make corpus-import SRC=<dir|url>` scarica (con resume), verifica e
-  ripristina tutto — il self-hosting parte in minuti senza ingestione né
+  ripristina tutto: il self-hosting parte in minuti senza ingestione né
   costi di embedding.
 - **Documentazione in-app** a `/docs`: otto pagine (panoramica, self-hosting
   con deploy Vercel, corpus, trust layer, guida ai moduli, API reference con
@@ -29,13 +29,13 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   varianza dichiarata); la tabella «Current results» era rimasta al run
   superseded con il reranker in fallback.
 - **Free tier hosted completo** (feature flag `ACCOUNTS_ENABLED`, default
-  off — il self-hosting resta senza registrazione): tabelle `user_account`
+  off, il self-hosting resta senza registrazione): tabelle `user_account`
   (Argon2id) e `auth_session` (nel DB solo lo SHA-256 del token opaco),
   endpoint `/auth/register|login|logout|me|config`, **enforcement** su
   tutti gli endpoint applicativi (senza sessione → 401; il token condiviso
   resta per ops/benchmark), **quota giornaliera per utente**
-  (`FREE_DAILY_CHAT_LIMIT`, default 30 — upsert atomico su `usage_daily`,
-  messaggio 429 che rimanda al self-hosting), documenti legati all'account.
+  (`FREE_DAILY_CHAT_LIMIT`, default 30, con upsert atomico su `usage_daily`
+  e messaggio 429 che rimanda al self-hosting), documenti legati all'account.
   Web app: schermata di accesso/registrazione servita dal gate quando la
   config del server lo richiede, badge utente + logout in sidebar, header
   Authorization su tutte le chiamate. Migrazioni 0005-0006.
@@ -45,24 +45,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   GitHub. Zero claim non verificabili.
 - **Thinking onesto in chat**: eventi SSE `status` con le fasi REALI della
   pipeline (analisi, fonti selezionate, verifica citazioni, eventuale
-  riparazione) mostrate live durante l'elaborazione — incluso il silenzio
-  post-streaming che prima sembrava un blocco — e collassate a fine
+  riparazione) mostrate live durante l'elaborazione (incluso il silenzio
+  post-streaming che prima sembrava un blocco) e collassate a fine
   risposta in «N fonti consultate · N citazioni verificate», espandibili.
   L'evento `done` riporta i conteggi di verifica.
 - **Add-in Word (v0, non ancora collaudato in Word reale)**: taskpane
   Office.js (`apps/word-addin/` + statici in `apps/web/public/word-addin/`)
   con ricerca giuridica via SSE, inserimento della risposta nel documento
   (citazioni in forma canonica) e **verifica delle citazioni del documento
-  aperto** contro il corpus via `POST /citations/validate` — esistenza,
+  aperto** contro il corpus via `POST /citations/validate`: esistenza,
   vigenza, abrogazione, con esiti verde/giallo/rosso. Manifest validato,
   istruzioni di sideload nel README; fuori da Word la pagina degrada con
   avviso e ricerca comunque funzionante.
-- **Endpoint `POST /citations/validate`**: il trust layer come servizio —
-  estrae i riferimenti (tag e prosa) da un testo arbitrario e li valida
+- **Endpoint `POST /citations/validate`**: il trust layer come servizio.
+  Estrae i riferimenti (tag e prosa) da un testo arbitrario e li valida
   contro il corpus.
 - **Modulo Giurisprudenza**: ricerca negli orientamenti della Cassazione.
   In questa modalità l'ordine dei corpora si inverte (Cassazione primaria
-  nel retrieval, normativa di supporto — l'ordine di `query.corpora` è ora
+  nel retrieval, normativa di supporto; l'ordine di `query.corpora` è ora
   semantico nel retriever) e il prompt raggruppa per orientamento
   (prevalente/minoritario), cita le decisioni in prosa con gli estremi e
   collega i principî alle norme con `<cite/>`; vietato estrapolare
@@ -77,24 +77,24 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   l'export Word.
 - **Analisi documentale (v1)**: upload di .docx/.pdf (`POST /documents`,
   testo estratto all'upload, file originale non conservato; PDF scansionati
-  rifiutati con errore chiaro — niente OCR silenzioso), allegato alla chat
+  rifiutati con errore chiaro, niente OCR silenzioso), allegato alla chat
   via `document_ids`. Il documento entra nel prompt come fatti del caso
   (cap 30k char/doc con troncamento dichiarato al modello), l'incipit
   alimenta la query di retrieval (il dominio del documento fa emergere la
-  normativa giusta), e le clausole si citano in prosa — i tag `<cite/>`
+  normativa giusta), e le clausole si citano in prosa: i tag `<cite/>`
   restano riservati alle norme, così il trust layer non valida mai una
   clausola come fonte normativa. UI: graffetta + chip documento in chat.
 - **Export del parere in Word** (`POST /export/docx` + bottone in chat): il
   server ri-verifica le citazioni contro il corpus al momento dell'export e
   produce un .docx con formattazione da studio (Times New Roman, corpo
   giustificato, numeri di pagina), riferimenti in forma citazionale canonica
-  e allegato «Riferimenti normativi» con rubrica, testo e stato di vigenza —
-  con avvertenza esplicita su disposizioni abrogate o non trovate. Nota di
+  e allegato «Riferimenti normativi» con rubrica, testo e stato di vigenza;
+  avvertenza esplicita su disposizioni abrogate o non trovate. Nota di
   trasparenza AI in coda al documento.
 - **Guardrail bidirezionale**: policy che distingue analisi giuridica (sempre
   ammessa, anche su reati e clienti colpevoli) da assistenza operativa a un
   illecito (rifiutata per chiunque, avvocati inclusi: artt. 377-378 c.p.), e
-  metrica **over-refusal** nel benchmark — nessun benchmark legale la misura.
+  metrica **over-refusal** nel benchmark (nessun benchmark legale la misura).
 - **Route `/norma/{source}/art/{num}`**: destinazione dei link delle citazioni
   (API + pagina), con filtro di vigenza e banner per gli articoli abrogati.
 - **Corpus**: 50 fonti Normattiva (codici, testi unici, compliance: 231/2001,
@@ -103,7 +103,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
   NIS2, DORA, MiCA, eIDAS, DSA, DMA, direttive), harvest incrementale
   Cassazione da SentenzeWeb (testo integrale anonimizzato, resumabile).
 - **Caucus Bench** (`benchmark/`, MIT): primo benchmark legale italiano
-  aperto — 171 casi, metriche source-aware, hallucination rate solo sulle
+  aperto: 171 casi, metriche source-aware, hallucination rate solo sulle
   risposte che citano, casi abrogati/adversarial/out-of-corpus.
 - **Trust layer**: validazione post-generazione delle citazioni (esistenza,
   fonte, vigenza, abrogazione, grounding sul contesto).
@@ -143,7 +143,7 @@ Formato: [Keep a Changelog](https://keepachangelog.com/) · versioni [SemVer](ht
 
 ### Fixed
 - **Streaming SSE finalmente visibile in UI**: la compressione applicata
-  dal dev server Next alla risposta proxata bufferizzava l'intero stream —
+  dal dev server Next alla risposta proxata bufferizzava l'intero stream:
   il browser riceveva la risposta in un colpo solo, senza token progressivi
   né fasi di thinking (i probe da terminale, senza Accept-Encoding, non lo
   mostravano). Fix su entrambi i lati: `compress: false` in next.config e

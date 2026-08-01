@@ -70,7 +70,7 @@ def cmd_fetch(
     codice: Annotated[
         str,
         typer.Option(
-            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ... — vedi CODICI_CATALOG)"
+            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ...; vedi CODICI_CATALOG)"
         ),
     ],
     output: Annotated[
@@ -106,7 +106,7 @@ def cmd_parse(
     codice: Annotated[
         str,
         typer.Option(
-            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ... — vedi CODICI_CATALOG)"
+            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ...; vedi CODICI_CATALOG)"
         ),
     ],
     xml_path: Annotated[
@@ -144,7 +144,7 @@ def cmd_ingest(
     codice: Annotated[
         str,
         typer.Option(
-            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ... — vedi CODICI_CATALOG)"
+            "--codice", "-c", help="short_id dal catalogo (cc, cp, cds, ...; vedi CODICI_CATALOG)"
         ),
     ],
     from_fixture: Annotated[

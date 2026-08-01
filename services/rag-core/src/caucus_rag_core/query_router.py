@@ -305,7 +305,7 @@ class RoutedQuery:
     # deterministica, pinnata e pesata al massimo.
     direct_articles: tuple[ArticleRef, ...] = ()
     # Articoli suggeriti dalle regole di materia (euristica per keyword):
-    # utili come candidati, ma NON pinnati — una regola che scatta su
+    # utili come candidati, ma NON pinnati: una regola che scatta su
     # "contratto" non deve imporre l'art. 1218 a una domanda sulla vendita.
     suggested_articles: tuple[ArticleRef, ...] = ()
     fts_extra_terms: tuple[str, ...] = ()

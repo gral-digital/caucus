@@ -25,8 +25,8 @@ import { Wordmark } from "./Wordmark";
  * Sidebar minimale: logo, nuova conversazione, moduli, footer.
  *
  * Il catalogo delle fonti NON vive più qui (era un elenco di 50+ voci sempre
- * aperto): sta nel pannello «Fonti» richiamabile dal footer — visibile quando
- * serve, invisibile quando si lavora.
+ * aperto): sta nel pannello «Fonti» richiamabile dal footer, visibile quando
+ * serve e invisibile quando si lavora.
  *
  * Su mobile (<md) è un drawer a scomparsa controllato da `open`/`onClose`;
  * su desktop è sempre visibile e le due prop sono ininfluenti.
@@ -453,7 +453,7 @@ function FontiPanel({ onClose }: { onClose: () => void }) {
         <div className="flex flex-col gap-1.5 rounded-b-2xl border-t border-paper-border/70 bg-paper-panel px-5 py-3.5 sm:flex-row sm:items-center sm:justify-between sm:px-8">
           <span className="text-[12px] text-ink-muted">
             + Giurisprudenza: Cassazione civile e penale, Consiglio di Stato e
-            TAR — testo integrale, corpus in crescita
+            TAR (testo integrale, corpus in crescita)
           </span>
           <span className="text-[11.5px] text-ink-subtle">
             Testi vigenti al 17/04/2026

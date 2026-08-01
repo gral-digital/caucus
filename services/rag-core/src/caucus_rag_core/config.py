@@ -37,7 +37,7 @@ class Settings(BaseSettings):
     query_expansion_enabled: bool = True
     # Modello per l'espansione (piccolo e veloce, separato dalla generazione).
     # A/B sul prompt strutturato attuale (10 casi difficili, articoli attesi
-    # nei RIF): gpt-4.1-mini 9/14, gpt-4o-mini 7/14, gpt-4o 6/14 — il prompt
+    # nei RIF): gpt-4.1-mini 9/14, gpt-4o-mini 7/14, gpt-4o 6/14. Il prompt
     # conta più della taglia del modello, e 4.1-mini è il migliore misurato.
     query_expansion_model: str = "openai/gpt-4.1-mini"
 

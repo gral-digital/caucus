@@ -13,7 +13,7 @@ bold() { printf "\033[1m%s\033[0m\n" "$1"; }
 ok()   { printf "  \033[32m✓\033[0m %s\n" "$1"; }
 ko()   { printf "  \033[31m✗\033[0m %s\n" "$1"; exit 1; }
 
-bold "1. Postgres — conteggi"
+bold "1. Postgres: conteggi"
 sources=$(PGPASSWORD=avvocato $PG -c "SELECT count(*) FROM norm_source")
 articoli=$(PGPASSWORD=avvocato $PG -c "SELECT count(*) FROM norm_partition WHERE kind='articolo'")
 chunks=$(PGPASSWORD=avvocato $PG -c "SELECT count(*) FROM norm_chunk")
@@ -22,16 +22,16 @@ echo "  sources=$sources articoli=$articoli chunks=$chunks"
 [ "$articoli" -ge 4000 ] && ok "articoli in DB" || ko "troppo pochi articoli"
 [ "$chunks" -ge 13000 ] && ok "chunk in DB" || ko "troppo pochi chunk"
 
-bold "2. Qdrant — points"
+bold "2. Qdrant: points"
 codici_pts=$(curl -sf "${QDRANT}/collections/codici" -H "api-key: ${QDRANT_KEY}" | python3 -c "import sys,json;print(json.load(sys.stdin)['result']['points_count'])")
 echo "  codici points=$codici_pts"
 [ "$codici_pts" -ge 13000 ] && ok "vettori in Qdrant" || ko "pochi vettori: $codici_pts"
 
-bold "3. API — /health/ready"
+bold "3. API: /health/ready"
 curl -sf "${API}/api/v1/health/ready" | python3 -m json.tool
 ok "health ready"
 
-bold "4. API — /search"
+bold "4. API: /search"
 curl -sf "${API}/api/v1/search" \
   -H "content-type: application/json" \
   -d '{"query": {"text": "risarcimento per fatto illecito extracontrattuale", "corpora": ["codici"], "top_k_retrieve": 20, "top_k_rerank": 5}}' \
@@ -48,7 +48,7 @@ for h in hits[:3]:
 "
 ok "search restituisce hit"
 
-bold "5. API — /chat (SSE streaming)"
+bold "5. API: /chat (SSE streaming)"
 echo '  domanda: "qual è la differenza tra dolo e colpa?"'
 echo '  risposta: '
 curl -Ns "${API}/api/v1/chat" \

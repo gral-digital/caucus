@@ -223,7 +223,7 @@ class GiustiziaAmministrativaFetcher:
             f"{prefix}TipoProvvedimentoItem": tipo,
             f"{prefix}sedeProvvedimenti": sede,
             # I value delle option coincidono con le label ("Consiglio di
-            # Stato", nomi città, "Sentenza") — verificato sull'HTML del form.
+            # Stato", nomi città, "Sentenza"): verificato sull'HTML del form.
             f"{prefix}DataYearItem": str(anno),
             f"{prefix}numeroProvvedimenti": "",
             f"{prefix}isAdvancedSearch": "false",

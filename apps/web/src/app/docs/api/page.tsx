@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "API — Documentazione Caucus" };
+export const metadata: Metadata = { title: "API | Documentazione Caucus" };
 
 export default function ApiDocs() {
   return (
@@ -83,7 +83,7 @@ export default function ApiDocs() {
         </tbody>
       </table>
 
-      <h2>POST /chat — lo stream</h2>
+      <h2>POST /chat: lo stream</h2>
       <p>Richiesta:</p>
       <pre>{`{
   "question": "Recesso dal contratto per vizio della cosa venduta",
@@ -109,7 +109,7 @@ export default function ApiDocs() {
           <tr>
             <td><code>status</code></td>
             <td>
-              <code>{"{stage, detail}"}</code> — le fasi reali della pipeline
+              <code>{"{stage, detail}"}</code>: le fasi reali della pipeline
               (instradamento, espansione, retrieval, reranking, generazione,
               verifica, riparazione), emesse quando accadono
             </td>
@@ -122,28 +122,28 @@ export default function ApiDocs() {
           </tr>
           <tr>
             <td><code>token</code></td>
-            <td><code>{"{text}"}</code> — frammento incrementale della risposta</td>
+            <td><code>{"{text}"}</code>: frammento incrementale della risposta</td>
           </tr>
           <tr>
             <td><code>citation_warnings</code></td>
             <td>
-              <code>{"{valid: [...], invalid: [{source, num, reason}], total}"}</code>{" "}
-              — esito del <Link href="/docs/trust-layer">trust layer</Link>;
+              <code>{"{valid: [...], invalid: [{source, num, reason}], total}"}</code>:
+              esito del <Link href="/docs/trust-layer">trust layer</Link>;
               le citazioni valide includono <code>grounding: strong|weak</code>
             </td>
           </tr>
           <tr>
             <td><code>done</code></td>
             <td>
-              <code>{"{finish_reason, final_text, citations_total, citations_valid}"}</code>{" "}
-              — <code>final_text</code> è il testo con le citazioni in prosa
+              <code>{"{finish_reason, final_text, citations_total, citations_valid}"}</code>:
+              <code>final_text</code> è il testo con le citazioni in prosa
               promosse a tag <code>&lt;cite/&gt;</code> ed eventualmente
-              riparate: è la forma da usare per l&apos;export
+              riparate; è la forma da usare per l&apos;export
             </td>
           </tr>
           <tr>
             <td><code>error</code></td>
-            <td><code>{"{message}"}</code> — errore applicativo; chiude lo stream</td>
+            <td><code>{"{message}"}</code>: errore applicativo; chiude lo stream</td>
           </tr>
         </tbody>
       </table>

@@ -2,7 +2,7 @@
 
 Le citazioni nelle risposte sono rese dalla UI come link a
 ``/norma/{source}/art/{num}``: senza questo endpoint il trust layer si
-fermerebbe a metà — l'utente può vedere che una citazione è verificata ma non
+fermerebbe a metà: l'utente può vedere che una citazione è verificata ma non
 leggere la norma.
 """
 

@@ -22,7 +22,7 @@ MAX_CONSECUTIVE_FAILURES=5
 
 LOCKDIR=/tmp/harvest_cassazione.lock
 if ! mkdir "$LOCKDIR" 2>/dev/null; then
-  echo "harvest già in esecuzione (lock: $LOCKDIR) — esco. Se è un lock orfano: rmdir $LOCKDIR"
+  echo "harvest già in esecuzione (lock: $LOCKDIR), esco. Se è un lock orfano: rmdir $LOCKDIR"
   exit 1
 fi
 trap 'rmdir "$LOCKDIR" 2>/dev/null' EXIT
@@ -44,7 +44,7 @@ for kind in snpen snciv; do
       fi
     else
       failures=$((failures + 1))
-      echo "$kind: batch fallito ($failures/$MAX_CONSECUTIVE_FAILURES consecutivi) — ultimo output:"
+      echo "$kind: batch fallito ($failures/$MAX_CONSECUTIVE_FAILURES consecutivi), ultimo output:"
       echo "$out"
       if [ "$failures" -ge "$MAX_CONSECUTIVE_FAILURES" ]; then
         echo "$kind: troppi fallimenti consecutivi, passo oltre (rilanciare per riprendere)"

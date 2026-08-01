@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Caucus Bench — harness end-to-end del benchmark legale italiano.
+"""Caucus Bench: harness end-to-end del benchmark legale italiano.
 
 Differenze metodologiche rispetto alla v1 (eval_lexroom_benchmark.py, rimossa):
 
@@ -503,7 +503,7 @@ async def main() -> int:
             last_results = list(results)
             agg = aggregate(last_results)
             per_run_aggs.append(agg)
-            print(f"\n— run {run_idx + 1}/{args.runs} —")
+            print(f"\n[run {run_idx + 1}/{args.runs}]")
             _print_summary(agg, last_results)
 
     final_agg = per_run_aggs[-1]

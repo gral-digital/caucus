@@ -48,7 +48,7 @@ def create_embedding_provider(settings: Settings | None = None) -> EmbeddingProv
     # Guardia di coerenza: EMBEDDING_DIM guida lo schema della collection
     # Qdrant (deps.get_vectorstore). Un provider che produce vettori di
     # dimensione diversa (es. bge-m3 = 1024 vs EMBEDDING_DIM=1536) causerebbe
-    # mismatch a runtime — meglio fallire subito con un messaggio chiaro.
+    # mismatch a runtime: meglio fallire subito con un messaggio chiaro.
     if provider.dense_dim != cfg.embedding_dim:
         raise ValueError(
             f"EMBEDDING_DIM={cfg.embedding_dim} ma il backend {backend!r} produce "

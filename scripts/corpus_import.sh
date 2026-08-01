@@ -30,9 +30,16 @@ if [[ "$SRC" == http://* || "$SRC" == https://* ]]; then
   mkdir -p "$DL"
   echo "==> Scarico il manifest da ${BASE_URL}…"
   curl -fL --retry 3 -o "${DL}/manifest.json" "${BASE_URL}/manifest.json"
-  FILES=$(python3 -c '
-import json; print("\n".join(json.load(open("'"$DL"'/manifest.json"))["files"]))')
-  for f in $FILES; do
+  # I file possono essere pubblicati in parti (limite 2 GB di molti hosting):
+  # in quel caso si scaricano le parti elencate nel manifest.
+  DOWNLOADS=$(python3 -c '
+import json
+manifest = json.load(open("'"$DL"'/manifest.json"))
+names = []
+for name, meta in manifest["files"].items():
+    names.extend(meta.get("parts") or [name])
+print("\n".join(names))')
+  for f in $DOWNLOADS; do
     echo "==> Scarico ${f}…"
     curl -fL --retry 3 -C - -o "${DL}/${f}" "${BASE_URL}/${f}"
   done
@@ -52,13 +59,23 @@ curl -sf -H "api-key: ${QDRANT_API_KEY}" "${QDRANT_URL}/collections" >/dev/null 
   exit 1
 }
 
-echo "==> Verifica checksum…"
+echo "==> Riassemblo le eventuali parti e verifico i checksum…"
 python3 - "$SRC" <<'PYEOF'
 import hashlib, json, pathlib, sys
 src = pathlib.Path(sys.argv[1])
 manifest = json.loads((src / "manifest.json").read_text())
 for name, meta in manifest["files"].items():
     path = src / name
+    parts = meta.get("parts")
+    if parts and not path.exists():
+        for p in parts:
+            if not (src / p).exists():
+                sys.exit(f"ERRORE: parte mancante {p}")
+        with open(path, "wb") as out:
+            for p in parts:
+                with open(src / p, "rb") as fh:
+                    while block := fh.read(1 << 20):
+                        out.write(block)
     if not path.exists():
         sys.exit(f"ERRORE: file mancante {name}")
     h = hashlib.sha256()

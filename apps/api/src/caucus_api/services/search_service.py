@@ -113,7 +113,7 @@ class SearchService:
         # L'espansione LLM (la parte lenta, ~1-2s) parte SUBITO; in parallelo
         # girano i rami DB sul testo originale. ATTENZIONE: le chiamate che
         # usano la AsyncSession (direct, fts, exp_lookup) devono restare
-        # SEQUENZIALI tra loro — la sessione SQLAlchemy non ammette operazioni
+        # SEQUENZIALI tra loro: la sessione SQLAlchemy non ammette operazioni
         # concorrenti ("This session is provisioning a new connection...").
         # Se l'utente ha già citato un articolo per numero, il lookup diretto
         # è la chiave di retrieval: l'espansione aggiungerebbe solo latenza.
@@ -211,7 +211,7 @@ class SearchService:
             # dei rami probabilistici. I candidati dell'espansione LLM pesano
             # più del probabilistico ma meno del lookup utente.
             # NB (misurato): un ramo FTS GLOBALE sul testo espanso NON va
-            # aggiunto — i chunk contati due volte nei rami probabilistici
+            # aggiunto: i chunk contati due volte nei rami probabilistici
             # superano i candidati d'espansione nel merge e li spingono fuori
             # dai rerank_candidates (recall 96%→92%, MRR 0.89→0.77). Il ramo
             # scoped (max 8 hit, max 3 fonti) non ha lo stesso effetto.
@@ -232,7 +232,7 @@ class SearchService:
             reranked, direct=direct_keys, top_k=effective_query.top_k_rerank
         )
         # Dedup per partizione: lo stesso articolo non deve occupare più slot
-        # del top-k con chunk diversi (articolo-full + comma) — spreca contesto
+        # del top-k con chunk diversi (articolo-full + comma): spreca contesto
         # e maschera articoli diversi rilevanti.
         seen_partitions: set[object] = set()
         deduped = []

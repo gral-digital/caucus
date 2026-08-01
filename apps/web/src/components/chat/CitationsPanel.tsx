@@ -28,7 +28,7 @@ export function CitationsPanel({ hits }: { hits: RetrievalHitSummary[] }) {
             <li key={h.chunk_id} className="px-3 py-2.5">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="text-[13px] font-medium text-ink">
-                  {h.citation_display ?? "—"}
+                  {h.citation_display ?? "fonte non identificata"}
                 </span>
                 <span className="shrink-0 font-mono text-[11px] text-ink-subtle">
                   {h.score.toFixed(3)}

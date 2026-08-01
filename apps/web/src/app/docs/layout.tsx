@@ -6,7 +6,7 @@ import { Wordmark } from "@/components/layout/Wordmark";
 import { DocsMobileNav, DocsSidebarNav } from "@/components/docs/DocsNav";
 
 export const metadata: Metadata = {
-  title: "Documentazione — Caucus",
+  title: "Documentazione | Caucus",
   description:
     "Documentazione di Caucus: self-hosting, corpus, trust layer, API e benchmark.",
 };

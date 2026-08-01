@@ -188,7 +188,7 @@ def _setup_styles(doc: DocumentObject) -> None:
         lst.paragraph_format.space_after = Pt(3)
         lst.paragraph_format.left_indent = Cm(0.75)
         # Elenco tipografico semplice (trattino): niente numerazione OOXML,
-        # che python-docx non sa definire senza template — il testo resta
+        # che python-docx non sa definire senza template; il testo resta
         # editabile e lo stile uniforme.
         lst.paragraph_format.first_line_indent = Cm(-0.35)
 
@@ -257,7 +257,7 @@ def render_parere_docx(
     run = title.add_run("PARERE")
     run.font.size = Pt(18)
     sub = doc.add_paragraph(style="Caucus Small")
-    sub.add_run("Bozza di lavoro assistita da AI — da rivedere prima dell'uso professionale")
+    sub.add_run("Bozza di lavoro assistita da AI, da rivedere prima dell'uso professionale")
 
     meta = doc.add_paragraph(style="Caucus Body")
     meta.add_run("Oggetto: ").bold = True
@@ -282,7 +282,7 @@ def render_parere_docx(
             head = doc.add_paragraph(style="Caucus Heading 3")
             label = ref.display
             if ref.source_title:
-                label += f" — {ref.source_title}"
+                label += f" ({ref.source_title})"
             head.add_run(label)
             if ref.rubrica:
                 rub = doc.add_paragraph(style="Caucus Body")

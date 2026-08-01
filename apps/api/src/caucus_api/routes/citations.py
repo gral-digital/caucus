@@ -2,7 +2,7 @@
 
 Stesso trust layer della chat, esposto come endpoint: estrae i riferimenti
 normativi (tag ``<cite/>`` e prosa «art. 2043 c.c.») e li verifica contro il
-corpus — esistenza, fonte, vigenza, abrogazione. A differenza della chat non
+corpus (esistenza, fonte, vigenza, abrogazione). A differenza della chat non
 c'è un contesto di retrieval, quindi il campo ``grounding`` non viene
 riportato: qui si giudica il testo dell'utente, non una risposta del modello.
 """

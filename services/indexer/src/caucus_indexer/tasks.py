@@ -25,7 +25,7 @@ def reindex_corpus(corpus: str) -> None:
         reindex_corpus.send("codici")
     """
     logger.info("reindex_corpus.start", corpus=corpus)
-    # TODO: implementare — delete collection Qdrant, re-esegui ingest da snapshots GCS.
+    # TODO: implementare (delete collection Qdrant, re-esegui ingest da snapshots GCS).
     logger.info("reindex_corpus.done", corpus=corpus)
 
 

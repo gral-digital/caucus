@@ -18,7 +18,7 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    # Estensioni — idempotenti.
+    # Estensioni, idempotenti.
     for ext in ("uuid-ossp", "pg_trgm", "unaccent", "ltree", "vector", "btree_gin"):
         op.execute(f'CREATE EXTENSION IF NOT EXISTS "{ext}"')
 

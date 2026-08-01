@@ -31,13 +31,13 @@ Quindi:
 - Ogni `<attachment>` = un articolo (o pre-disposizione).
 - Il testo completo dell'articolo è concatenato in un singolo `<p>` con commi
   separati da ` \n \n `.
-- Le modifiche sono marcate con `(( ... ))` — le conserviamo inline (il
+- Le modifiche sono marcate con `(( ... ))`: le conserviamo inline (il
   contenuto tra doppie parentesi è testo modificato tuttora vigente).
 
 La gerarchia Libro/Titolo/Capo/Sezione NON è codificata a livello di articolo
 nell'XML. Per il primo indice la manteniamo semplice (root = "Codice Civile",
 children = articoli). La gerarchia completa verrà arricchita da una seconda
-pass sull'indice HTML (TODO — non blocca il RAG base).
+pass sull'indice HTML (TODO, non blocca il RAG base).
 """
 
 from __future__ import annotations
@@ -526,7 +526,7 @@ _RUBRICA_STD_RE = re.compile(
 
 # Marcatore di aggiornamenti Normattiva: linea "-----------" seguita da
 # "AGGIORNAMENTO (N)". Tutto ciò che segue NON è testo normativo vigente ma
-# note di modifica storica — lo isoliamo in metadata, non entra nei commi.
+# note di modifica storica: lo isoliamo in metadata, non entra nei commi.
 _AGGIORNAMENTO_SEP_RE = re.compile(
     r"\n\s*-{5,}\s*\n\s*AGGIORNAMENTO\s*\(\s*\d+\s*\)",
     re.IGNORECASE,
@@ -746,12 +746,12 @@ class NormattivaAknParser:
 
         Normattiva usa due serializzazioni AKN diverse:
 
-        **Formato A — "flat per attachment"** (codici del 1930-1942: CC, CP, CPC):
+        **Formato A, "flat per attachment"** (codici del 1930-1942: CC, CP, CPC):
           act > attachments > attachment > doc > mainBody > paragraph > content > p
           Ogni <attachment> è un articolo. Rubrica e commi sono concatenati in un
           singolo <p> e vanno estratti con regex.
 
-        **Formato B — "canonico AKN"** (decreti moderni: CdS, TU, leggi):
+        **Formato B, "canonico AKN"** (decreti moderni: CdS, TU, leggi):
           act > body > chapter > article > paragraph > content
           Ogni <article> ha <num>, <heading> (= rubrica nativa!), <paragraph> strutturati.
           La gerarchia (chapter/section/part) è navigabile.
@@ -835,7 +835,7 @@ class NormattivaAknParser:
 
         # Rubrica nativa: <heading> (opzionalmente tra parentesi, con eventuali
         # marcatori di modifica "(( (Oggetto). ))" da rimuovere PRIMA di
-        # spogliare le parentesi esterne — uno strip("().") ingenuo si ferma
+        # spogliare le parentesi esterne: uno strip("().") ingenuo si ferma
         # sugli spazi interni e lascia rubriche sporche tipo "(Oggetto).").
         heading_el = article.find("a:heading", _NS)
         rubrica: str | None = None
@@ -848,7 +848,7 @@ class NormattivaAknParser:
             rubrica = self._cleanup_rubrica(raw_heading.strip(" .")) or None
 
         # Commi: <paragraph> ripetuti. Il testo può stare in <content> diretto
-        # oppure — per i commi a elenco (definizioni, requisiti, esclusioni) —
+        # oppure, per i commi a elenco (definizioni, requisiti, esclusioni),
         # in <list><intro>…<point>…. Saltare i paragraph senza <content>
         # significherebbe perdere interi commi (misurato: fino al 17% del testo
         # su TU Sicurezza/CCP/TUF), quindi in fallback estraiamo tutto il testo
@@ -906,7 +906,7 @@ class NormattivaAknParser:
             return None
         # Codici interamente contenuti in allegati (es. CPA): gli allegati
         # successivi al primo (norme di attuazione/transitorie) ricominciano
-        # la numerazione da 1 — senza prefisso colliderebbero con il codice.
+        # la numerazione da 1: senza prefisso colliderebbero con il codice.
         # Convenzione citazionale: "art. N" nudo = Allegato 1.
         alm = self._ALLEGATO_NUM_RE.search(name)
         if alm and int(alm.group(1)) > 1:
@@ -1050,7 +1050,7 @@ class NormattivaAknParser:
         """Euristica: una rubrica è breve e nominale.
 
         - strict=True: nessun punto interno (usato per rubriche "plain" senza
-          parentesi — serve a evitare falsi positivi sui commi del corpo).
+          parentesi; serve a evitare falsi positivi sui commi del corpo).
         - strict=False: ammette punti interni (usato per rubriche tra
           parentesi, il cui wrapping è già un segnale forte).
         """

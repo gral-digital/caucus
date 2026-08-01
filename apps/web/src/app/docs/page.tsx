@@ -15,8 +15,8 @@ export default function DocsIndex() {
       </p>
       <p>
         Questa documentazione copre l&apos;uso del prodotto, il self-hosting
-        completo — incluso il <Link href="/docs/corpus">pacchetto corpus</Link>{" "}
-        già indicizzato, per partire in minuti senza rifare l&apos;ingestione —
+        completo (incluso il <Link href="/docs/corpus">pacchetto corpus</Link>{" "}
+        già indicizzato, per partire in minuti senza rifare l&apos;ingestione)
         e il funzionamento interno del sistema.
       </p>
 
@@ -43,8 +43,8 @@ export default function DocsIndex() {
         vector store, <code>ingestion</code> normalizza fonti eterogenee in un
         modello canonico unico, e l&apos;API li consuma.
       </p>
-      <pre>{`apps/web              Next.js 15 — chat SSE, pannello fonti, pagina /norma
-apps/api              FastAPI — /chat (SSE), /search, /norma, auth, export
+      <pre>{`apps/web              Next.js 15: chat SSE, pannello fonti, pagina /norma
+apps/api              FastAPI: /chat (SSE), /search, /norma, auth, export
 services/rag-core     retriever ibrido, reranker, query expansion,
                       fusione RRF pesata, schemi Pydantic
 services/ingestion    parser Normattiva AKN + EUR-Lex + SentenzeWeb,
@@ -55,7 +55,7 @@ benchmark/            Caucus Bench (MIT): gold set + harness di valutazione`}</p
       <ol>
         <li>
           <strong>Trust layer prima di tutto.</strong> Ogni citazione normativa
-          generata è validata contro il database — esistenza, fonte, vigenza
+          generata è validata contro il database: esistenza, fonte, vigenza
           temporale, abrogazione. Il sistema preferisce ammettere un gap che
           inventare una norma. Dettagli in{" "}
           <Link href="/docs/trust-layer">Trust layer</Link>.
@@ -81,7 +81,7 @@ benchmark/            Caucus Bench (MIT): gold set + harness di valutazione`}</p
         uno strumento di ricerca e supporto alla redazione, pensato per
         professionisti che verificano le fonti. Ogni risposta espone le fonti
         consultate e segnala esplicitamente le citazioni che non è riuscito a
-        verificare — ma la responsabilità professionale resta di chi firma
+        verificare, ma la responsabilità professionale resta di chi firma
         l&apos;atto.
       </p>
     </>

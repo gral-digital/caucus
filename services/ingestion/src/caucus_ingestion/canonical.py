@@ -1,7 +1,7 @@
 """Modello canonico (intermedio) per un atto normativo parsato.
 
 I parser (Normattiva XML, Normattiva HTML, CED, …) producono `CanonicalAct`.
-Il loader persiste SOLO questa struttura — così cambiare parser non tocca il
+Il loader persiste SOLO questa struttura: così cambiare parser non tocca il
 layer di persistenza.
 """
 
@@ -87,7 +87,7 @@ class CanonicalAct(BaseModel):
     in_force_to: date | None = None
     # Data dell'espressione consolidata (FRBRExpression/FRBRdate del meta AKN):
     # il testo parsato è "vigente a questa data". Da usare come effective_from
-    # delle partizioni — usare in_force_from (data storica dell'atto) farebbe
+    # delle partizioni; usare in_force_from (data storica dell'atto) farebbe
     # affermare che il testo consolidato di oggi era vigente decenni fa.
     expression_date: date | None = None
     source_url: str | None = None

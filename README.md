@@ -2,139 +2,119 @@
 
 [![CI](https://github.com/gral-digital/caucus/actions/workflows/ci.yml/badge.svg)](https://github.com/gral-digital/caucus/actions/workflows/ci.yml)
 
-**Open-source legal & compliance AI for Italian law — with a verifiable trust
-layer and the first open Italian legal benchmark.**
+**AI open source per il diritto e la compliance italiana, con un trust layer
+verificabile e il primo benchmark legale italiano aperto.**
 
-*[Versione italiana → README.it.md](README.it.md)*
+*[English version → README.en.md](README.en.md)*
 
-Caucus is a retrieval-augmented legal assistant over the Italian legal system:
-50 consolidated statutes from Normattiva (civil, criminal and procedure codes,
-consolidated acts, compliance legislation), 14 EU acts in Italian (GDPR,
-AI Act, NIS2, DORA, MiCA…), and the full-text, anonymized decisions of the
-Corte di Cassazione. Every normative citation in every answer is validated
-post-generation against the corpus — existence, source and temporal validity —
-and flagged to the user when it isn't verifiable.
+Caucus è un assistente legale RAG sull'ordinamento italiano: 50 fonti
+consolidate da Normattiva (codici, testi unici, leggi di compliance), 14 atti
+UE in italiano (GDPR, AI Act, NIS2, DORA, MiCA e altri) e le sentenze
+integrali anonimizzate della Corte di Cassazione. Ogni citazione normativa di
+ogni risposta è validata post-generazione contro il corpus (esistenza, fonte,
+vigenza temporale) e segnalata all'utente quando non è verificabile.
 
-> ⚠️ **Caucus is not a lawyer and its output is not legal advice.** It is a
-> research and drafting aid. No professional relationship is created by using
-> it. For decisions with legal consequences, consult a licensed professional.
+> ⚠️ **Caucus non è un avvocato e le sue risposte non sono pareri legali.**
+> È uno strumento di ricerca e supporto. Il suo uso non instaura alcun
+> rapporto professionale. Per decisioni con conseguenze legali rivolgiti a un
+> professionista abilitato.
 
-## Why it exists
+## Perché esiste
 
-Legal AI vendors claim accuracy figures that cannot be reproduced. Caucus takes
-the opposite bet: **open code (AGPL-3.0), open benchmark (MIT), honest
-numbers**. On [Caucus Bench](benchmark/README.md) — 171 cases across all major
-areas of Italian law, including repealed articles, adversarial requests and
-out-of-corpus questions — the reference stack currently measures:
+I vendor di AI legale dichiarano accuratezze non riproducibili. Caucus fa la
+scommessa opposta: **codice aperto (AGPL-3.0), benchmark aperto (MIT), numeri
+onesti**. [Caucus Bench](benchmark/README.md) conta 171 casi su tutte le aree
+principali del diritto italiano, inclusi articoli abrogati, richieste
+adversarial e domande fuori corpus. Lo stack di riferimento misura oggi:
 
 | | |
 |---|---|
-| Pass rate | **98%** (100% on hard cases) |
-| Source-aware recall@8 / MRR | **99% / 0.86** |
+| Pass rate | **98%** (100% sui casi difficili) |
+| Recall@8 source-aware / MRR | **99% / 0.86** |
 | Citation recall | **99%** |
-| **Hallucinated citations** (over citing answers) | **0.0%** |
-| Refusal on adversarial requests | **100%** |
-| **Over-refusal on legitimate professional questions** | **0%** |
+| **Citazioni allucinate** (sulle risposte che citano) | **0,0%** |
+| Rifiuto su richieste illecite | **100%** |
+| **Rifiuti indebiti su domande professionali legittime** | **0%** |
 
-Run-to-run variance of the same configuration is real (pass 95–98%,
-recall@8 96–99%, OpenAI nondeterminism): treat the range, not the peak, as
-the honest number. Numbers, methodology and anti-gaming rules:
+La varianza tra run della stessa configurazione è reale (pass 95–98%,
+recall@8 96–99%, per il nondeterminismo di OpenAI): il numero onesto è
+l'intervallo, non il picco. Metodologia e regole anti-gaming:
 [benchmark/](benchmark/README.md).
 
-## What's inside
+## Cosa c'è dentro
 
-- **Corpus** — 50 Normattiva sources parsed from official Akoma Ntoso XML
-  (with repeal detection and consolidation dating), 14 EUR-Lex acts in
-  Italian, incremental idempotent harvest of Cassazione decisions
-  (~430k available, resumable).
-- **Retrieval** — four fused branches (weighted RRF): deterministic
-  article lookup, LLM query expansion with official-reference resolution
-  ("art. 17 D.Lgs. 81/2008" → TU Sicurezza), Postgres FTS (Italian config),
-  dense vectors (Qdrant). Cross-encoder reranking (bge-reranker-v2-m3,
-  local, MPS/CUDA/CPU). One-hop expansion over the **norm citation graph**
-  extracted from the XML cross-references.
-- **Trust layer** — every `<cite/>` in the answer is validated against the
-  database: non-existent articles, articles outside their temporal validity
-  and repealed articles are flagged; citations of real articles that were
-  *not* in the retrieved context (the most insidious hallucination) are
-  reported as weak grounding. Case law is cited in prose with its real
-  docket data, never invented.
-- **Temporal validity** — every partition and chunk carries
-  `effective_from`/`effective_to`; retrieval filters by validity date on all
-  branches (default: today).
-- **API & UI** — FastAPI with SSE streaming, token auth, rate limiting;
-  Next.js chat with retrieved-sources panel and unverified-citation warnings.
+- **Corpus**: 50 fonti Normattiva parsate dall'XML Akoma Ntoso ufficiale
+  (rilevamento abrogazioni, data di consolidamento), 14 atti EUR-Lex in
+  italiano, harvest incrementale e idempotente delle sentenze di Cassazione
+  (~430k disponibili, riprendibile).
+- **Retrieval**: quattro rami fusi (RRF pesato), cioè lookup deterministico
+  per articolo, query expansion LLM con risoluzione degli estremi ufficiali
+  ("art. 17 D.Lgs. 81/2008" → TU Sicurezza), FTS Postgres (config italiana)
+  e vettori densi (Qdrant). Reranking cross-encoder (bge-reranker-v2-m3,
+  locale, MPS/CUDA/CPU). Espansione one-hop sul **grafo dei rinvii
+  normativi** estratto dai riferimenti incrociati dell'XML.
+- **Trust layer**: ogni `<cite/>` della risposta è validato su database.
+  Articoli inesistenti, fuori vigenza o abrogati vengono segnalati; le
+  citazioni di articoli reali ma *assenti dal contesto* recuperato
+  (l'allucinazione più insidiosa) sono riportate come grounding debole. La
+  giurisprudenza si cita in prosa con gli estremi reali, mai inventati.
+- **Vigenza temporale**: ogni partizione e chunk porta
+  `effective_from`/`effective_to`; il retrieval filtra per data di vigenza su
+  tutti i rami (default: oggi).
+- **API e UI**: FastAPI con streaming SSE, auth a token, rate limiting;
+  chat Next.js con pannello fonti e warning sulle citazioni non verificate.
 
-## Quick start
+## Avvio rapido
 
-Prerequisites: Docker, [`uv`](https://docs.astral.sh/uv/), `pnpm`, Node ≥ 20,
-an OpenAI API key (default backend; local backends supported).
+Prerequisiti: Docker, [`uv`](https://docs.astral.sh/uv/), `pnpm`, Node ≥ 20,
+una chiave OpenAI (backend di default; backend locali supportati).
 
 ```bash
-git clone <repo-url> caucus && cd caucus
-cp .env.example .env          # then set OPENAI_API_KEY
-make install                  # Python (uv) + Node (pnpm) deps
+git clone https://github.com/gral-digital/caucus && cd caucus
+cp .env.example .env          # poi imposta OPENAI_API_KEY
+make install
 make up                       # Postgres :55432, Qdrant :6333, Redis, Langfuse
-make migrate                  # DB schema
-make corpus-import SRC=<url>  # full pre-indexed corpus, embeddings included
+make migrate
+make corpus-import SRC=https://github.com/gral-digital/caucus/releases/download/corpus-20260801
 make dev                      # API :8000, web :3000
 ```
 
-**The corpus package** (published with each release) restores the whole
-indexed corpus — Postgres tables and Qdrant vectors — in one command: no
-ingestion run, no embedding cost. Checksums and schema revision are verified
-before anything is written. To rebuild from public sources instead:
+**Il pacchetto corpus** (pubblicato con le release) ripristina in un solo
+comando l'intero corpus indicizzato, tabelle Postgres e vettori Qdrant
+inclusi: niente ingestione, niente costi di embedding. Checksum e revisione
+dello schema sono verificati prima di scrivere. In alternativa, la
+ricostruzione dalle fonti pubbliche:
 
 ```bash
-make seed-all                 # 50 Normattiva sources + EU acts (≈ cents of embeddings)
-make harvest-cassazione       # case law, incremental and resumable
-make eval                     # run Caucus Bench against your instance
+make seed-all                 # 50 fonti Normattiva + atti UE (≈ centesimi di embedding)
+make harvest-cassazione       # giurisprudenza, incrementale e riprendibile
+make eval                     # Caucus Bench sulla tua istanza
 ```
 
-Detailed guides (self-hosting, corpus, trust layer, API, benchmark) ship in
-the app itself at [`/docs`](apps/web/src/app/docs/).
+Le guide dettagliate (self-hosting, corpus, trust layer, API, benchmark)
+sono nell'app stessa, alla pagina `/docs`.
 
-## Architecture (short)
+## Licenze
 
-```
-apps/web              Next.js 15 chat UI
-apps/api              FastAPI — chat SSE, search, citation validator
-services/rag-core     retriever, rerankers, query expansion, act registry, schemas
-services/ingestion    Normattiva AKN parser, EUR-Lex parser, Cassazione harvester,
-                      legal-aware chunker (contextual headers), loaders
-benchmark/            Caucus Bench: gold set + harness (MIT)
-```
+- **Codice applicativo**: [AGPL-3.0](LICENSE). Chi offre un Caucus
+  modificato come servizio condivide le modifiche.
+- **Benchmark** (`benchmark/`): [MIT](benchmark/LICENSE). Chiunque può
+  valutarci sopra qualunque sistema e pubblicare i risultati.
 
-Design notes live in [docs/](docs/); the honest gap analysis that drove the
-current architecture is in [docs/AUDIT_SOTA_2026-07-31.md](docs/AUDIT_SOTA_2026-07-31.md).
+Nota: il repo include ~50 MB di fixture XML ufficiali, così i test del parser
+sono riproducibili offline.
 
-## Data sources & licensing of data
+## Stato e roadmap
 
-Italian legislative texts are in the public domain (art. 5, L. 633/1941).
-Normattiva and EUR-Lex are queried at conservative rate limits (≤1 req/s);
-Cassazione decisions come from the public SentenzeWeb service in their
-official anonymized form, harvested at 0.5 req/s. See
-[data/fixtures/normattiva/README.md](data/fixtures/normattiva/README.md).
-Note: the repo ships ~50 MB of official XML fixtures so parser tests are
-reproducible offline.
+Funziona oggi: tutto quanto sopra. Limiti noti (tracciati onestamente):
+consolidamento a snapshot singolo (niente versioning storico), atti UE nel
+testo base GU (non consolidato), storia conversazioni client-side, TTFT
+~3-4s sulle domande concettuali. Roadmap: multivigenza storica via
+`dataVigenza` Normattiva, embedding self-hosted (BGE-M3 ibrido), citazioni in
+structured output, conversazioni server-side e audit log, ricerca agentica
+multi-hop.
 
-## License
+## Contribuire
 
-- **Application code**: [AGPL-3.0](LICENSE) — if you run a modified Caucus as
-  a service, you share your changes.
-- **Benchmark** (`benchmark/`): [MIT](benchmark/LICENSE) — evaluate anything
-  against it, publish results freely.
-
-## Status & roadmap
-
-Working today: everything described above. Known limits (tracked honestly):
-single-snapshot consolidation (no historical versioning yet), EU acts are the
-OJ base text (not consolidated), conversation history is client-side, TTFT
-~3-4s on conceptual questions. Roadmap: historical versioning via Normattiva
-`dataVigenza`, self-hosted embeddings (BGE-M3 hybrid), structured citation
-outputs, server-side conversations + audit log, agentic multi-hop research.
-
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md). Security reports:
+Vedi [CONTRIBUTING.md](CONTRIBUTING.md). Segnalazioni di sicurezza:
 [.github/SECURITY.md](.github/SECURITY.md).

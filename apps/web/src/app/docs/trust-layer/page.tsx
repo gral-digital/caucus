@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Trust layer — Documentazione Caucus" };
+export const metadata: Metadata = { title: "Trust layer | Documentazione Caucus" };
 
 export default function TrustLayerDocs() {
   return (
@@ -92,7 +92,7 @@ export default function TrustLayerDocs() {
       <h2>La giurisprudenza è un caso a parte</h2>
       <p>
         Le decisioni si citano in prosa con gli estremi reali (sezione, numero,
-        anno) presi dal contesto recuperato — mai generati. Il prompt lo vieta,
+        anno) presi dal contesto recuperato, mai generati. Il prompt lo vieta,
         e il <Link href="/docs/benchmark">benchmark</Link> contiene casi che
         verificano proprio questo: quando il corpus non contiene giurisprudenza
         pertinente, la risposta deve dirlo (&laquo;gap admission&raquo;), non
@@ -104,7 +104,7 @@ export default function TrustLayerDocs() {
         Lo stesso motore è esposto dall&apos;endpoint{" "}
         <code>POST /api/v1/citations/validate</code> e dall&apos;add-in Word:
         seleziona un atto già scritto e ottieni la verifica di ogni citazione
-        contenuta — utile per il controllo finale prima del deposito. Vedi{" "}
+        contenuta: utile per il controllo finale prima del deposito. Vedi{" "}
         <Link href="/docs/moduli">Guida ai moduli</Link>.
       </p>
 
@@ -121,7 +121,7 @@ export default function TrustLayerDocs() {
         </li>
         <li>
           Il tasso di citazioni allucinate misurato sul benchmark è 0,0%
-          sull&apos;ultimo run — misurato, non garantito: la varianza tra run
+          sull&apos;ultimo run: misurato, non garantito. La varianza tra run
           esiste ed è pubblicata insieme ai numeri.
         </li>
       </ul>

@@ -2,8 +2,8 @@
 
 Scarica l'HTML ufficiale da EUR-Lex per numero CELEX
 (``https://eur-lex.europa.eu/legal-content/IT/TXT/HTML/?uri=CELEX:32016R0679``)
-e lo parsa in un ``CanonicalAct`` riusando lo stesso modello canonico — e
-quindi lo stesso Loader — della pipeline Normattiva.
+e lo parsa in un ``CanonicalAct`` riusando lo stesso modello canonico (e
+quindi lo stesso Loader) della pipeline Normattiva.
 
 NB sul consolidamento: viene fetchato il testo pubblicato in Gazzetta UE
 (serie CELEX ``3xxxx``), non il consolidato con emendamenti successivi (serie

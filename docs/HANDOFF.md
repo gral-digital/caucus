@@ -1,4 +1,4 @@
-# Handoff — Caucus
+# Handoff: Caucus
 
 > Passaggio di consegne (2026-07-31). Questo documento porta un nuovo agente/
 > sviluppatore da zero contesto a operativo. Leggilo tutto prima di toccare
@@ -11,7 +11,7 @@ Assistente legale RAG open source sul diritto italiano, con trust layer che
 valida ogni citazione, e **Caucus Bench**: il primo benchmark legale italiano
 aperto. Obiettivo dichiarato dall'owner: "agente open source SOTA per legal e
 compliance in Italia, deve essere perfetto/impeccabile". **Non ancora
-pubblicato** — nessun remote git configurato (`git remote -v` è vuoto).
+pubblicato**: nessun remote git configurato (`git remote -v` è vuoto).
 
 Il posizionamento è "numeri onesti": codice AGPL-3.0, benchmark MIT, metriche
 riproducibili contro claim di marketing dei competitor (Lexroom dichiara "97%"
@@ -24,22 +24,22 @@ Funzionante e verificato. Ultimo eval 171 casi (gold v2.3, stack idle):
 **pass 97.7%, pass(hard) 100%, recall@8 99.4%, MRR 0.86, citation recall
 98.5%, hallucination 0%, over-refusal 0%, refusal adversarial 100%, gap
 admission 100%, TTFT p50 4.7s**. Varianza tra run della stessa config: pass
-95.3–97.7%, recall 96.2–99.4 — il numero onesto è l'intervallo, non il
+95.3–97.7%, recall 96.2–99.4: il numero onesto è l'intervallo, non il
 picco. 106 test Python + 9 TS verdi, build di produzione Next ok, ruff+mypy
 strict+tsc+eslint puliti, CI bloccante. Test E2E completo dei flussi
 prodotto eseguito il 2026-07-31 sera (ricerca+link /norma, export, upload+
 analisi, redazione, giurisprudenza, validate, taskpane): tutto verde;
 UNICA cosa non collaudata: l'add-in dentro Word reale (serve sideload
 dell'owner). NB: non lanciare `next build` mentre `next dev` gira (corrompe
-la cache .next del dev server — successo e risolto).
+la cache .next del dev server; successo e risolto).
 
 ## 3. Architettura (dove sta cosa)
 
 Leggi `docs/ARCHITECTURE.md` (aggiornato al reale). In breve:
 
 ```
-apps/web            Next.js 15 — chat SSE, pannello fonti, pagina /norma
-apps/api            FastAPI — /chat (SSE), /search, /norma, /health
+apps/web            Next.js 15: chat SSE, pannello fonti, pagina /norma
+apps/api            FastAPI: /chat (SSE), /search, /norma, /health
 services/rag-core   retriever, rerankers, query expansion, act_registry,
                     hit_merge (RRF pesato), query_router, schemi
 services/ingestion  parser Normattiva AKN + EUR-Lex + SentenzeWeb,
@@ -67,7 +67,7 @@ cd apps/api && RATE_LIMIT_PER_MINUTE=0 uv run uvicorn caucus_api.main:app --port
 Env chiave in `.env` (gitignorato, NON committato): `OPENAI_API_KEY` presente,
 `LLM_PRIMARY_MODEL=openai/gpt-4o`, `QUERY_EXPANSION_MODEL=openai/gpt-4o`
 (aggiunto: il default in config resta gpt-4o-mini, ma la config di riferimento
-usa 4o — misurato molto più preciso sugli articoli), `RERANKER_BACKEND=local`,
+usa 4o, misurato molto più preciso sugli articoli), `RERANKER_BACKEND=local`,
 `RERANKER_DEVICE=mps`. Un eval completo (171 casi) costa nell'ordine di 1-2€
 di API OpenAI: misurare con criterio, non a raffica.
 
@@ -76,7 +76,7 @@ di API OpenAI: misurare con criterio, non a raffica.
 - **Il benchmark è l'arbitro.** Ogni cambiamento di qualità → `make eval`
   prima/dopo, confronto con `--baseline`. Il gold set NON si adatta mai
   all'output del sistema (è come la v1 barava).
-- **Mai `gather` su più chiamate della stessa `AsyncSession` SQLAlchemy** —
+- **Mai `gather` su più chiamate della stessa `AsyncSession` SQLAlchemy**:
   crash "session is provisioning a new connection". I rami DB in
   `search_service.py` restano sequenziali; solo espansione LLM (HTTP) e ramo
   vettoriale (Qdrant) sono paralleli.
@@ -112,10 +112,10 @@ di API OpenAI: misurare con criterio, non a raffica.
    cds-multi-2054, cpp-335, cpp-438/cost-* ("risposta senza citazioni",
    generazione). NON tentare di nuovo il ramo FTS globale sul testo espanso
    (vedi §5).
-2. **Latenza — pass fatto (2026-07-31 sera)**: TTFT p50 8.7s→4.6s, p95
+2. **Latenza (pass fatto il 2026-07-31 sera)**: TTFT p50 8.7s→4.6s, p95
    23s→10.1s a pari pass/recall (costo: MRR 0.89→0.85, cite recall ~94%).
    Come: espansione → gpt-4.1-mini (A/B sul prompt finale: 9/14 vs 7/14 di
-   4o-mini e 6/14 di 4o — il prompt conta più del modello; nano 2/14,
+   4o-mini e 6/14 di 4o: il prompt conta più del modello; nano 2/14,
    inutilizzabile), reranker max_length 512→384 (~3s→0.8s), ramo vettoriale
    in parallelo all'espansione (sulla query pre-espansione). Residuo ~4s
    idle = espansione 1.7s + rerank 1s + primo token gpt-4o ~1.5s: per
@@ -136,35 +136,35 @@ di API OpenAI: misurare con criterio, non a raffica.
    `ChatRequest.mode` e prompt dedicati per analisi/redazione
    (`Workspace.tsx`, Sidebar navigabile, conversazioni per modulo).
    Scoperto durante i test: manca la L. 431/1998 (locazioni abitative) dal
-   corpus — task separato avviato dall'owner. Fatto anche: (d) sidebar
+   corpus: task separato avviato dall'owner. Fatto anche: (d) sidebar
    minimale (catalogo fonti in pannello modale); (e) modulo Giurisprudenza
-   (mode dedicato, Cassazione primaria nel retrieval — NB: l'ordine di
+   (mode dedicato, Cassazione primaria nel retrieval; NB: l'ordine di
    `query.corpora` è ora semantico, il primo è il corpus primario).
    Fatto anche: (f) estratti pertinenti per documenti lunghi
    (document_excerpts.py, testa + finestre rilevanti con omissis marcati);
    (g) Word add-in v0 (apps/word-addin/ + statici in
-   apps/web/public/word-addin/, endpoint POST /citations/validate) —
+   apps/web/public/word-addin/, endpoint POST /citations/validate),
    **NON ancora collaudato dentro Word reale**: manifest validato e pagina
    verificata nel browser (SSE ok, endpoint ok); il primo sideload in Word
    (richiede HTTPS: `pnpm dev --experimental-https`) è in checklist
    pre-release insieme alle icone definitive. La fase prodotto
    pre-pubblicazione è COMPLETA: prossimo passo test completo (eval +
    E2E) e poi pubblicazione.
-5. **Giurisprudenza di merito — fetcher Giustizia Amministrativa PRONTO**
+5. **Giurisprudenza di merito: fetcher Giustizia Amministrativa PRONTO**
    (`services/ingestion/.../fetchers/giustizia_amministrativa.py`, 4 test):
    ricerca portlet Liferay (instance id + p_auth estratti a runtime, MAI
    hardcodati), paginazione verificata live (CdS e TAR Milano), testo
    integrale da mdp.* con trim dei metadati interni del gestionale (path di
-   rete, operatori — NON devono finire nel corpus). ToS verificati
+   rete, operatori: NON devono finire nel corpus). ToS verificati
    2026-07-31: no robots.txt, no clausole anti-riuso, pubblicità legale;
    postura SentenzeWeb (0.5 req/s, UA identificato). PDF storici scartati
    in v1. **Manca il loader**: riusare il pattern cassazione_loader
    (case_law con kind ga_cds/ga_tar_*, display «Cons. St., Sez. IV, n.
    6189/2026» da aggiungere a CaseLawCitation, quota corpus). Costo
-   embedding ~7€/100k provvedimenti — partire con CdS ultimi 3 anni + TAR
+   embedding ~7€/100k provvedimenti: partire con CdS ultimi 3 anni + TAR
    Roma/Milano/Napoli. Per il merito CIVILE: la Banca Dati pubblica del
-   Ministero (3,5M sentenze) richiede SPID e non consente harvest — dopo
-   la pubblicazione, richiesta formale di accesso programmatico come
+   Ministero (3,5M sentenze) richiede SPID e non consente harvest. Dopo
+   la pubblicazione: richiesta formale di accesso programmatico come
    progetto open di interesse pubblico.
 6. **Rilascio free (2026-07-31 notte)**: landing a `/` (numeri onesti,
    quattro moduli, trust layer; l'app è su `/app`), thinking onesto in chat
@@ -173,7 +173,7 @@ di API OpenAI: misurare con criterio, non a raffica.
    reload). Wordmark tipografico «caucus.» ovunque (niente icona). Gli URL
    GitHub in landing e docs puntano a github.com/gral-digital/caucus (l'org
    caucus-legal non esiste; un eventuale transfer futuro mantiene i redirect). **Streaming**: la compressione del proxy Next bufferizzava
-   l'SSE (risposta consegnata in blocco) — risolto con compress:false +
+   l'SSE (risposta consegnata in blocco); risolto con compress:false +
    Cache-Control no-transform; se cambi reverse proxy in prod, NON
    comprimere /api/v1/chat (X-Accel-Buffering: no già impostato). **Account
    free tier**: fondamenta pronte dietro `ACCOUNTS_ENABLED` (default off):
@@ -194,7 +194,7 @@ di API OpenAI: misurare con criterio, non a raffica.
    **Corpus scaricabile (2026-08-01)**: `make corpus-export` produce il
    pacchetto ridistribuibile (pg dump data-only con snapshot MVCC coerente +
    snapshot Qdrant + manifest con checksum; ~3.9 GB) e `make corpus-import
-   SRC=<dir|url>` lo ripristina con verifica integrale — testato end-to-end
+   SRC=<dir|url>` lo ripristina con verifica integrale; testato end-to-end
    in locale (DB temporaneo + collection di test). Azione owner al publish:
    scegliere l'hosting (i singoli file superano il limite 2 GB dei release
    asset GitHub per la collection cassazione → serve hosting statico tipo
@@ -208,8 +208,8 @@ di API OpenAI: misurare con criterio, non a raffica.
 
 ## 7. File da leggere per primi
 
-- `docs/AUDIT_SOTA_2026-07-31.md` — il gap analysis iniziale (competitor,
+- `docs/AUDIT_SOTA_2026-07-31.md`: il gap analysis iniziale (competitor,
   SOTA, tecniche). Storico ma utile per il perché delle scelte.
-- `benchmark/README.md` + `benchmark/RESULTS.md` — cosa si misura e come.
-- `docs/ARCHITECTURE.md` — il sistema com'è.
-- `git log --oneline` — la storia ha i numeri prima/dopo in ogni commit.
+- `benchmark/README.md` + `benchmark/RESULTS.md`: cosa si misura e come.
+- `docs/ARCHITECTURE.md`: il sistema com'è.
+- `git log --oneline`: la storia ha i numeri prima/dopo in ogni commit.

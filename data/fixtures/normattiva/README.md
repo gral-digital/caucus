@@ -1,4 +1,4 @@
-# Fixture AKN — Normattiva
+# Fixture AKN Normattiva
 
 Snapshot Akoma Ntoso XML scaricati da `normattiva.it` per test offline del parser.
 

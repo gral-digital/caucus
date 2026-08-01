@@ -2,7 +2,7 @@
 
 > ⚠️ **STATO (2026-07-31)**: documento parzialmente storico (descrive la
 > pipeline della fase CC/CP). La pipeline reale copre oggi 50 fonti
-> Normattiva + 14 atti EUR-Lex + Cassazione (SentenzeWeb) — vedi
+> Normattiva + 14 atti EUR-Lex + Cassazione (SentenzeWeb); vedi
 > `docs/ARCHITECTURE.md` §3. Non ancora implementati rispetto a quanto sotto:
 > scheduling automatico del refresh, snapshot su GCS, diff-awareness sul
 > source_hash. I numeri di coverage citati sotto sono precedenti ai fix del
@@ -38,7 +38,7 @@ fetch → cache (GCS/local) → validate (hash, size)
 Ogni stadio scrive snapshot in `data/sources/<source>/<timestamp>/`, così si
 può fare rollback e rerun parziali.
 
-## 3. Normattiva — Akoma Ntoso XML
+## 3. Normattiva: Akoma Ntoso XML
 
 ### URN supportati
 
@@ -51,7 +51,7 @@ può fare rollback e rerun parziali.
 
 ### Protocollo di download
 
-Normattiva **richiede una sessione cookie** — il link diretto a `caricaAKN`
+Normattiva **richiede una sessione cookie**: il link diretto a `caricaAKN`
 non funziona senza aver prima visitato il permalink.
 
 1. **Pagina permalink** (necessaria per i cookie di sessione):
@@ -78,7 +78,7 @@ Normattiva serializza l'AKN in un formato "flat":
   dell'articolo (rubrica + commi concatenati con `\n \n`).
 - Il testo usa `(( ... ))` per marcare passaggi introdotti da modifiche.
 - Dopo il testo vigente, Normattiva accoda note `-----------\nAGGIORNAMENTO (N)`
-  con descrizione delle modifiche storiche — il parser le separa in metadata.
+  con descrizione delle modifiche storiche; il parser le separa in metadata.
 
 La gerarchia Libro/Titolo/Capo/Sezione **non** è codificata a livello di
 articolo nell'XML servito da Normattiva. Il parser iniziale flattisce tutti

@@ -1,13 +1,13 @@
 """Chunker legal-aware con contextual retrieval.
 
 Genera chunk da ogni articolo:
-- `articolo-full`: testo intero (header contestuale + rubrica + commi) —
+- `articolo-full`: testo intero (header contestuale + rubrica + commi),
   SOLO se l'articolo ha più di un comma (con un comma unico sarebbe un
   duplicato quasi identico del chunk comma: doppio costo embedding e due
   hit ridondanti nei top-k; misurato ~1450 coppie nel solo CC).
 - `comma`: un chunk per comma, con **prefisso contestuale** (fonte, articolo,
   rubrica): un comma nudo tipo "1. Il presente decreto disciplina…" è
-  indistinguibile da migliaia di altri commi di rinvio — il contesto deve
+  indistinguibile da migliaia di altri commi di rinvio: il contesto deve
   stare NEL testo embeddato, non solo nel payload (contextual retrieval).
 - `window`: finestre 512 tok (overlap 64) solo se articolo > 2k token.
 
@@ -85,7 +85,7 @@ def build_chunks(
     }
     header = _context_header(source_title, articolo_num, rubrica)
 
-    # 1. Articolo-full — solo con 2+ commi (vedi docstring del modulo).
+    # 1. Articolo-full: solo con 2+ commi (vedi docstring del modulo).
     full_text = f"[Fonte] {header}\n"
     if rubrica:
         full_text += f"[Rubrica] {rubrica}\n"

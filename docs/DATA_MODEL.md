@@ -1,7 +1,7 @@
 # Data Model
 
 > ⚠️ **STATO (2026-07-31)**: lo schema reale è la somma delle migration
-> Alembic (`apps/api/alembic/versions/`) — oggi: norm_source, norm_partition,
+> Alembic (`apps/api/alembic/versions/`). Oggi: norm_source, norm_partition,
 > norm_comma, norm_citation (con target denormalizzato), norm_chunk,
 > case_law, case_law_chunk. Non ancora implementati rispetto a quanto sotto:
 > versioning multivigenza con chiusura effective_to, path ltree nativo
@@ -35,7 +35,7 @@ Codice
                             └── Numero (opzionale: 1), 2), …)
 ```
 
-Il Codice Penale ha la stessa struttura ma non sempre `Sezione` (più raro). Altre leggi possono avere struttura diversa — il modello è volutamente flessibile.
+Il Codice Penale ha la stessa struttura ma non sempre `Sezione` (più raro). Altre leggi possono avere struttura diversa: il modello è volutamente flessibile.
 
 ## 3. Entità principali
 
@@ -66,7 +66,7 @@ Nodo della gerarchia (libro, titolo, capo, sezione, articolo). Tabella unica con
 | parent_id | uuid NULL | FK self |
 | kind | enum | `libro`, `titolo`, `capo`, `sezione`, `articolo`, `disposizione-transitoria` |
 | number | text | "I", "2043", "bis" preservato |
-| label | text | "Libro IV — Delle obbligazioni" |
+| label | text | "Libro IV - Delle obbligazioni" |
 | ordinal | int | Per ordinamento |
 | path | ltree | `cc.libro_iv.titolo_ix.capo_i.art_2043` (indice veloce) |
 | citation | text | Forma canonica `art. 2043 c.c.` |

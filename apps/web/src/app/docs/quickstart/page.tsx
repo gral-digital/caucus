@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Self-hosting — Documentazione Caucus" };
+export const metadata: Metadata = { title: "Self-hosting | Documentazione Caucus" };
 
 export default function Quickstart() {
   return (
@@ -9,7 +9,7 @@ export default function Quickstart() {
       <h1>Self-hosting</h1>
       <p>
         Caucus è progettato per girare per intero sulla tua macchina o nel tuo
-        studio: database, vector store, reranker e — volendo — anche i modelli
+        studio: database, vector store, reranker e, volendo, anche i modelli
         di linguaggio. Questa pagina porta da zero a uno stack funzionante.
         Tempo stimato: <strong>10–15 minuti</strong> con il pacchetto corpus,
         qualche ora se ricostruisci il corpus da zero.
@@ -18,7 +18,7 @@ export default function Quickstart() {
       <h2>Prerequisiti</h2>
       <ul>
         <li>
-          <strong>Docker</strong> (con Docker Compose) — per Postgres, Qdrant e
+          <strong>Docker</strong> (con Docker Compose) per Postgres, Qdrant e
           Redis;
         </li>
         <li>
@@ -29,7 +29,7 @@ export default function Quickstart() {
         </li>
         <li>
           una <strong>chiave OpenAI</strong> per la generazione delle risposte
-          (default; backend alternativi: Ollama e modelli locali — vedi{" "}
+          (default; backend alternativi: Ollama e modelli locali, vedi{" "}
           <a href="#backend-llm">Backend LLM</a>). Con il pacchetto corpus non
           servono chiamate di embedding: paghi solo la generazione, centesimi
           per centinaia di domande.
@@ -63,7 +63,7 @@ make migrate     # schema del database (Alembic)`}</pre>
         gli embedding Qdrant già calcolati. Un solo comando, nessuna chiamata
         API, nessun costo:
       </p>
-      <pre>{`make corpus-import SRC=https://<hosting-del-pacchetto>/caucus-corpus-YYYYMMDD`}</pre>
+      <pre>{`make corpus-import SRC=https://github.com/gral-digital/caucus/releases/download/corpus-20260801`}</pre>
       <p>
         Lo script scarica i file (con ripresa automatica se la connessione
         cade), verifica i checksum SHA-256, controlla che lo schema del
@@ -95,11 +95,11 @@ make harvest-cassazione   # giurisprudenza, incrementale e resumabile (ore)`}</p
       </p>
       <ul>
         <li>
-          <code>LLM_BACKEND=ollama</code> — modelli locali via Ollama, per un
+          <code>LLM_BACKEND=ollama</code>: modelli locali via Ollama, per un
           deployment senza alcuna dipendenza cloud;
         </li>
         <li>
-          <code>EMBEDDING_BACKEND=local</code> — embedding self-hosted
+          <code>EMBEDDING_BACKEND=local</code>: embedding self-hosted
           (BGE-M3); nota che gli embedding del pacchetto corpus sono
           text-embedding-3-small: cambiando modello di embedding va rifatta
           l&apos;indicizzazione vettoriale;
@@ -108,7 +108,7 @@ make harvest-cassazione   # giurisprudenza, incrementale e resumabile (ore)`}</p
           <code>RERANKER_BACKEND=local</code> (default) con{" "}
           <code>RERANKER_DEVICE=mps|cuda|cpu</code>; in assenza delle
           dipendenze il sistema degrada a un reranker keyword e lo segnala nei
-          log — le prestazioni misurate valgono solo con il cross-encoder
+          log: le prestazioni misurate valgono solo con il cross-encoder
           attivo.
         </li>
       </ul>
@@ -164,24 +164,24 @@ make harvest-cassazione   # giurisprudenza, incrementale e resumabile (ore)`}</p
       <h2>Problemi comuni</h2>
       <ul>
         <li>
-          <strong>Porte occupate</strong> — Postgres è mappato su :55432
+          <strong>Porte occupate</strong>: Postgres è mappato su :55432
           proprio per non collidere con un Postgres locale; Qdrant usa :6333.
         </li>
         <li>
-          <strong>&laquo;reranker_local_deps_missing_fallback_keyword&raquo; nei log</strong>{" "}
-          — manca <code>sentence-transformers</code> nel venv: rilancia{" "}
+          <strong>&laquo;reranker_local_deps_missing_fallback_keyword&raquo; nei log</strong>:
+          manca <code>sentence-transformers</code> nel venv; rilancia{" "}
           <code>make install</code>. Con il fallback keyword la qualità del
           retrieval cala sensibilmente.
         </li>
         <li>
-          <strong>Streaming che arriva &laquo;a blocchi&raquo;</strong> — se
+          <strong>Streaming che arriva &laquo;a blocchi&raquo;</strong>: se
           metti un reverse proxy davanti all&apos;API, disattiva compressione
           e buffering su <code>/api/v1/chat</code> (l&apos;API imposta già{" "}
           <code>X-Accel-Buffering: no</code> e <code>Cache-Control:
           no-transform</code>).
         </li>
         <li>
-          <strong>Import corpus rifiutato</strong> — il pacchetto dichiara la
+          <strong>Import corpus rifiutato</strong>: il pacchetto dichiara la
           revisione di schema per cui è stato prodotto: esegui{" "}
           <code>make migrate</code> (o aggiorna il codice) e riprova.
         </li>

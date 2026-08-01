@@ -1,7 +1,7 @@
 """Export del parere in .docx con citazioni ri-verificate server-side.
 
 Il client manda la risposta così com'è (markdown + tag ``<cite/>``): il
-server NON si fida dello stato client — estrae le citazioni, le risolve di
+server NON si fida dello stato client: estrae le citazioni, le risolve di
 nuovo contro il DB (rubrica, testo, vigenza/abrogazione) e produce il
 documento. Un'eventuale citazione manomessa o scaduta emerge nell'allegato
 come «non trovata» o «abrogata», mai come riferimento pulito.

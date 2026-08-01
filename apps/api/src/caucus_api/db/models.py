@@ -62,7 +62,7 @@ class NormPartition(Base):
     __tablename__ = "norm_partition"
     __table_args__ = (
         Index("ix_norm_partition_source_kind_number", "source_id", "kind", "number"),
-        # path è VARCHAR (non ltree) in Fase 1 — vedi commento nella migration.
+        # path è VARCHAR (non ltree) in Fase 1: vedi commento nella migration.
         Index(
             "ix_norm_partition_path",
             "path",
@@ -325,7 +325,7 @@ class UserAccount(Base):
     # Sempre lowercase (normalizzata alla registrazione): l'unicità è
     # case-insensitive di fatto.
     email: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
-    # Argon2id — mai altri schemi: niente password in chiaro da nessuna parte.
+    # Argon2id, mai altri schemi: niente password in chiaro da nessuna parte.
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     display_name: Mapped[str | None] = mapped_column(String(120), nullable=True)
     created_at: Mapped[datetime] = mapped_column(

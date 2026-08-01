@@ -1,7 +1,7 @@
 """Loader per la giurisprudenza di Cassazione → Postgres + Qdrant (`cassazione`).
 
 Idempotenza incrementale: le sentenze sono identificate da ``external_id``
-(id SentenzeWeb); quelle già presenti vengono saltate — l'harvest può essere
+(id SentenzeWeb); quelle già presenti vengono saltate: l'harvest può essere
 rilanciato quante volte si vuole e riprende da dove era arrivato.
 """
 

@@ -10,7 +10,7 @@ i moduli si sbloccano in parallelo perché riusano lo stesso motore.
 
 ## Milestone
 
-### M1 — Fondazioni (in corso)
+### M1: Fondazioni (in corso)
 - [x] Scaffolding monorepo (Python+Node)
 - [x] Schema dati normativa (Postgres + pgvector + Qdrant)
 - [x] Migration iniziale con FTS italiano + ltree
@@ -26,38 +26,38 @@ i moduli si sbloccano in parallelo perché riusano lo stesso motore.
 - [ ] Deploy `dev` su Cloud Run
 - [ ] Arricchimento gerarchia Libro/Titolo/Capo (parsing indice HTML Normattiva)
 
-### M2 — "Chiedi al Codice" GA
+### M2: "Chiedi al Codice" GA
 - [ ] Auth (Clerk o Auth.js)
 - [ ] Storico conversazioni
 - [ ] Feedback thumbs up/down → dataset di eval
 - [ ] Eval set gold verificato da avvocato partner (≥ 200 coppie)
 - [ ] Metriche: recall@10 per retriever, faithfulness (LLM-as-judge) per risposte
 
-### M3 — Analisi Documenti
+### M3: Analisi Documenti
 - [ ] Upload PDF/DOCX → GCS → Docling parse
 - [ ] Estrazione strutturata (parti, oggetto, clausole)
 - [ ] Red flags detector (LangGraph agent)
 - [ ] Report PDF/HTML scaricabile
 
-### M4 — Drafting assistito
+### M4: Drafting assistito
 - [ ] Template library (atto di citazione, comparsa di costituzione, contratto)
 - [ ] LangGraph flow con validazione normativa intermedia
 - [ ] Versioning bozze, commenti
 
-### M5 — Giurisprudenza
+### M5: Giurisprudenza
 - [ ] Ingestion CED Cassazione (massime)
 - [ ] Ingestion sentenze integrali (on-demand)
 - [ ] Filter materia/anno/sezione
 - [ ] Collegamento automatico sentenze ↔ norme citate
 
-### M6 — Enterprise
+### M6: Enterprise
 - [ ] Onyx connectors (Drive, SharePoint, Outlook, Notion)
 - [ ] Multi-tenancy stretta (Postgres RLS + Qdrant collections per-tenant)
 - [ ] SSO SAML/OIDC (WorkOS)
 - [ ] Audit log WORM su GCS
 - [ ] CMEK per tenant
 
-### M7 — Scale
+### M7: Scale
 - [ ] Fine-tune Italian-LegalBERT come reranker domain-specific
 - [ ] Self-hosted vLLM su GKE (se volume giustifica)
 - [ ] Evaluation continua in CI (LLM-as-judge su dataset gold)
@@ -65,6 +65,6 @@ i moduli si sbloccano in parallelo perché riusano lo stesso motore.
 ## KPI di prodotto (da strumentare dalla M2)
 
 - **Precisione citazioni**: % risposte in cui ogni citazione puntata è verificabile contro il testo normativo (target ≥ 98%).
-- **Completezza**: % domande del test set con risposta utile (non "non trovato", anche quando la risposta c'è) — target ≥ 85%.
-- **Latenza P50 / P95**: chat response — target P50 < 2s TTFT, P95 < 5s TTFT.
+- **Completezza**: % domande del test set con risposta utile (non "non trovato", anche quando la risposta c'è); target ≥ 85%.
+- **Latenza P50 / P95**: chat response; target P50 < 2s TTFT, P95 < 5s TTFT.
 - **Cost per request**: target < €0.05 in fase 1 con Llama via Vertex.

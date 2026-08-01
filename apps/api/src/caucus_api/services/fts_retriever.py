@@ -1,7 +1,7 @@
 """Retrieval Postgres FTS + lookup diretto articolo per numero.
 
 Entrambi i rami applicano il filtro di vigenza (``effective_at``, default oggi)
-su ``norm_partition.effective_from/effective_to`` — stessa semantica del ramo
+su ``norm_partition.effective_from/effective_to``, stessa semantica del ramo
 vettoriale (``HybridRetriever._build_filters``). Senza questo filtro, FTS e
 lookup diretto restituivano versioni non vigenti alla data richiesta, e il
 lookup diretto le pinnava pure in cima.
@@ -80,7 +80,7 @@ class FtsRetriever:
         if not rows:
             # websearch_to_tsquery è AND-semantico: con query lunghe (es. dopo
             # query expansion) l'AND di 15+ termini non matcha nulla. Fallback:
-            # OR dei termini significativi — ts_rank premia chi ne matcha di più.
+            # OR dei termini significativi: ts_rank premia chi ne matcha di più.
             # I risultati OR sono però rumorosi (articoli lunghi pieni di parole
             # comuni): vengono marcati "fts-or" e NON ricevono boost dal reranker.
             words = set(re.findall(r"[a-zà-ù0-9]{3,}", fts_query.lower()))

@@ -212,7 +212,7 @@ class CrossEncoderReranker(Reranker):
                 adj += 1.0
             # Malus abrogato SOLO sui rami probabilistici: se l'articolo è
             # stato chiesto per numero (utente o espansione), la domanda È
-            # probabilmente sull'abrogazione — non seppellire la risposta.
+            # probabilmente sull'abrogazione: non seppellire la risposta.
             if h.metadata.get("abrogato") and lookup not in ("direct", "expansion"):
                 adj -= 0.5
             reranked.append(h.model_copy(update={"score_rerank": score, "score_final": adj}))

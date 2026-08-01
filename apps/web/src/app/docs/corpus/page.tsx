@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Corpus — Documentazione Caucus" };
+export const metadata: Metadata = { title: "Corpus | Documentazione Caucus" };
 
 export default function CorpusDocs() {
   return (
@@ -50,7 +50,7 @@ export default function CorpusDocs() {
             <td>
               Decisioni civili e penali a testo integrale, nella forma
               anonimizzata pubblicata dalla Corte; harvest incrementale, corpus
-              in crescita (~68.000 provvedimenti alla data del pacchetto
+              in crescita (72.050 provvedimenti alla data del pacchetto
               corrente)
             </td>
           </tr>
@@ -67,15 +67,16 @@ export default function CorpusDocs() {
         </li>
         <li>
           <strong>Chunk contestuali.</strong> Ogni frammento indicizzato porta
-          nel testo il proprio contesto (&laquo;[Fonte] Codice Civile — art.
-          2043 (Risarcimento per fatto illecito)&raquo;), così l&apos;embedding
-          codifica anche la collocazione, non solo il testo del comma.
+          nel testo il proprio contesto: fonte, articolo e rubrica (per
+          esempio Codice Civile, art. 2043, &laquo;Risarcimento per fatto
+          illecito&raquo;), così l&apos;embedding codifica anche la
+          collocazione, non solo il testo del comma.
         </li>
         <li>
           <strong>Vigenza temporale.</strong> Ogni partizione e ogni chunk
           hanno <code>effective_from</code>/<code>effective_to</code>: il
           retrieval filtra per data di vigenza (default: oggi) e gli articoli
-          abrogati sono marcati — possono essere citati come abrogati, mai
+          abrogati sono marcati: possono essere citati come abrogati, mai
           spacciati per vigenti.
         </li>
         <li>
@@ -101,29 +102,29 @@ export default function CorpusDocs() {
         già calcolate.
       </p>
       <pre>{`# con l'infra attiva (make up && make migrate):
-make corpus-import SRC=https://<hosting-del-pacchetto>/caucus-corpus-YYYYMMDD
+make corpus-import SRC=https://github.com/gral-digital/caucus/releases/download/corpus-20260801
 # oppure da una directory locale già scaricata:
 make corpus-import SRC=/percorso/caucus-corpus-YYYYMMDD`}</pre>
       <p>Il pacchetto contiene:</p>
       <ul>
         <li>
-          <code>postgres_corpus.dump</code> — dump compresso delle sole tabelle
+          <code>postgres_corpus.dump</code>: dump compresso delle sole tabelle
           del corpus (norme, commi, chunk, grafo dei rinvii, giurisprudenza).
           Le tabelle utente non sono incluse e l&apos;import non le tocca;
         </li>
         <li>
-          <code>qdrant_*.snapshot</code> — uno snapshot per collection
+          <code>qdrant_*.snapshot</code>: uno snapshot per collection
           vettoriale (embedding <code>text-embedding-3-small</code>, 1536
           dimensioni), ripristinato così com&apos;è: zero chiamate API;
         </li>
         <li>
-          <code>manifest.json</code> — data, commit di origine, revisione dello
+          <code>manifest.json</code>: data, commit di origine, revisione dello
           schema, conteggi per tabella e collection, checksum SHA-256 di ogni
           file. L&apos;import verifica tutto prima di scrivere e confronta i
           conteggi a fine ripristino;
         </li>
         <li>
-          <code>README.md</code> — licenze dei dati e istruzioni minime.
+          <code>README.md</code>: licenze dei dati e istruzioni minime.
         </li>
       </ul>
       <p>

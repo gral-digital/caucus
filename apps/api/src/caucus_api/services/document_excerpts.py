@@ -1,11 +1,11 @@
 """Selezione dei passaggi rilevanti da un documento lungo.
 
 Quando il documento supera il budget di contesto, il taglio "solo testa"
-perde le clausole in fondo — che nei contratti sono spesso quelle che
+perde le clausole in fondo, che nei contratti sono spesso quelle che
 contano (penali, foro, recesso). Qui si selezionano, oltre alla testa del
 documento (identità: parti, oggetto), le finestre più pertinenti alla
 domanda con uno scoring lessicale in-memory: deterministico, zero latenza,
-nessuna dipendenza. Le omissioni sono marcate esplicitamente — il modello
+nessuna dipendenza. Le omissioni sono marcate esplicitamente: il modello
 deve sapere cosa NON sta vedendo.
 """
 

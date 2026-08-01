@@ -85,7 +85,7 @@ async def login(
     session_days: int,
     user_agent: str | None = None,
 ) -> tuple[UserAccount, str, datetime]:
-    """(utente, token in chiaro — consegnato UNA volta, scadenza)."""
+    """(utente, token in chiaro consegnato UNA volta, scadenza)."""
     email = normalize_email(email)
     user = (
         await session.execute(select(UserAccount).where(UserAccount.email == email))

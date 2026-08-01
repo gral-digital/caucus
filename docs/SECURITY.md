@@ -1,6 +1,6 @@
 # Sicurezza & Compliance
 
-> ⚠️ **STATO (2026-07-31)**: questo è un *design document* — descrive la
+> ⚠️ **STATO (2026-07-31)**: questo è un *design document*: descrive la
 > postura di sicurezza target. **Implementato oggi**: token auth fail-closed,
 > rate limiting per IP, CORS da env, cap history, validazione citazioni,
 > container non-root, niente leak di errori interni. **NON ancora
@@ -11,9 +11,9 @@
 
 Il settore legale italiano ha tre vincoli stringenti che pesano su ogni decisione:
 
-1. **Segreto professionale** — art. 622 c.p. + art. 6 cod. deont. forense. L'avvocato risponde penalmente se comunica fatti del cliente a terzi. Un LLM provider US che processi quei dati *senza* DPA adeguato è un rischio legale per il cliente.
-2. **GDPR** — dati particolari (art. 9), dati giudiziari (art. 10). Trattamento su base "necessità per l'esecuzione del contratto" + misure tecniche-organizzative adeguate.
-3. **Cybersecurity** — NIS2 (recepito con d.lgs. 138/2024) si applica a studi che erogano servizi digitali. Data breach notification 72h.
+1. **Segreto professionale**: art. 622 c.p. + art. 6 cod. deont. forense. L'avvocato risponde penalmente se comunica fatti del cliente a terzi. Un LLM provider US che processi quei dati *senza* DPA adeguato è un rischio legale per il cliente.
+2. **GDPR**: dati particolari (art. 9), dati giudiziari (art. 10). Trattamento su base "necessità per l'esecuzione del contratto" + misure tecniche-organizzative adeguate.
+3. **Cybersecurity**: NIS2 (recepito con d.lgs. 138/2024) si applica a studi che erogano servizi digitali. Data breach notification 72h.
 
 ## 1. Data sovereignty
 
@@ -21,7 +21,7 @@ Il settore legale italiano ha tre vincoli stringenti che pesano su ogni decision
 - **Nessun data residency fallback US**: Cloud SQL, GCS, Memorystore, GKE configurati con EU-only.
 - **LLM providers ammessi in fase 1**:
   - Vertex AI Model Garden in `europe-west*` (Google DPA standard, Data Processing Addendum sottoscritto).
-  - Anthropic via **Vertex AI** (non API diretta) — mantiene dati in EU region Google.
+  - Anthropic via **Vertex AI** (non API diretta): mantiene i dati in EU region Google.
   - No OpenAI API diretta in fase 1 (richiederebbe Azure OpenAI EU o API con EU data residency attivato; valutato in fase 2 con DPIA dedicata).
 - **Self-hosted option** (fase 2+): vLLM su GKE Autopilot EU per tenant enterprise paranoid.
 
@@ -29,7 +29,7 @@ Il settore legale italiano ha tre vincoli stringenti che pesano su ogni decision
 
 - TLS 1.3 minimum, HSTS con preload.
 - At-rest default GCP (AES-256 con Google-managed keys).
-- **CMEK** (Customer-Managed Encryption Keys) tramite Cloud KMS attivabile per tenant enterprise — chiave specifica per cliente con rotation 90d.
+- **CMEK** (Customer-Managed Encryption Keys) tramite Cloud KMS attivabile per tenant enterprise: chiave specifica per cliente con rotation 90d.
 - **Application-level encryption** per documenti caricati: chiave per-tenant, GCM, IV random per blob. Chiave wrapped da KMS.
 - Secrets in **Secret Manager**, mai in env committed.
 
@@ -60,9 +60,9 @@ Il settore legale italiano ha tre vincoli stringenti che pesano su ogni decision
 ## 5. Authorization
 
 RBAC a 3 ruoli minimi:
-- `avvocato` — può leggere/scrivere propri casi.
-- `admin-studio` — può gestire utenti del tenant, billing.
-- `superadmin` — solo staff Caucus, con audit log forte.
+- `avvocato`: può leggere/scrivere propri casi.
+- `admin-studio`: può gestire utenti del tenant, billing.
+- `superadmin`: solo staff Caucus, con audit log forte.
 
 ABAC su alcune risorse (es. "caso riservato" visibile solo all'avvocato referente anche dentro lo studio).
 

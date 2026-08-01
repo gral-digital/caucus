@@ -2,7 +2,7 @@
 
 v1 deliberatamente senza OCR: un PDF scansionato (nessun layer testuale)
 viene rifiutato con errore chiaro invece di produrre un'analisi su un
-documento vuoto — meglio nessuna risposta che una risposta non ancorata.
+documento vuoto: meglio nessuna risposta che una risposta non ancorata.
 """
 
 from __future__ import annotations

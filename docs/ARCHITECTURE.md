@@ -7,24 +7,24 @@
 
 ## 1. Principi
 
-1. **Trust layer prima di tutto** — ogni citazione normativa generata è
+1. **Trust layer prima di tutto**: ogni citazione normativa generata è
    validata post-generazione contro il database (esistenza, fonte, vigenza,
    abrogazione, presenza nel contesto). Il sistema preferisce ammettere un
    gap che inventare una norma.
-2. **Il benchmark è l'arbitro** — ogni modifica di qualità si misura su
+2. **Il benchmark è l'arbitro**: ogni modifica di qualità si misura su
    Caucus Bench (`benchmark/`), mai su impressioni.
-3. **Determinismo dove possibile** — il lookup per numero di articolo batte
+3. **Determinismo dove possibile**: il lookup per numero di articolo batte
    sempre il retrieval probabilistico; i segnali deterministici (riferimenti
    espliciti, abrogazione) correggono i punteggi neurali, non viceversa.
-4. **Separation of concerns** — `rag-core` è l'unica libreria che parla con
+4. **Separation of concerns**: `rag-core` è l'unica libreria che parla con
    LLM/vector store; `ingestion` produce un modello canonico unico
    (`CanonicalAct`) qualunque sia la fonte; l'API li consuma.
 
 ## 2. Componenti
 
 ```
-apps/web        Next.js 15 — chat SSE, pannello fonti, warning citazioni
-apps/api        FastAPI — /chat (SSE), /search, /health; auth token; rate limit
+apps/web        Next.js 15: chat SSE, pannello fonti, warning citazioni
+apps/api        FastAPI: /chat (SSE), /search, /health; auth token; rate limit
 services/rag-core     retriever ibrido, rerankers, query expansion,
                       act registry, hit merge (RRF pesato), schemi Pydantic
 services/ingestion    parser Normattiva AKN + EUR-Lex HTML + SentenzeWeb,
@@ -50,8 +50,8 @@ Tre fonti, un solo modello canonico (`CanonicalAct` → `Loader`):
 
 Proprietà dei loader: **delete-and-replace per fonte** (re-run = stesso
 corpus, mai duplicati) per le norme; **append-only per external_id** per la
-giurisprudenza. Ogni chunk porta un header contestuale
-(`[Fonte] Codice Civile — art. 2043 (Rubrica), comma 1`) così il contesto sta
+giurisprudenza. Ogni chunk porta un header contestuale (tag `[Fonte]` seguito
+da titolo, articolo con rubrica ed eventuale comma) così il contesto sta
 nel testo embeddato, e i campi `effective_from`/`effective_to` per il filtro
 di vigenza.
 
@@ -100,7 +100,7 @@ Post-generazione, su ogni risposta:
 4. l'evento SSE `citation_warnings` porta tutto alla UI; `done` include il
    testo finale con i tag promossi.
 
-La giurisprudenza si cita solo in prosa con gli estremi reali del contesto —
+La giurisprudenza si cita solo in prosa con gli estremi reali del contesto:
 il prompt vieta di inventare estremi e il gold set lo verifica.
 
 ## 6. Sicurezza (implementata)
@@ -123,7 +123,7 @@ cancellazione silenziosa.
 ## 8. Roadmap architetturale
 
 Multivigenza storica (Normattiva `dataVigenza` per versioni passate);
-embedding self-hosted BGE-M3 (dense+sparse, il codice c'è già — richiede
+embedding self-hosted BGE-M3 (dense+sparse, il codice c'è già ma richiede
 re-ingest); citazioni in structured output; conversazioni server-side + audit
 log; observability Langfuse; deploy di riferimento (l'attuale
-`infra/terraform` è parziale e non allineato — vedi RELEASE_CHECKLIST).
+`infra/terraform` è parziale e non allineato; vedi RELEASE_CHECKLIST).

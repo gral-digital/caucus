@@ -125,12 +125,24 @@ QDRANT_COUNTS="${QDRANT_COUNTS%,}}"
 # --- Manifest con conteggi e checksum --------------------------------------
 echo "==> Manifest e checksum…"
 
+# File sopra 1900 MB: divisi in parti, perché molti hosting (release asset
+# GitHub inclusi) rifiutano file oltre 2 GB. Il checksum resta quello del
+# file intero; l'import riassembla le parti e verifica.
+SPLIT_BYTES=$((1900 * 1024 * 1024))
 FILES_JSON="{"
 for f in "$OUT"/*.dump "$OUT"/*.snapshot; do
   base="$(basename "$f")"
   sha=$(shasum -a 256 "$f" | cut -d' ' -f1)
   size=$(stat -f%z "$f" 2>/dev/null || stat -c%s "$f")
-  FILES_JSON+="\"${base}\": {\"sha256\": \"${sha}\", \"bytes\": ${size}},"
+  if [ "$size" -gt "$SPLIT_BYTES" ]; then
+    echo "==> ${base} supera 1.9 GB: split in parti…"
+    split -b 1900m "$f" "${f}.part"
+    rm "$f"
+    PARTS=$(cd "$OUT" && ls "${base}".part* | sort | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read().split()))')
+    FILES_JSON+="\"${base}\": {\"sha256\": \"${sha}\", \"bytes\": ${size}, \"parts\": ${PARTS}},"
+  else
+    FILES_JSON+="\"${base}\": {\"sha256\": \"${sha}\", \"bytes\": ${size}},"
+  fi
 done
 FILES_JSON="${FILES_JSON%,}}"
 

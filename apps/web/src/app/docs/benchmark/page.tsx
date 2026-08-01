@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-export const metadata: Metadata = { title: "Benchmark — Documentazione Caucus" };
+export const metadata: Metadata = { title: "Benchmark | Documentazione Caucus" };
 
 export default function BenchmarkDocs() {
   return (
@@ -11,7 +11,7 @@ export default function BenchmarkDocs() {
         Il mercato dell&apos;AI legale è pieno di percentuali non
         riproducibili. Caucus Bench è la risposta: un benchmark{" "}
         <strong>aperto</strong> (licenza MIT, separato dal codice AGPL) per
-        l&apos;AI giuridica italiana — gold set, harness e report sono nel
+        l&apos;AI giuridica italiana. Gold set, harness e report sono nel
         repository, e chiunque può rieseguire la misura o sottomettere i
         risultati del proprio sistema.
       </p>
@@ -24,21 +24,21 @@ export default function BenchmarkDocs() {
       </p>
       <ul>
         <li>
-          <strong>casi hard</strong> — articoli abrogati, riforme recenti,
+          <strong>casi hard</strong>: articoli abrogati, riforme recenti,
           istituti che i modelli confondono sistematicamente;
         </li>
         <li>
-          <strong>casi adversarial</strong> — richieste di assistenza a
+          <strong>casi adversarial</strong>: richieste di assistenza a
           condotte illecite, anche con framing professionale: la risposta
           giusta è il rifiuto;
         </li>
         <li>
-          <strong>casi professional-legitimate</strong> — domande legittime di
+          <strong>casi professional-legitimate</strong>: domande legittime di
           un difensore che <em>sembrano</em> scabrose: la risposta giusta è
           rispondere (misura l&apos;over-refusal);
         </li>
         <li>
-          <strong>casi fuori corpus</strong> — la risposta giusta è ammettere
+          <strong>casi fuori corpus</strong>: la risposta giusta è ammettere
           il gap, non improvvisare.
         </li>
       </ul>
@@ -59,7 +59,7 @@ export default function BenchmarkDocs() {
           <tr>
             <td>Recall@8 (source-aware)</td>
             <td>
-              Gli articoli attesi sono nei primi 8 risultati del retrieval —
+              Gli articoli attesi sono nei primi 8 risultati del retrieval,
               contando fonte + numero, non la sola stringa
             </td>
           </tr>
@@ -126,7 +126,7 @@ export default function BenchmarkDocs() {
         citation recall 99%, <strong>0,0% citazioni allucinate</strong>, 100%
         refusal sugli adversarial, 0% over-refusal, 100% gap admission, TTFT
         p50 4,7s. Varianza tra run identici: pass 95,3–97,7%, recall@8
-        96,2–99,4% — <em>l&apos;intervallo è il numero onesto, non il picco</em>.
+        96,2–99,4%: <em>l&apos;intervallo è il numero onesto, non il picco</em>.
         La leaderboard completa con configurazioni e correzioni dichiarate è in{" "}
         <code>benchmark/RESULTS.md</code>.
       </p>

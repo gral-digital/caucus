@@ -1,6 +1,6 @@
 cff-version: 1.2.0
 message: "If you use Caucus or Caucus Bench in your research, please cite it as below."
-title: "Caucus — Open-source legal & compliance AI for Italian law"
+title: "Caucus: Open-source legal & compliance AI for Italian law"
 type: software
 license: AGPL-3.0
 repository-code: "https://github.com/gral-digital/caucus"

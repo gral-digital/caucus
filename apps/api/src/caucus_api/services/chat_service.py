@@ -128,7 +128,7 @@ class ChatService:
         doc_ids = list(getattr(request, "document_ids", []) or [])
         doc_rows = await self._fetch_documents(doc_ids) if doc_ids else []
 
-        # 1. Retrieve — usa come query il messaggio corrente + ultimo user turn
+        # 1. Retrieve: usa come query il messaggio corrente + ultimo user turn
         # del contesto, per non perdere riferimenti in follow-up brevi.
         retrieval_query_text = self._build_retrieval_query(request)
         if doc_rows:
@@ -157,7 +157,7 @@ class ChatService:
             if CorpusFilter.CODICI not in corpora:
                 corpora.append(CorpusFilter.CODICI)
         # Eventi `status`: il lavoro della pipeline reso visibile alla UI
-        # (thinking onesto — fasi vere, non animazioni). I client che non li
+        # (thinking onesto: fasi vere, non animazioni). I client che non li
         # conoscono (benchmark incluso) li ignorano.
         yield ChatEvent(
             name="status",
@@ -250,7 +250,7 @@ class ChatService:
             )
 
         # Documenti allegati dall'utente (analisi documentale): entrano nel
-        # contesto PRIMA del blocco normativo — sono i fatti del caso.
+        # contesto PRIMA del blocco normativo: sono i fatti del caso.
         if doc_rows:
             system_content += "\n\n" + self._assemble_documents_block(
                 doc_rows, question=str(request.question)
@@ -295,7 +295,7 @@ class ChatService:
                     validation = await self._validate_citations(raw, result.hits)
                     # Trust layer che si auto-corregge: se restano citazioni
                     # inesistenti, UNA passata di riparazione (solo nel caso
-                    # raro in cui serve) invece del solo warning — il client
+                    # raro in cui serve) invece del solo warning: il client
                     # sostituisce il testo streamato con final_text.
                     if validation["invalid"]:
                         yield ChatEvent(
@@ -318,7 +318,7 @@ class ChatService:
                                 raw, validation = candidate, revalidation
                     # Warning anche su grounding debole (articolo esistente ma
                     # NON nel contesto fornito: l'allucinazione più insidiosa)
-                    # e su citazioni di articoli abrogati — non solo su invalid.
+                    # e su citazioni di articoli abrogati, non solo su invalid.
                     has_soft_warnings = any(
                         c.get("grounding") == "weak" or c.get("abrogato")
                         for c in validation["valid"]
@@ -666,7 +666,7 @@ class ChatService:
         for s, n in self._CITE_PATTERN.findall(text):
             citations.append({"source": s.lower(), "num": n.lower(), "form": "tag"})
 
-        # Testo libero — normalizza la sigla
+        # Testo libero: normalizza la sigla
         for m in self._FREEFORM_CITE_PATTERN.finditer(text):
             num = re.sub(r"\s+", "-", m.group(1).strip()).lower()
             suffix = m.group(3)
@@ -726,7 +726,7 @@ class ChatService:
                 entry: dict[str, Any] = dict(c)
                 if (row or {}).get("abrogato"):
                     # L'articolo esiste ma è abrogato: citarlo come vigente è
-                    # un errore legale — flag esplicito per la UI.
+                    # un errore legale: flag esplicito per la UI.
                     entry["abrogato"] = True
                 valid.append(entry)
             else:
