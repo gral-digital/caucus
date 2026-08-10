@@ -217,6 +217,10 @@ class ChatService:
             f"«La giurisprudenza che ho indicizzata parte dal {case_law_min_year}: "
             "sull'orientamento consolidato serve una verifica su banca dati completa» "
             "e inquadra la questione sulla norma con i tag <cite/>.\n"
+            "- Distingui ciò che il TESTO delle norme nel CONTESTO fonda da ciò che è "
+            "elaborazione giurisprudenziale (es. la portata di «profitto», «ingiusto», "
+            "«apprezzabile»): sul secondo, senza sentenze nel CONTESTO, non presentare "
+            "MAI una conclusione come certa, nemmeno senza nominare la Cassazione.\n"
             "- Sei un assistente AI: non sei un avvocato iscritto all'albo, questa "
             "conversazione non è un parere legale e non instaura un rapporto "
             "professionale. Non dichiararlo a ogni risposta, ma se il cliente mostra "
@@ -356,6 +360,39 @@ class ChatService:
                         # Riparazione fallita o insufficiente: il warning arriva
                         # comunque alla UI insieme a quelli sulle citazioni.
                         validation["case_law_ungrounded"] = ungrounded_claims
+                    # Terzo strato: risposta di merito con CONTESTO disponibile
+                    # ma ZERO citazioni (né tag né estremi di sentenze): il
+                    # modello sta rispondendo dalla conoscenza parametrica.
+                    if (
+                        result.hits
+                        and not ungrounded_claims
+                        and self._is_substantive_without_citations(raw, validation["total"])
+                    ):
+                        yield ChatEvent(
+                            name="status",
+                            data={
+                                "stage": "riparazione",
+                                "detail": (
+                                    "Risposta senza citazioni: la fondo sulle norme "
+                                    "del corpus o dichiaro l'incertezza"
+                                ),
+                            },
+                        )
+                        grounded = await self._repair_missing_grounding(raw, system_content)
+                        if grounded is not None:
+                            candidate = self._promote_freeform_citations(grounded, result.hits)
+                            revalidation = await self._validate_citations(candidate, result.hits)
+                            if (
+                                not revalidation["invalid"]
+                                and not self._ungrounded_case_law_claims(candidate, result.hits)
+                                and (
+                                    revalidation["total"] > 0
+                                    or not self._is_substantive_without_citations(
+                                        candidate, revalidation["total"]
+                                    )
+                                )
+                            ):
+                                raw, validation = candidate, revalidation
                     # Warning anche su grounding debole (articolo esistente ma
                     # NON nel contesto fornito: l'allucinazione più insidiosa)
                     # e su citazioni di articoli abrogati, non solo su invalid.
@@ -765,6 +802,76 @@ class ChatService:
         if cited & context_extremes:
             return []
         return claims[:5]
+
+    # Marcatori delle risposte che dichiarano onestamente un limite o un
+    # buco: non vanno mai mandate in riparazione grounding.
+    _HONESTY_MARKERS = ("corpus", "indicizzat", "non trovo", "banca dati")
+
+    @classmethod
+    def _is_substantive_without_citations(cls, text: str, total_citations: int) -> bool:
+        """Risposta di merito senza NESSUNA citazione: da fondare o ammettere.
+
+        Osservato in prod: il modello può affermare una tesi giuridica errata
+        come fatto proprio, senza attribuirla («il profitto deve essere
+        economicamente apprezzabile») e senza citare nulla: così scavalca sia
+        il validator (niente da validare) sia il guardrail sulle attribuzioni.
+        Una risposta di merito con il CONTESTO a disposizione e zero citazioni
+        è di per sé un red flag.
+
+        Esclusioni: risposte brevi (saluti, chiacchiere), domande di
+        chiarimento, ammissioni oneste di copertura.
+        """
+        if total_citations > 0:
+            return False
+        stripped = text.strip()
+        if len(stripped) < 300:
+            return False
+        if stripped.endswith("?"):
+            return False
+        low = stripped.lower()
+        if any(m in low for m in cls._HONESTY_MARKERS):
+            return False
+        return not cls._CASE_LAW_EXTREME_PATTERN.search(stripped)
+
+    async def _repair_missing_grounding(self, draft: str, system_content: str) -> str | None:
+        """Una passata di riparazione sulle risposte di merito senza citazioni."""
+        min_year = get_settings().case_law_min_year
+        try:
+            repaired = await asyncio.wait_for(
+                self._llm.chat(
+                    [
+                        LLMMessage(role="system", content=system_content),
+                        LLMMessage(role="assistant", content=draft),
+                        LLMMessage(
+                            role="user",
+                            content=(
+                                "REVISIONE GROUNDING (messaggio di sistema, non del "
+                                "cliente). La tua risposta afferma conclusioni giuridiche "
+                                "senza citare alcuna fonte. Riscrivila fondando ogni "
+                                "affermazione sugli articoli del CONTESTO con i tag "
+                                "<cite/>. Quello che il testo delle norme nel CONTESTO "
+                                "non fonda, NON darlo per certo: riformulalo come punto "
+                                "di elaborazione giurisprudenziale, dicendo che la "
+                                f"giurisprudenza indicizzata parte dal {min_year} e che "
+                                "sull'orientamento serve una verifica su banca dati "
+                                "completa. Non inventare riferimenti. Output: SOLO la "
+                                "risposta riscritta."
+                            ),
+                        ),
+                    ],
+                    max_tokens=1200,
+                    temperature=0.0,
+                ),
+                timeout=20.0,
+            )
+        except Exception as exc:
+            logger.warning("grounding_repair_failed", error=type(exc).__name__)
+            return None
+        text = (repaired or "").strip()
+        if not text:
+            return None
+        logger.info("grounding_repair_done")
+        return text
 
     async def _repair_ungrounded_case_law(
         self, draft: str, claims: list[str], system_content: str

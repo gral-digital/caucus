@@ -140,3 +140,36 @@ def test_generic_giurisprudenza_attribution_is_flagged():
     # senza citazioni è comunque un'attribuzione da fondare o dichiarare.
     text = "La giurisprudenza ha spesso interpretato il profitto in senso ampio."
     assert ChatService._ungrounded_case_law_claims(text, [])
+
+
+# ------------------- risposta di merito senza citazioni -------------------
+
+
+def test_substantive_answer_without_citations_is_flagged():
+    text = (
+        "Sì, nel contesto del furto il profitto deve essere economicamente "
+        "apprezzabile. Il concetto di profitto implica un vantaggio che può "
+        "essere valutato in termini economici, anche se non necessariamente in "
+        "denaro contante. Questo significa che il profitto può consistere in "
+        "qualsiasi utilità o beneficio che abbia un valore economico, come "
+        "l'uso di un bene o il risparmio di una spesa."
+    )
+    assert ChatService._is_substantive_without_citations(text, 0)
+
+
+def test_answer_with_citations_is_not_flagged():
+    assert not ChatService._is_substantive_without_citations("x" * 400, 2)
+
+
+def test_short_or_interrogative_answers_are_not_flagged():
+    assert not ChatService._is_substantive_without_citations("Ciao! Come posso aiutarti?", 0)
+    long_question = ("Per inquadrare il caso mi servono alcuni dettagli. " * 8) + "Com'era?"
+    assert not ChatService._is_substantive_without_citations(long_question, 0)
+
+
+def test_honest_admission_is_not_sent_to_grounding_repair():
+    text = (
+        "Su questo punto specifico non trovo la norma nel corpus indicizzato: "
+        "ti consiglio di verificare su una banca dati completa. " * 5
+    )
+    assert not ChatService._is_substantive_without_citations(text, 0)
