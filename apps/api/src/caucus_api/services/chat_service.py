@@ -544,6 +544,7 @@ class ChatService:
         r"|la\s+(?:Corte\s+di\s+)?Cassazione\s+ha\s+\w+"
         r"|le\s+Sezioni\s+Unite\s+hanno\s+\w+"
         r"|la\s+Suprema\s+Corte\s+ha\s+\w+"
+        r"|la\s+giurisprudenza\s+ha\s+\w+"
         r"|(?:la\s+)?giurisprudenza\s+(?:costante|consolidata|prevalente|unanime|pacifica|"
         r"di\s+legittimità)\s+" + _CASE_LAW_ASSERTIVE_VERBS +
         r"|l'orientamento\s+(?:consolidato|prevalente|maggioritario|dominante)\s+"

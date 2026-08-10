@@ -206,7 +206,42 @@ di API OpenAI: misurare con criterio, non a raffica.
    self-hosted BGE-M3 (azzera costi/dipendenza US, il codice c'è già),
    structured output per le citazioni, conversazioni server-side + audit log.
 
-## 7. File da leggere per primi
+## 7. Produzione (stato al 2026-08-10)
+
+Deploy reale: frontend su Vercel (progetto `caucus`, dominio
+**caucus.gral.tech**), API su Cloud Run (`caucus-api`, progetto GCP
+`caucus-prod-gral`, europe-west1), Cloud SQL Postgres (`caucus-pg`, IP
+privato), Qdrant su VM dedicata (IP pubblico, API key). Il terraform in
+`infra/` è una bozza NON allineata (il deploy è stato fatto a mano con
+gcloud); `infra/cloudbuild-api.yaml` è untracked di proposito.
+
+**Lezione della prima sessione utente reale (2026-08-10, un avvocato)**: la
+config di prod NON era quella misurata dal benchmark, e nessuno se n'era
+accorto perché i default sono silenziosi:
+
+- `RERANKER_BACKEND` non impostato → `auto` → **keyword reranker** (i numeri
+  del benchmark valgono solo col cross-encoder);
+- `LLM_PRIMARY_MODEL` non impostato → default gpt-4o-mini invece del gpt-4o
+  della config di riferimento;
+- corpus cassazione in prod = solo 2025+ (l'harvest standard pagina dal più
+  recente): mancava perfino Cass. SS.UU. n. 41570/2023, e il sistema ha
+  attribuito alla Cassazione l'orientamento OPPOSTO, senza citazioni;
+- i follow-up sopra i 25 caratteri perdevano il contesto conversazionale
+  nel retrieval (fix: ora l'ultimo turno utente entra sempre).
+
+Fix introdotti: guardrail sulle attribuzioni giurisprudenziali infondate
+(`_ungrounded_case_law_claims` + riparazione LLM), copertura temporale
+dichiarata nel prompt (`case_law_min_year`, da aggiornare a valle
+dell'harvest), pesi del reranker nell'immagine Docker, harvest per anno
+(`scripts/harvest_cassazione_anni.sh`, disponibilità SentenzeWeb: penale
+2022+, civile 2021+, 2020 fuori retention).
+
+**Regola operativa**: dopo ogni deploy verificare nei log di Cloud Run
+`cross_encoder_rerank.done` (non `keyword_rerank.done`) e il modello LiteLLM
+atteso; ogni env var di qualità va impostata ESPLICITAMENTE su Cloud Run,
+mai affidata ai default.
+
+## 8. File da leggere per primi
 
 - `docs/AUDIT_SOTA_2026-07-31.md`: il gap analysis iniziale (competitor,
   SOTA, tecniche). Storico ma utile per il perché delle scelte.

@@ -133,3 +133,10 @@ def test_retrieval_query_skips_duplicate_context():
     history = [ChatMessage(role="user", content="Quanto dura la prescrizione?")]
     req = _request("Quanto dura la prescrizione?", history)
     assert ChatService._build_retrieval_query(req) == "Quanto dura la prescrizione?"
+
+
+def test_generic_giurisprudenza_attribution_is_flagged():
+    # Osservato in prod post-fix: «la giurisprudenza ha spesso interpretato…»
+    # senza citazioni è comunque un'attribuzione da fondare o dichiarare.
+    text = "La giurisprudenza ha spesso interpretato il profitto in senso ampio."
+    assert ChatService._ungrounded_case_law_claims(text, [])
