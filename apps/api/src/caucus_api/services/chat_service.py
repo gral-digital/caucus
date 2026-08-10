@@ -583,10 +583,11 @@ class ChatService:
         r"|la\s+Suprema\s+Corte\s+ha\s+\w+"
         r"|la\s+giurisprudenza\s+ha\s+\w+"
         r"|(?:la\s+)?giurisprudenza\s+(?:costante|consolidata|prevalente|unanime|pacifica|"
-        r"di\s+legittimità)\s+" + _CASE_LAW_ASSERTIVE_VERBS +
-        r"|l'orientamento\s+(?:consolidato|prevalente|maggioritario|dominante)\s+"
-        + _CASE_LAW_ASSERTIVE_VERBS +
-        r"|(?:è|risulta)\s+pacifico\s+in\s+giurisprudenza)",
+        r"di\s+legittimità)\s+"
+        + _CASE_LAW_ASSERTIVE_VERBS
+        + r"|l'orientamento\s+(?:consolidato|prevalente|maggioritario|dominante)\s+"
+        + _CASE_LAW_ASSERTIVE_VERBS
+        + r"|(?:è|risulta)\s+pacifico\s+in\s+giurisprudenza)",
         re.IGNORECASE,
     )
 
@@ -796,9 +797,7 @@ class ChatService:
             display = str(h.metadata.get("display") or "")
             for dm in cls._CASE_LAW_EXTREME_PATTERN.finditer(display):
                 context_extremes.add((dm.group(1), dm.group(2)))
-        cited = {
-            (m.group(1), m.group(2)) for m in cls._CASE_LAW_EXTREME_PATTERN.finditer(text)
-        }
+        cited = {(m.group(1), m.group(2)) for m in cls._CASE_LAW_EXTREME_PATTERN.finditer(text)}
         if cited & context_extremes:
             return []
         return claims[:5]
