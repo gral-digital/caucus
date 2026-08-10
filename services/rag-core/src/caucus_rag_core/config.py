@@ -105,6 +105,10 @@ class Settings(BaseSettings):
     # Frazione del budget candidati assegnata alla giurisprudenza (il resto
     # va alla normativa, fonte primaria). 0.25 = 1 sentenza ogni 4 norme.
     case_law_candidate_ratio: float = 0.25
+    # Primo anno coperto dal corpus giurisprudenziale indicizzato: entra nel
+    # prompt (copertura dichiarata) e nei messaggi del guardrail. Da
+    # aggiornare quando l'harvest recupera gli anni precedenti.
+    case_law_min_year: int = 2025
     # auto | keyword | cohere | local | noop
     reranker_backend: str = "auto"
     cohere_api_key: str | None = None

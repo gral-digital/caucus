@@ -345,6 +345,17 @@ def cmd_ingest_cassazione(
     max_docs: Annotated[int, typer.Option("--max", help="Numero massimo di sentenze")] = 500,
     start: Annotated[int, typer.Option("--start", help="Offset di partenza (paginazione)")] = 0,
     rows: Annotated[int, typer.Option("--rows", help="Sentenze per pagina")] = 50,
+    anno: Annotated[
+        int | None,
+        typer.Option(
+            "--anno",
+            help=(
+                "Limita l'harvest a un anno di decisione. Senza filtro la "
+                "paginazione parte dal più recente: il corpus resta schiacciato "
+                "sugli ultimi anni (misurato in prod: copertura solo 2025+)."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """Harvest incrementale da SentenzeWeb → Postgres + Qdrant (collection cassazione).
 
@@ -352,10 +363,12 @@ def cmd_ingest_cassazione(
     """
     if kind not in ("snciv", "snpen"):
         raise typer.BadParameter("kind deve essere snciv o snpen")
-    asyncio.run(_run_ingest_cassazione(kind, max_docs, start, rows))
+    asyncio.run(_run_ingest_cassazione(kind, max_docs, start, rows, anno))
 
 
-async def _run_ingest_cassazione(kind: str, max_docs: int, start: int, rows: int) -> None:
+async def _run_ingest_cassazione(
+    kind: str, max_docs: int, start: int, rows: int, anno: int | None = None
+) -> None:
     from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
     from caucus_ingestion.cassazione_loader import CassazioneLoader
@@ -385,8 +398,11 @@ async def _run_ingest_cassazione(kind: str, max_docs: int, start: int, rows: int
             vectorstore=vectorstore,
             collection=settings.qdrant_collection_cassazione,
         )
+        query_extra = f'anno:"{anno}"' if anno is not None else None
         while loaded < max_docs:
-            num_found, docs, received = await fetcher.search(kind=kind, start=offset, rows=rows)
+            num_found, docs, received = await fetcher.search(
+                kind=kind, start=offset, rows=rows, query_extra=query_extra
+            )
             if received == 0:
                 break
             n = await loader.load_batch(docs[: max_docs - loaded])

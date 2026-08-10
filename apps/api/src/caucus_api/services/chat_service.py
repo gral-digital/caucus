@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from caucus_api.db.models import NormPartition, NormSource
 from caucus_api.deps import get_llm_router
 from caucus_api.services.search_service import SearchService
+from caucus_rag_core.config import get_settings
 from caucus_rag_core.llm.router import LLMMessage, LLMRouter
 from caucus_rag_core.schemas.retrieval import CorpusFilter, RetrievalHit, RetrievalQuery
 
@@ -192,6 +193,7 @@ class ChatService:
         )
 
         # 2. Prompt assembly con storico conversazione
+        case_law_min_year = get_settings().case_law_min_year
         system_content = SYSTEM_PROMPT + (
             "\n\n# Contesto operativo (fatti, non negoziabili)\n"
             f"- Data odierna: {date.today().isoformat()}.\n"
@@ -199,15 +201,26 @@ class ChatService:
             "(codici, testi unici, leggi fondamentali e di compliance), 14 atti UE in "
             "italiano (GDPR, AI Act, NIS2, DORA, MiCA, eIDAS, DSA, DMA, direttive "
             "consumatori/whistleblowing/AML/PSD2/ePrivacy/MiFID II — testo base, non "
-            "consolidato), una selezione di sentenze recenti della Cassazione "
-            "(testo integrale anonimizzato) e provvedimenti della giustizia "
+            f"consolidato), sentenze della Cassazione SOLO dal {case_law_min_year} "
+            "in poi (testo integrale anonimizzato) e provvedimenti della giustizia "
             "amministrativa (Consiglio di Stato e TAR, in crescita — si citano in "
             "prosa con gli estremi, come la Cassazione). NON contiene: prassi amministrativa "
             "(circolari, interpelli), CCNL, normativa regionale, né la giurisprudenza "
-            "integrale storica: se la risposta dipende da queste, dillo.\n"
+            f"precedente il {case_law_min_year} (comprese le Sezioni Unite storiche): "
+            "se la risposta dipende da queste, dillo.\n"
             "- Le sentenze di Cassazione nel CONTESTO si citano IN PROSA con gli "
             "estremi forniti (es. «Cass. pen., Sez. 3, n. 27992/2026»), mai con tag "
             "<cite/>. Non citare MAI estremi di sentenze che non sono nel CONTESTO.\n"
+            "- MAI attribuire posizioni alla Cassazione o alla «giurisprudenza» se il "
+            "CONTESTO non contiene sentenze che le fondano. Quando l'orientamento "
+            "consolidato (spesso ante corpus) sarebbe decisivo, dichiara il limite: "
+            f"«La giurisprudenza che ho indicizzata parte dal {case_law_min_year}: "
+            "sull'orientamento consolidato serve una verifica su banca dati completa» "
+            "e inquadra la questione sulla norma con i tag <cite/>.\n"
+            "- Distingui ciò che il TESTO delle norme nel CONTESTO fonda da ciò che è "
+            "elaborazione giurisprudenziale (es. la portata di «profitto», «ingiusto», "
+            "«apprezzabile»): sul secondo, senza sentenze nel CONTESTO, non presentare "
+            "MAI una conclusione come certa, nemmeno senza nominare la Cassazione.\n"
             "- Sei un assistente AI: non sei un avvocato iscritto all'albo, questa "
             "conversazione non è un parere legale e non instaura un rapporto "
             "professionale. Non dichiararlo a ogni risposta, ma se il cliente mostra "
@@ -316,6 +329,70 @@ class ChatService:
                             revalidation = await self._validate_citations(candidate, result.hits)
                             if len(revalidation["invalid"]) < len(validation["invalid"]):
                                 raw, validation = candidate, revalidation
+                    # Guardrail giurisprudenza: attribuzioni alla Cassazione
+                    # senza sentenze del CONTESTO a supporto → una passata di
+                    # riparazione che riformula o dichiara il gap di copertura.
+                    ungrounded_claims = self._ungrounded_case_law_claims(raw, result.hits)
+                    if ungrounded_claims:
+                        yield ChatEvent(
+                            name="status",
+                            data={
+                                "stage": "riparazione",
+                                "detail": (
+                                    "Affermazioni giurisprudenziali senza sentenze a "
+                                    "supporto nel corpus: riformulo la risposta"
+                                ),
+                            },
+                        )
+                        reframed = await self._repair_ungrounded_case_law(
+                            raw, ungrounded_claims, system_content
+                        )
+                        if reframed is not None:
+                            candidate = self._promote_freeform_citations(reframed, result.hits)
+                            if not self._ungrounded_case_law_claims(candidate, result.hits):
+                                revalidation = await self._validate_citations(
+                                    candidate, result.hits
+                                )
+                                if not revalidation["invalid"]:
+                                    raw, validation = candidate, revalidation
+                                    ungrounded_claims = []
+                    if ungrounded_claims:
+                        # Riparazione fallita o insufficiente: il warning arriva
+                        # comunque alla UI insieme a quelli sulle citazioni.
+                        validation["case_law_ungrounded"] = ungrounded_claims
+                    # Terzo strato: risposta di merito con CONTESTO disponibile
+                    # ma ZERO citazioni (né tag né estremi di sentenze): il
+                    # modello sta rispondendo dalla conoscenza parametrica.
+                    if (
+                        result.hits
+                        and not ungrounded_claims
+                        and self._is_substantive_without_citations(raw, validation["total"])
+                    ):
+                        yield ChatEvent(
+                            name="status",
+                            data={
+                                "stage": "riparazione",
+                                "detail": (
+                                    "Risposta senza citazioni: la fondo sulle norme "
+                                    "del corpus o dichiaro l'incertezza"
+                                ),
+                            },
+                        )
+                        grounded = await self._repair_missing_grounding(raw, system_content)
+                        if grounded is not None:
+                            candidate = self._promote_freeform_citations(grounded, result.hits)
+                            revalidation = await self._validate_citations(candidate, result.hits)
+                            if (
+                                not revalidation["invalid"]
+                                and not self._ungrounded_case_law_claims(candidate, result.hits)
+                                and (
+                                    revalidation["total"] > 0
+                                    or not self._is_substantive_without_citations(
+                                        candidate, revalidation["total"]
+                                    )
+                                )
+                            ):
+                                raw, validation = candidate, revalidation
                     # Warning anche su grounding debole (articolo esistente ma
                     # NON nel contesto fornito: l'allucinazione più insidiosa)
                     # e su citazioni di articoli abrogati, non solo su invalid.
@@ -323,7 +400,7 @@ class ChatService:
                         c.get("grounding") == "weak" or c.get("abrogato")
                         for c in validation["valid"]
                     )
-                    if validation["invalid"] or has_soft_warnings:
+                    if validation["invalid"] or has_soft_warnings or ungrounded_claims:
                         yield ChatEvent(name="citation_warnings", data=validation)
                     # final_text = testo con le citazioni in prosa promosse a
                     # tag <cite/>: la UI può sostituire il testo streamato per
@@ -354,21 +431,26 @@ class ChatService:
     def _build_retrieval_query(request) -> str:  # type: ignore[no-untyped-def]
         """Compone il testo per la query di retrieval.
 
-        Strategia: se il turno corrente è breve ("sì", "certo", "spiega"),
-        lo arricchisce con l'ultimo turno utente per non perdere contesto.
-        Altrimenti usa solo il turno corrente.
+        L'ultimo turno utente dello storico entra SEMPRE come contesto: un
+        follow-up autosufficiente in apparenza («quindi deve essere per forza
+        economico?») senza il turno precedente manda il retrieval su un
+        dominio sbagliato. Il contesto è troncato per non diluire
+        l'espansione, e il turno corrente resta in coda: è la posizione che
+        l'espansione pesa di più.
         """
         q = str(request.question).strip()
-        if len(q) >= 25 or not request.history:
+        if not request.history:
             return q
-        # Cerca l'ultimo turno user nello storico
         last_user = next(
             (m.content for m in reversed(request.history) if m.role == "user"),
             None,
         )
-        if last_user:
-            return f"{last_user}\n\n{q}"
-        return q
+        if not last_user:
+            return q
+        context = re.sub(r"\s+", " ", str(last_user)).strip()[:400]
+        if not context or context == q:
+            return q
+        return f"{context}\n\n{q}"
 
     @staticmethod
     def _hit_summary(hit: RetrievalHit) -> dict[str, Any]:
@@ -472,6 +554,40 @@ class ChatService:
 
     _CITE_PATTERN = re.compile(
         r'<cite\s+source="([a-z0-9-]+)"\s+part="[a-z]+"\s+num="([^"]+)"(?:\s+comma="[^"]+")?\s*/>',
+        re.IGNORECASE,
+    )
+
+    # Estremi di provvedimenti giurisprudenziali («n. 41570/2023», «n. 41570
+    # del 2023») sia nel testo della risposta sia nei display dei chunk.
+    _CASE_LAW_EXTREME_PATTERN = re.compile(r"n\.\s*(\d+)\s*(?:/|\s+del\s+)(\d{4})", re.IGNORECASE)
+
+    # Attribuzioni di una posizione alla giurisprudenza. Volutamente in forma
+    # verbo-attributiva («la Cassazione ha chiarito»): le ammissioni oneste
+    # («non trovo sentenze della Cassazione nel corpus») NON devono matchare.
+    # I sintagmi nominali («giurisprudenza costante», «orientamento
+    # consolidato») matchano solo seguiti da un verbo assertivo: nudi
+    # compaiono anche nelle ammissioni oneste che il guardrail stesso
+    # suggerisce («sull'orientamento consolidato serve una verifica…») e
+    # flaggarle manderebbe in loop la riparazione.
+    _CASE_LAW_ASSERTIVE_VERBS = (
+        r"(?:ritiene|afferma|richiede|esclude|ammette|considera|impone|"
+        r"riconosce|qualifica|è\s+nel\s+senso|ha\s+\w+)"
+    )
+    _CASE_LAW_CLAIM_PATTERN = re.compile(
+        r"(?:secondo\s+(?:la\s+|l')(?:costante\s+|consolidata\s+|prevalente\s+|pacifica\s+)?"
+        r"giurisprudenza|secondo\s+la\s+(?:Corte\s+di\s+)?Cassazione"
+        r"|secondo\s+le\s+Sezioni\s+Unite"
+        r"|secondo\s+l'orientamento\s+\w+"
+        r"|la\s+(?:Corte\s+di\s+)?Cassazione\s+ha\s+\w+"
+        r"|le\s+Sezioni\s+Unite\s+hanno\s+\w+"
+        r"|la\s+Suprema\s+Corte\s+ha\s+\w+"
+        r"|la\s+giurisprudenza\s+ha\s+\w+"
+        r"|(?:la\s+)?giurisprudenza\s+(?:costante|consolidata|prevalente|unanime|pacifica|"
+        r"di\s+legittimità)\s+"
+        + _CASE_LAW_ASSERTIVE_VERBS
+        + r"|l'orientamento\s+(?:consolidato|prevalente|maggioritario|dominante)\s+"
+        + _CASE_LAW_ASSERTIVE_VERBS
+        + r"|(?:è|risulta)\s+pacifico\s+in\s+giurisprudenza)",
         re.IGNORECASE,
     )
 
@@ -650,6 +766,159 @@ class ChatService:
         if not text:
             return None
         logger.info("citation_repair_done", invalid_refs=refs)
+        return text
+
+    @classmethod
+    def _ungrounded_case_law_claims(cls, text: str, hits: list[RetrievalHit]) -> list[str]:
+        """Attribuzioni alla giurisprudenza senza sentenze del CONTESTO a supporto.
+
+        È l'allucinazione peggiore osservata in prod: «la Cassazione ha
+        chiarito che…» con zero citazioni, su una questione decisa in senso
+        OPPOSTO dalle Sezioni Unite (assenti dal corpus). Il validator delle
+        citazioni non la vede perché non c'è nessuna citazione da validare.
+
+        Ritorna gli snippet incriminati; lista vuota se almeno un estremo di
+        sentenza citato nel testo corrisponde a un hit del contesto (il
+        modello sta lavorando sulle sentenze fornite, va bene così).
+        """
+        claims: list[str] = []
+        for m in cls._CASE_LAW_CLAIM_PATTERN.finditer(text):
+            snippet = m.group(0).strip()
+            if snippet not in claims:
+                claims.append(snippet)
+        if not claims:
+            return []
+        context_extremes: set[tuple[str, str]] = set()
+        for h in hits:
+            numero = h.metadata.get("numero")
+            anno = h.metadata.get("anno")
+            if numero and anno:
+                context_extremes.add((str(numero), str(anno)))
+            display = str(h.metadata.get("display") or "")
+            for dm in cls._CASE_LAW_EXTREME_PATTERN.finditer(display):
+                context_extremes.add((dm.group(1), dm.group(2)))
+        cited = {(m.group(1), m.group(2)) for m in cls._CASE_LAW_EXTREME_PATTERN.finditer(text)}
+        if cited & context_extremes:
+            return []
+        return claims[:5]
+
+    # Marcatori delle risposte che dichiarano onestamente un limite o un
+    # buco: non vanno mai mandate in riparazione grounding.
+    _HONESTY_MARKERS = ("corpus", "indicizzat", "non trovo", "banca dati")
+
+    @classmethod
+    def _is_substantive_without_citations(cls, text: str, total_citations: int) -> bool:
+        """Risposta di merito senza NESSUNA citazione: da fondare o ammettere.
+
+        Osservato in prod: il modello può affermare una tesi giuridica errata
+        come fatto proprio, senza attribuirla («il profitto deve essere
+        economicamente apprezzabile») e senza citare nulla: così scavalca sia
+        il validator (niente da validare) sia il guardrail sulle attribuzioni.
+        Una risposta di merito con il CONTESTO a disposizione e zero citazioni
+        è di per sé un red flag.
+
+        Esclusioni: risposte brevi (saluti, chiacchiere), domande di
+        chiarimento, ammissioni oneste di copertura.
+        """
+        if total_citations > 0:
+            return False
+        stripped = text.strip()
+        if len(stripped) < 300:
+            return False
+        if stripped.endswith("?"):
+            return False
+        low = stripped.lower()
+        if any(m in low for m in cls._HONESTY_MARKERS):
+            return False
+        return not cls._CASE_LAW_EXTREME_PATTERN.search(stripped)
+
+    async def _repair_missing_grounding(self, draft: str, system_content: str) -> str | None:
+        """Una passata di riparazione sulle risposte di merito senza citazioni."""
+        min_year = get_settings().case_law_min_year
+        try:
+            repaired = await asyncio.wait_for(
+                self._llm.chat(
+                    [
+                        LLMMessage(role="system", content=system_content),
+                        LLMMessage(role="assistant", content=draft),
+                        LLMMessage(
+                            role="user",
+                            content=(
+                                "REVISIONE GROUNDING (messaggio di sistema, non del "
+                                "cliente). La tua risposta afferma conclusioni giuridiche "
+                                "senza citare alcuna fonte. Riscrivila fondando ogni "
+                                "affermazione sugli articoli del CONTESTO con i tag "
+                                "<cite/>. Quello che il testo delle norme nel CONTESTO "
+                                "non fonda, NON darlo per certo: riformulalo come punto "
+                                "di elaborazione giurisprudenziale, dicendo che la "
+                                f"giurisprudenza indicizzata parte dal {min_year} e che "
+                                "sull'orientamento serve una verifica su banca dati "
+                                "completa. Non inventare riferimenti. Output: SOLO la "
+                                "risposta riscritta."
+                            ),
+                        ),
+                    ],
+                    max_tokens=1200,
+                    temperature=0.0,
+                ),
+                timeout=20.0,
+            )
+        except Exception as exc:
+            logger.warning("grounding_repair_failed", error=type(exc).__name__)
+            return None
+        text = (repaired or "").strip()
+        if not text:
+            return None
+        logger.info("grounding_repair_done")
+        return text
+
+    async def _repair_ungrounded_case_law(
+        self, draft: str, claims: list[str], system_content: str
+    ) -> str | None:
+        """Una passata di riparazione sulle attribuzioni giurisprudenziali infondate.
+
+        Stessa filosofia di ``_repair_invalid_citations``: best-effort, mai
+        bloccante; errori o timeout → None e si tiene la bozza coi warning.
+        """
+        min_year = get_settings().case_law_min_year
+        elenco = "; ".join(f"«{c}»" for c in claims)
+        try:
+            repaired = await asyncio.wait_for(
+                self._llm.chat(
+                    [
+                        LLMMessage(role="system", content=system_content),
+                        LLMMessage(role="assistant", content=draft),
+                        LLMMessage(
+                            role="user",
+                            content=(
+                                "REVISIONE GIURISPRUDENZA (messaggio di sistema, non del "
+                                "cliente). La tua risposta attribuisce posizioni alla "
+                                "giurisprudenza senza che nel CONTESTO ci sia alcuna "
+                                f"sentenza a supporto: {elenco}. Riscrivi la risposta "
+                                "mantenendo tutto il resto identico, ma: (1) se nel "
+                                "CONTESTO ci sono sentenze pertinenti, fonda le "
+                                "affermazioni su quelle citandone gli estremi; (2) "
+                                "altrimenti rimuovi ogni attribuzione alla Cassazione o "
+                                "alla giurisprudenza, inquadra la questione sulla norma "
+                                "con i tag <cite/> del CONTESTO e di' apertamente che la "
+                                f"giurisprudenza indicizzata parte dal {min_year}, quindi "
+                                "sull'orientamento consolidato serve una verifica su banca "
+                                "dati completa. Output: SOLO la risposta riscritta."
+                            ),
+                        ),
+                    ],
+                    max_tokens=1200,
+                    temperature=0.0,
+                ),
+                timeout=20.0,
+            )
+        except Exception as exc:
+            logger.warning("case_law_repair_failed", error=type(exc).__name__)
+            return None
+        text = (repaired or "").strip()
+        if not text:
+            return None
+        logger.info("case_law_repair_done", claims=len(claims))
         return text
 
     async def _validate_citations(self, text: str, hits: list[RetrievalHit]) -> dict[str, Any]:
