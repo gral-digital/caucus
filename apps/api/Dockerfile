@@ -25,6 +25,12 @@ WORKDIR /app/apps/api
 
 RUN uv sync --frozen --no-dev
 
+# Pesi del reranker cross-encoder nel layer immagine: scaricarli a freddo
+# (~2.3 GB da HuggingFace) a ogni cold start è inaccettabile su Cloud Run.
+# HF_HOME sotto /app così il chown li rende leggibili ad appuser.
+ENV HF_HOME=/app/hf-cache
+RUN uv run python -c "from sentence_transformers import CrossEncoder; CrossEncoder('BAAI/bge-reranker-v2-m3', device='cpu')"
+
 # Mai girare come root in un container esposto.
 RUN useradd --create-home --uid 1001 appuser \
   && chown -R appuser:appuser /app
