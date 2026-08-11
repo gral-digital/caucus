@@ -27,8 +27,10 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         batch_size: int = 64,
     ) -> None:
         import litellm
+        import tiktoken
 
         self._litellm = litellm
+        self._encoding = tiktoken.get_encoding("cl100k_base")
         self._model = model
         self._dense_dim = dense_dim
         self._api_key = api_key
@@ -42,6 +44,13 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
     def dense_dim(self) -> int:
         return self._dense_dim
 
+    def _truncate(self, text: str) -> str:
+        text = text[:24000]
+        tokens = self._encoding.encode(text, disallowed_special=())
+        if len(tokens) <= 8000:
+            return text
+        return self._encoding.decode(tokens[:8000])
+
     async def embed(
         self,
         texts: Sequence[str],
@@ -51,11 +60,14 @@ class OpenAIEmbeddingProvider(EmbeddingProvider):
         del kind
         if not texts:
             return []
-        # Difesa dal limite input del modello (~8k token): tronchiamo a ~24k
-        # caratteri (≈6k token): l'embedding della prima parte rappresenta
-        # adeguatamente l'articolo; il testo integrale resta in DB/payload.
-        # Input vuoti → " " (l'API rifiuta stringhe vuote).
-        texts = [(t[:24000] or " ") for t in texts]
+        # Difesa dal limite input del modello (8192 token). Il taglio a 24k
+        # caratteri copre il caso tipico (~3-4 char/token), ma i testi
+        # degeneri (OCR di tabelle numeriche, ~1.5 char/token) lo sfondano:
+        # il conteggio esatto con tiktoken taglia a 8000 token con margine.
+        # L'embedding della prima parte rappresenta adeguatamente il testo;
+        # l'integrale resta in DB/payload. Input vuoti → " " (l'API rifiuta
+        # stringhe vuote).
+        texts = [(self._truncate(t) or " ") for t in texts]
 
         vectors: list[EmbeddingVector] = []
         for start in range(0, len(texts), self._batch_size):
