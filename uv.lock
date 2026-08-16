@@ -539,6 +539,7 @@ dependencies = [
     { name = "sqlalchemy", extra = ["asyncio"] },
     { name = "structlog" },
     { name = "tenacity" },
+    { name = "tiktoken" },
 ]
 
 [package.optional-dependencies]
@@ -566,6 +567,7 @@ requires-dist = [
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.36" },
     { name = "structlog", specifier = ">=24.4" },
     { name = "tenacity", specifier = ">=9.0" },
+    { name = "tiktoken", specifier = ">=0.8" },
     { name = "torch", marker = "extra == 'embeddings-local'", specifier = ">=2.5" },
     { name = "torch", marker = "extra == 'reranker-local'", specifier = ">=2.5" },
 ]
