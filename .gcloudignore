@@ -1,0 +1,23 @@
+# Contesto di build per Cloud Build: solo il codice necessario all'immagine API.
+.git/
+.venv/
+node_modules/
+**/node_modules/
+dist/
+data/
+reports/
+benchmark/
+docs/
+apps/web/
+apps/word-addin/
+.next/
+**/.next/
+.turbo/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.claude/
+.vercel/
+*.log
+.env
+.env.*

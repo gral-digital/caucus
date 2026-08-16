@@ -72,3 +72,5 @@ reports/
 
 # Config locale dell'assistente di sviluppo
 .claude/
+.vercel
+.playwright-mcp/
