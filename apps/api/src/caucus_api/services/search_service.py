@@ -250,6 +250,23 @@ class SearchService:
             deduped.append(h)
         reranked = deduped
 
+        # Query a primaria normativa: al massimo UNA sentenza nel top-k. È il
+        # comportamento storico (già validato dall'eval) che il vecchio dedup
+        # produceva per accidente collassando tutti i chunk giurisprudenziali
+        # su UUID(0): più slot alla giurisprudenza diluiscono il contesto
+        # normativo e nei gap-case sopprimono l'ammissione di assenza
+        # (misurato su gap-regionale: 3/3 pass -> 1/3).
+        if not (effective_query.corpora and effective_query.corpora[0] == CorpusFilter.CASSAZIONE):
+            kept_hits: list[RetrievalHit] = []
+            case_slot_used = False
+            for h in reranked:
+                if h.metadata.get("case_external_id"):
+                    if case_slot_used:
+                        continue
+                    case_slot_used = True
+                kept_hits.append(h)
+            reranked = kept_hits
+
         # Garanzia giurisprudenziale: con la Cassazione come corpus primario
         # (toggle o intento rilevato), 4 rami del merge su 5 producono solo
         # normativa e il cross-encoder — tarato sul confronto con articoli
