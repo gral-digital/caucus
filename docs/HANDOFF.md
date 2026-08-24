@@ -241,6 +241,46 @@ dell'harvest), pesi del reranker nell'immagine Docker, harvest per anno
 atteso; ogni env var di qualità va impostata ESPLICITAMENTE su Cloud Run,
 mai affidata ai default.
 
+**Aggiornamento corpus in prod (2026-08-24)**: importato il pacchetto
+`corpus-20260816` (release GitHub): Cassazione civile+penale 2023-2026,
+279.563 provvedimenti / 1.474.167 chunk, SS.UU. 41570/2023 inclusa (testo
+dal PDF ufficiale via OCR: su SentenzeWeb è «in fase di oscuramento», come
+il ~12-17% dell'archivio penale; 2021-2022 da completare con un prossimo
+harvest). `CASE_LAW_MIN_YEAR=2023` su Cloud Run. Eval post-crescita del
+corpus (4,5x): nessuna regressione (pass 98,8%, recall@8 98,7%,
+`case_law_candidate_ratio` invariato a 0.25).
+
+Percorso import collaudato (gli script locali assumono Postgres docker
+superuser, Cloud SQL non lo è): `make corpus-export` in locale → pacchetto
+su GCS (`gcloud storage cp`, MAI scp: 20x più lento) → dalla VM Qdrant:
+pg_restore via cloud-sql-proxy (token `gcloud auth print-access-token`,
+FK droppate e ricreate al posto di `--disable-triggers`) e recover Qdrant
+da snapshot LOCALE (`file:///qdrant/storage/...`: l'upload HTTP multipart
+fallisce sopra qualche GB). Attenzione al disco VM (46 GB): tenere una
+sola copia degli snapshot, il bucket è il buffer.
+
+**VM Qdrant (2026-08-24)**: resize e2-medium → e2-standard-4 (16 GB RAM):
+con 1,47M vettori la collection non stava più in page cache e ogni query
+andava in ReadTimeout. Dopo un riavvio la cache va riscaldata (prime query
+lente, poi ~80 ms). Latenza chat in prod sulle domande giurisprudenziali:
+60-90 s per turno, dominata dal cross-encoder su CPU Cloud Run
+(candidati OCR lunghi); margini futuri: reranker più piccolo o GPU.
+
+**Fix follow-up giurisprudenziali (2026-08-24, PR #4 e #5)**: il follow-up
+perdeva la sentenza discussa il turno prima (osservato sulla
+domanda-campione delle SS.UU. 41570/2023). Ora: estremi citati in
+conversazione riagganciati nella query di retrieval, intento
+giurisprudenziale esplicito → Cassazione corpus primario, garanzia di
+almeno 2 sentenze nel top-k con Cassazione primaria, tetto di 1 con
+primaria normativa (il comportamento storico validato dall'eval, prima
+prodotto per accidente da un bug di dedup su partition_id mancante).
+Secondo round (PR #5): la sentenza nel top-k è rappresentata dal chunk
+col principio di diritto quando esiste tra i candidati — un chunk della
+ricostruzione degli orientamenti superati induceva l'attribuzione
+OPPOSTA (la 41570/2023 citata come se dicesse «profitto solo
+patrimoniale»). Test finale end-to-end contro prod superato: follow-up
+con citazione SS.UU. e attribuzione corretta, zero warning guardrail.
+
 ## 8. File da leggere per primi
 
 - `docs/AUDIT_SOTA_2026-07-31.md`: il gap analysis iniziale (competitor,
