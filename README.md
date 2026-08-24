@@ -75,7 +75,7 @@ cp .env.example .env          # poi imposta OPENAI_API_KEY
 make install
 make up                       # Postgres :55432, Qdrant :6333, Redis, Langfuse
 make migrate
-make corpus-import SRC=https://github.com/gral-digital/caucus/releases/download/corpus-20260801
+make corpus-import SRC=https://github.com/gral-digital/caucus/releases/download/corpus-20260816
 make dev                      # API :8000, web :3000
 ```
 
