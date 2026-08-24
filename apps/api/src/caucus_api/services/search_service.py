@@ -233,15 +233,58 @@ class SearchService:
         )
         # Dedup per partizione: lo stesso articolo non deve occupare più slot
         # del top-k con chunk diversi (articolo-full + comma): spreca contesto
-        # e maschera articoli diversi rilevanti.
+        # e maschera articoli diversi rilevanti. I chunk giurisprudenziali non
+        # hanno partition_id nel payload (tutti UUID(0): il dedup ne salvava
+        # UNO in assoluto): per loro la chiave è la sentenza di provenienza.
         seen_partitions: set[object] = set()
         deduped = []
         for h in reranked:
-            if h.partition_id in seen_partitions:
+            key = (
+                h.metadata.get("case_external_id")
+                if h.metadata.get("case_external_id")
+                else h.partition_id
+            )
+            if key in seen_partitions:
                 continue
-            seen_partitions.add(h.partition_id)
+            seen_partitions.add(key)
             deduped.append(h)
         reranked = deduped
+
+        # Garanzia giurisprudenziale: con la Cassazione come corpus primario
+        # (toggle o intento rilevato), 4 rami del merge su 5 producono solo
+        # normativa e il cross-encoder — tarato sul confronto con articoli
+        # brevi e puliti — può espellere ogni sentenza dal top-k (osservato
+        # in prod 2026-08-24 proprio sulla domanda-campione delle SS.UU.
+        # 41570/2023). Rientro deterministico: le migliori sentenze del merge
+        # prendono la coda del top-k, una per pronuncia.
+        if effective_query.corpora and effective_query.corpora[0] == CorpusFilter.CASSAZIONE:
+            min_case_law = 2
+            present = {
+                h.metadata.get("case_external_id")
+                for h in reranked
+                if h.metadata.get("case_external_id")
+            }
+            if len(present) < min_case_law:
+                refill = []
+                for h in merged:
+                    ext = h.metadata.get("case_external_id")
+                    if not ext or ext in present:
+                        continue
+                    present.add(ext)
+                    refill.append(h)
+                    if len(present) >= min_case_law:
+                        break
+                if refill:
+                    drop = len(reranked) + len(refill) - effective_query.top_k_rerank
+                    if drop > 0:
+                        kept: list = []
+                        for h in reversed(reranked):
+                            if drop > 0 and not h.metadata.get("case_external_id"):
+                                drop -= 1
+                                continue
+                            kept.append(h)
+                        reranked = list(reversed(kept))
+                    reranked = reranked + refill
 
         # One-hop expansion sul grafo dei rinvii: gli articoli citati dai top
         # hit entrano nel contesto come materiale ausiliario (in coda).

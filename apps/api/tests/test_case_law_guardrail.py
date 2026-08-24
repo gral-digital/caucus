@@ -135,6 +135,57 @@ def test_retrieval_query_skips_duplicate_context():
     assert ChatService._build_retrieval_query(req) == "Quanto dura la prescrizione?"
 
 
+def test_retrieval_query_reaggancia_sentenze_citate():
+    # Osservato in prod 2026-08-24: il follow-up perdeva la SS.UU. discussa
+    # al turno prima, perché i suoi estremi non entravano nella query e il
+    # braccio Cassazione ripartiva da zero.
+    history = [
+        ChatMessage(role="user", content="Concezione del profitto nel delitto di furto"),
+        ChatMessage(
+            role="assistant",
+            content="Le Sezioni Unite, con la sentenza n. 41570/2023, hanno risolto il contrasto.",
+        ),
+    ]
+    req = _request("Per forza di cose deve essere economicamente apprezzabile?", history)
+    q = ChatService._build_retrieval_query(req)
+    assert "Cass. n. 41570/2023" in q
+    assert q.endswith("Per forza di cose deve essere economicamente apprezzabile?")
+
+
+def test_case_refs_ignora_estremi_normativi():
+    history = [
+        ChatMessage(
+            role="assistant",
+            content="Si applica la legge 7 agosto 1990, n. 241 e il d.lgs. n. 33 del 2013.",
+        ),
+    ]
+    assert ChatService._case_refs_from_history(history) == ""
+
+
+def test_intento_giurisprudenziale_riconosciuto():
+    pat = ChatService._GIURISPRUDENZA_INTENT
+    assert pat.search("Concezione del profitto nel delitto di furto cassazione")
+    assert pat.search("contesto: Cass. n. 41570/2023\n\nquindi?")
+    assert pat.search("qual è l'orientamento delle Sezioni Unite?")
+    assert not pat.search("Quanto dura il preavviso di licenziamento?")
+    assert not pat.search("Requisiti della comunicazione di avvio del procedimento")
+
+
+def test_case_refs_dedup_e_ultimi_tre():
+    history = [
+        ChatMessage(
+            role="assistant",
+            content=(
+                "V. Cass. n. 100/2020; la sentenza n. 200 del 2021; "
+                "Cass. ord. n. 300/2022; le Sezioni Unite n. 400/2023; "
+                "e ancora Cass. n. 100/2020."
+            ),
+        ),
+    ]
+    refs = ChatService._case_refs_from_history(history)
+    assert refs == "Cass. n. 200/2021; Cass. n. 300/2022; Cass. n. 400/2023"
+
+
 def test_generic_giurisprudenza_attribution_is_flagged():
     # Osservato in prod post-fix: «la giurisprudenza ha spesso interpretato…»
     # senza citazioni è comunque un'attribuzione da fondare o dichiarare.

@@ -147,6 +147,12 @@ class ChatService:
             )
             return
         mode = getattr(request, "mode", "ricerca")
+        # Intento giurisprudenziale esplicito nella domanda (o negli estremi
+        # riagganciati dal contesto): equivale al toggle manuale. Senza
+        # priorità, la Cassazione resta braccio secondario con una frazione
+        # dei candidati e la pronuncia chiesta può non riemergere.
+        if mode != "giurisprudenza" and self._GIURISPRUDENZA_INTENT.search(retrieval_query_text):
+            mode = "giurisprudenza"
         corpora = list(request.corpora)
         if mode == "giurisprudenza":
             # L'ordine dei corpora è semantico (il primo è primario nel
@@ -448,9 +454,47 @@ class ChatService:
         if not last_user:
             return q
         context = re.sub(r"\s+", " ", str(last_user)).strip()[:400]
-        if not context or context == q:
-            return q
-        return f"{context}\n\n{q}"
+        anchors = ChatService._case_refs_from_history(request.history)
+        parts = [p for p in (context if context != q else "", anchors, q) if p]
+        return "\n\n".join(parts) if len(parts) > 1 else q
+
+    # Marcatori di intento giurisprudenziale nella query di retrieval.
+    _GIURISPRUDENZA_INTENT = re.compile(
+        r"cassazione|giurisprudenz\w*|sentenz\w*|ordinanz\w*|sezioni\s+unite"
+        r"|ss\.?\s?uu\.?|orientament\w*|massim\w*|pronunc\w*|\bcass\.\s*n\.",
+        re.IGNORECASE,
+    )
+
+    # Estremi di sentenze citate nei turni assistant: «Cass. … n. 41570/2023»,
+    # «sentenza n. 12345 del 2024». Il quantificatore chiede un marcatore
+    # giurisprudenziale nelle vicinanze per non catturare estremi normativi
+    # («legge 7 agosto 1990, n. 241»).
+    _CASE_REF = re.compile(
+        r"(?:cass\w*|sez\w*|sentenz\w*|ordinanz\w*|pronunc\w*)[^;\n]{0,60}?"
+        r"n\.\s*(\d{1,6})\s*(?:/|\s+del\s+)\s*((?:19|20)\d{2})",
+        re.IGNORECASE,
+    )
+
+    @staticmethod
+    def _case_refs_from_history(history) -> str:  # type: ignore[no-untyped-def]
+        """Riferimenti giurisprudenziali già citati in conversazione.
+
+        Un follow-up («quindi va sempre risarcito?») di rado contiene gli
+        estremi della sentenza discussa: senza riaggancio, il braccio
+        Cassazione del retrieval riparte da zero su un corpus da milioni di
+        chunk e la pronuncia al centro della conversazione può non riemergere.
+        Gli estremi citati nei turni assistant rientrano quindi nella query:
+        la ricerca ibrida li aggancia per numero.
+        """
+        refs: list[str] = []
+        for m in history or []:
+            if m.role != "assistant":
+                continue
+            for numero, anno in ChatService._CASE_REF.findall(str(m.content)):
+                ref = f"Cass. n. {numero}/{anno}"
+                if ref not in refs:
+                    refs.append(ref)
+        return "; ".join(refs[-3:])
 
     @staticmethod
     def _hit_summary(hit: RetrievalHit) -> dict[str, Any]:
