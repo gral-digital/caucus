@@ -229,7 +229,7 @@ def test_honest_admission_is_not_sent_to_grounding_repair():
 # ----------------------- chunk col principio di diritto -----------------------
 
 
-def _hit(chunk_id: int, text: str, case: str | None = None) -> "RetrievalHit":
+def _hit(chunk_id: int, text: str, case: str | None = None):
     from uuid import UUID
 
     from caucus_rag_core.schemas.retrieval import RetrievalHit
