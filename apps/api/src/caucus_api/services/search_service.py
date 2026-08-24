@@ -294,7 +294,7 @@ class SearchService:
                 if refill:
                     drop = len(reranked) + len(refill) - effective_query.top_k_rerank
                     if drop > 0:
-                        kept: list = []
+                        kept: list[RetrievalHit] = []
                         for h in reversed(reranked):
                             if drop > 0 and not h.metadata.get("case_external_id"):
                                 drop -= 1
