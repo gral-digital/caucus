@@ -224,3 +224,43 @@ def test_honest_admission_is_not_sent_to_grounding_repair():
         "ti consiglio di verificare su una banca dati completa. " * 5
     )
     assert not ChatService._is_substantive_without_citations(text, 0)
+
+
+# ----------------------- chunk col principio di diritto -----------------------
+
+
+def _hit(chunk_id: int, text: str, case: str | None = None):
+    from uuid import UUID
+
+    from caucus_rag_core.schemas.retrieval import RetrievalHit
+
+    return RetrievalHit(
+        chunk_id=UUID(int=chunk_id),
+        partition_id=UUID(int=0),
+        text=text,
+        score_final=0.5,
+        metadata={"case_external_id": case} if case else {},
+    )
+
+
+def test_prefer_principle_chunk_sostituisce_il_rappresentante():
+    from caucus_api.services.search_service import SearchService
+
+    ricostruzione = _hit(1, "un orientamento riteneva il profitto patrimoniale", "snpen2023U41570S")
+    principio = _hit(
+        2, "deve essere enunciato il seguente Principio di diritto: ...", "snpen2023U41570S"
+    )
+    norma = _hit(3, "articolo 624")
+    out = SearchService._prefer_principle_chunks(
+        [ricostruzione, norma], [ricostruzione, principio, norma]
+    )
+    assert out[0].chunk_id == principio.chunk_id
+    assert out[1].chunk_id == norma.chunk_id
+
+
+def test_prefer_principle_chunk_senza_principio_non_tocca_nulla():
+    from caucus_api.services.search_service import SearchService
+
+    a = _hit(1, "testo qualunque", "snpen2024X1S")
+    b = _hit(2, "articolo 624")
+    assert SearchService._prefer_principle_chunks([a, b], [a, b]) == [a, b]
