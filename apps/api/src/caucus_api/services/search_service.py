@@ -98,6 +98,38 @@ class SearchService:
             fts=FtsRetriever(session),
         )
 
+    @staticmethod
+    def _prefer_principle_chunks(
+        reranked: list[RetrievalHit], merged: list[RetrievalHit]
+    ) -> list[RetrievalHit]:
+        """Per ogni sentenza nel top-k, il chunk col principio di diritto.
+
+        Una pronuncia (specie le Sezioni Unite) ricostruisce prima gli
+        orientamenti che poi supera: se a rappresentarla nel contesto finisce
+        un chunk della ricostruzione, il modello può attribuirle la tesi
+        OPPOSTA a quella accolta (osservato in prod 2026-08-24 sulla
+        41570/2023). Se tra i candidati del merge c'è il chunk che enuncia il
+        principio di diritto, è quello a rappresentare la sentenza.
+        """
+        principle_by_case: dict[str, RetrievalHit] = {}
+        for h in merged:
+            ext = h.metadata.get("case_external_id")
+            if (
+                ext
+                and ext not in principle_by_case
+                and "principio di diritto" in (h.text or "").lower()
+            ):
+                principle_by_case[ext] = h
+        out: list[RetrievalHit] = []
+        for h in reranked:
+            ext = h.metadata.get("case_external_id")
+            swap = principle_by_case.get(ext) if ext else None
+            if swap is not None and swap.chunk_id != h.chunk_id:
+                out.append(swap.model_copy(update={"score_final": h.score_final}))
+            else:
+                out.append(h)
+        return out
+
     async def search(self, query: RetrievalQuery) -> RetrievalResult:
         t0 = perf_counter()
         routed = route_query(query.text, base_sources=query.sources)
@@ -302,6 +334,8 @@ class SearchService:
                             kept.append(h)
                         reranked = list(reversed(kept))
                     reranked = reranked + refill
+
+        reranked = self._prefer_principle_chunks(reranked, merged)
 
         # One-hop expansion sul grafo dei rinvii: gli articoli citati dai top
         # hit entrano nel contesto come materiale ausiliario (in coda).
